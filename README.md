@@ -37,19 +37,14 @@ $ pip install fintoc
 
 ## Quickstart
 
-1. Get your API key using the [Fintoc dashboard](https://app.fintoc.com/login).
+1. Get your API key and link your bank account using the [Fintoc dashboard](https://app.fintoc.com/login).
 2. Open your command-line interface.
 3. Write a few lines of Python to see your bank movements.
 
 ```python
 >>> from fintoc import Client
->>> client = Client("your_dashboard_key")
->>> link = client.create_link(
-   username="guido",
-   password="vanr0ssum",
-   holder_type="individual",
-   institution_id="nl_monty_python_bank",
-)
+>>> client = Client("your_api_key")
+>>> link = client.get_link("your_link_token")
 >>> account = link.find(type_="checking_account")
 >>> account.update_movements()
 >>> account.show_movements(10)
