@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "fintoc"
+version = "0.1.0"
+description = "The official Python client for the Fintoc API."
+authors = ["Nebil Kawas <nebil@uc.cl>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+homepage = "https://fintoc.com/"
+repository = "https://github.com/fintoc-com/fintoc-python"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+httpx = "^0.12.1"
+tabulate = "^0.8.7"
+python-dateutil = "^2.8.1"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.2"
+black = {version = "*", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
