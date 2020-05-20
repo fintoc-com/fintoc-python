@@ -4,6 +4,7 @@ venv
 *.egg
 *.egg-info
 __pycache__
+dist/
 
 # Mac OS
 .DS_Store
