@@ -22,7 +22,7 @@ BASE_URL = "api.fintoc.com/v1/"
 class Client:
     def __init__(self, api_key):
         self.api_key = api_key
-        self.user_agent = "fintoc-python/{__version__}"
+        self.user_agent = f"fintoc-python/{__version__}"
 
         self.headers = {"Authorization": self.api_key, "User-Agent": self.user_agent}
         self._client = httpx.Client(base_url=SCHEME + BASE_URL, headers=self.headers)
