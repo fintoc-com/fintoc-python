@@ -200,7 +200,7 @@ class Movement(ResourceMixin):
         self.currency = currency
         self.description = description
         self.post_date = isoparse(post_date)
-        self.transaction_date = isoparse(transaction_date)
+        self.transaction_date = transaction_date and isoparse(transaction_date)
 
     @property
     def locale_date(self):
