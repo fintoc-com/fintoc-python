@@ -91,7 +91,7 @@ account = link.find(id_="sdfsdf234")
 You can also search for multiple accounts matching a specific criteria with **find_all**:
 
 ```python
-account = link.find(currency="clp")
+clp_accounts = link.find_all(currency="clp")
 ```
 
 ### Get movements
