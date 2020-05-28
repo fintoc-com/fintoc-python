@@ -53,8 +53,7 @@ $ pip install fintoc
 >>> client = Client("your_api_key")
 >>> link = client.get_link("your_link_token")
 >>> account = link.find(type_="checking_account")
->>> account.update_movements()
->>> account.show_movements(10)
+>>> account.get_movements(since='2020-01-01')
 ```
 
 And that’s it!
@@ -94,20 +93,28 @@ You can also search for multiple accounts matching a specific criteria with **fi
 clp_accounts = link.find_all(currency="CLP")
 ```
 
+To update the account balance you can use **update_balance**:
+
+```python
+account.update_balance()
+print(account.balance.available)
+```
+
 ### Get movements
 
 ```python
-from datetime import date, timedelta
-
-from fintoc import Client
-
-client = Client("your_api_key")
 link = client.get_link("your_link_token")
 account = link.find(type_="checking_account")
 
+# You can get the account movements since a specific datetime
 yesterday = date.today() - timedelta(days=1)
 movements = account.get_movements(since=yesterday)
+
+# Or... you can use an ISO 8601 formatted string representation of the datetime
+movements = account.get_movements(since='2020-01-01')
 ```
+
+Calling **get_movements** without arguments gets the last 30 movements of the account.
 
 ## Dependencies
 
