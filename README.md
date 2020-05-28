@@ -103,6 +103,10 @@ print(account.balance.available)
 ### Get movements
 
 ```python
+from datetime import date, timedelta
+from fintoc import Client
+
+client = Client("your_api_key")
 link = client.get_link("your_link_token")
 account = link.find(type_="checking_account")
 
