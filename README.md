@@ -13,11 +13,18 @@ Do yourself a favor: go grab some ice cubes by installing this refreshing librar
 
 ---
 
-## Features
+## Table of contents
 
-- Your bank account at your fingertips using idiomatic Python
-- A minimalist user interface that feels like a [DSL](https://en.wikipedia.org/wiki/Domain-specific_language)
-- Quite a few handpicked emoji
+* [How to install](#how-to-install)
+* [Quickstart](#quickstart)
+* [Documentation](#documentation)
+* [Examples](#examples)
+  + [Get accounts](#get-accounts)
+  + [Get movements](#get-movements)
+* [Dependencies](#dependencies)
+* [How to test...](#how-to-test)
+* [Roadmap](#roadmap)
+* [Acknowledgements](#acknowledgements)
 
 ## How to install
 
@@ -51,6 +58,56 @@ $ pip install fintoc
 ```
 
 And that’s it!
+
+## Documentation
+
+This client supports all Fintoc API endpoints. For complete information about the API, head to the [docs](https://fintoc.com/docs).
+
+## Examples
+
+### Get accounts
+
+```python
+from fintoc import Client
+
+client = Client("your_api_key")
+link = client.get_link("your_link_token")
+
+for account in link:
+    print(account.name)
+
+# Or... you can pretty print all the accounts in a Link
+link.show_accounts()
+```
+
+If you want to find a specific account in a link, you can use **find**. You can search by any account field:
+
+```python
+account = link.find(type_="checking_account")
+account = link.find(number="1111111")
+account = link.find(id_="sdfsdf234")
+```
+
+You can also search for multiple accounts matching a specific criteria with **find_all**:
+
+```python
+account = link.find(currency="clp")
+```
+
+### Get movements
+
+```python
+from datetime import date, timedelta
+
+from fintoc import Client
+
+client = Client("your_api_key")
+link = client.get_link("your_link_token")
+account = link.find(type_="checking_account")
+
+yesterday = date.today() - timedelta(days=1)
+movements = account.get_movements(since=yesterday)
+```
 
 ## Dependencies
 
