@@ -1,5 +1,7 @@
 
 # Fintoc meets :snake:
+![PyPI - Version](https://img.shields.io/pypi/v/fintoc)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/fintoc)
 
 You have just found the [Python](https://www.python.org/)-flavored client of [Fintoc](https://fintoc.com/).
 
