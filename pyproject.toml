@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fintoc"
-version = "0.1.2"
+version = "0.2.0"
 description = "The official Python client for the Fintoc API."
 authors = ["Nebil Kawas <nebil@uc.cl>"]
 license = "BSD-3-Clause"
