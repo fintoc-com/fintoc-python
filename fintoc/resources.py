@@ -5,11 +5,13 @@ resources.py
 All the resources offered by Fintoc.
 """
 
-from functools import reduce
 import json
 from datetime import date, datetime
+from functools import reduce
+
 from dateutil.parser import isoparse
 from tabulate import tabulate
+
 from fintoc.utils import fieldsubs, flatten, pluralize, rename_keys
 
 
@@ -193,7 +195,18 @@ class Account(ResourceMixin):
 
 class Movement(ResourceMixin):
     def __init__(
-        self, id_, amount, currency, description, post_date, transaction_date, **kwargs
+        self,
+        id_,
+        amount,
+        currency,
+        description,
+        post_date,
+        transaction_date,
+        type_,
+        recipient_account,
+        sender_account,
+        comment,
+        **kwargs,
     ):
         self.id_ = id_
         self.amount = amount
@@ -201,6 +214,12 @@ class Movement(ResourceMixin):
         self.description = description
         self.post_date = isoparse(post_date)
         self.transaction_date = transaction_date and isoparse(transaction_date)
+        self.type_ = type_
+        self.recipient_account = recipient_account and TransferAccount(
+            **recipient_account
+        )
+        self.sender_account = sender_account and TransferAccount(**sender_account)
+        self.comment = comment
 
     @property
     def locale_date(self):
@@ -208,6 +227,21 @@ class Movement(ResourceMixin):
 
     def __str__(self):
         return f"{self.amount:n} ({self.description} @ {self.locale_date})"
+
+
+class TransferAccount(ResourceMixin):
+    def __init__(self, holder_id, holder_name, number, institution, **kwargs):
+        self.holder_id = holder_id
+        self.holder_name = holder_name
+        self.number = number
+        self.institution = institution and Institution(**institution)
+
+    @property
+    def id_(self):
+        return id(self)
+
+    def __str__(self):
+        return f"{self.holder_id}"
 
 
 class Balance(ResourceMixin):
