@@ -5,7 +5,7 @@ __init__.py
 Let's initialize this machine.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 import locale
 from fintoc.client import Client
