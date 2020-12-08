@@ -125,6 +125,7 @@ class Account(ResourceMixin):
         holder_name,
         type_,
         currency,
+        refreshed_at,
         balance=None,
         movements=None,
         _client=None,
@@ -138,6 +139,7 @@ class Account(ResourceMixin):
         self.holder_name = holder_name
         self.type_ = type_
         self.currency = currency
+        self.refreshed_at = refreshed_at and isoparse(refreshed_at)
         self.balance = Balance(**balance)
         self.movements = movements or []
         self._client = _client
