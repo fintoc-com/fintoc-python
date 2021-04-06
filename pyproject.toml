@@ -10,7 +10,7 @@ repository = "https://github.com/fintoc-com/fintoc-python"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-httpx = "^0.12.1"
+httpx = "^0.17.1"
 tabulate = "^0.8.7"
 python-dateutil = "^2.8.1"
 
