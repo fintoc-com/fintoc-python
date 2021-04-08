@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 0.3.1 - 2021-04-08
+
+* [#7](https://github.com/fintoc-com/fintoc-python/pull/7) Upgrade httpx dependency
+
 ## 0.3.0 - 2020-12-08
 
 * Add refreshed_at field to account
