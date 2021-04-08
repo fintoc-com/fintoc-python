@@ -9,6 +9,7 @@ from functools import reduce
 from importlib import import_module
 from operator import itemgetter
 import re
+
 import httpx
 
 from fintoc import __version__
