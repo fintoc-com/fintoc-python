@@ -59,6 +59,16 @@ jobs:
       - setup
 
       - run:
+          name: Validate pyproject.toml and __init__.py versions match
+          command: |
+            TOML_VERSION=$(awk -F'[ ="]+' '$1 == "version" {print $2}' pyproject.toml)
+            INIT_VERSION=$(awk -F'[ ="]+' '$1 == "__version__" {print $2}' fintoc/__init__.py)
+            if [ $TOML_VERSION != $INIT_VERSION ]; then
+                echo "Versions of pyproject.toml ($TOML_VERSION) and __init__.py ($INIT_VERSION) do not match"
+                exit 1
+            fi
+
+      - run:
           name: Build package
           command: poetry build
 
