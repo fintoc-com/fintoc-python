@@ -149,7 +149,11 @@ class Account(ResourceMixin):
 
     def _get_movements(self, **params):
         first = self._client.get(f"accounts/{self.id_}/movements", params=params)
-        return first + flatten(self._client.fetch_next()) if params else first
+        return (
+            first + flatten(self._client.fetch_next())
+            if params and "page" not in params
+            else first
+        )
 
     def update_balance(self):
         data = self._get_account().get("balance")
