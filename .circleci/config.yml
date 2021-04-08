@@ -1,0 +1,84 @@
+version: 2.1
+
+commands:
+  build:
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - dependencies-{{ checksum "poetry.lock" }}
+
+      - run:
+          name: Install dependencies
+          command: poetry install
+
+      - save_cache:
+          key: dependencies-{{ checksum "poetry.lock" }}
+          paths:
+            - /home/circleci/.cache/pypoetry/virtualenvs
+
+jobs:
+  lint:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - build
+
+      - run:
+          name: Install reviewdog
+          command: |
+            curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b ./bin
+
+      - run:
+          name: Get files to lint
+          command: |
+            mkdir -p tmp
+            git diff origin/master --name-only --diff-filter=d > tmp/files_to_lint
+
+      - run:
+          name: Run linter
+          shell: /bin/bash
+          command: |
+            cat tmp/files_to_lint | grep -E '.+\.(py)$' \
+            | xargs poetry run pylint -E --msg-template="{path}:{line}:{column}: {msg}" \
+            | ./bin/reviewdog -reporter=github-pr-review -efm="%f:%l:%c: %m"
+  test:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - build
+
+      - run:
+          name: Run tests
+          command: poetry run python -m unittest
+  # deploy:
+  #   docker:
+  #     - image: circleci/node:12
+  #       environment:
+  #         ZAPIER_DEPLOY_KEY: $ZAPIER_DEPLOY_KEY
+  #   steps:
+  #     - setup
+
+  #     - run:
+  #         name: Deploy app
+  #         command: zapier push
+workflows:
+  version: 2
+  lint_and_test:
+    jobs:
+      - test
+      - lint:
+          context: org-global
+
+  # test_and_deploy:
+  #   jobs:
+  #     - test:
+  #         filters: &filters-master
+  #           branches:
+  #             only: master
+  #     - deploy:
+  #         requires:
+  #           - test
+  #         filters:
+  #           <<: *filters-master
