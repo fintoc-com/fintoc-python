@@ -1,7 +1,7 @@
 version: 2.1
 
 commands:
-  build:
+  setup:
     steps:
       - checkout
 
@@ -23,7 +23,7 @@ jobs:
     docker:
       - image: circleci/python:3.6
     steps:
-      - build
+      - setup
 
       - run:
           name: Install reviewdog
@@ -47,22 +47,24 @@ jobs:
     docker:
       - image: circleci/python:3.6
     steps:
-      - build
+      - setup
 
       - run:
           name: Run tests
           command: poetry run python -m unittest
-  # deploy:
-  #   docker:
-  #     - image: circleci/node:12
-  #       environment:
-  #         ZAPIER_DEPLOY_KEY: $ZAPIER_DEPLOY_KEY
-  #   steps:
-  #     - setup
+  publish:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - setup
 
-  #     - run:
-  #         name: Deploy app
-  #         command: zapier push
+      - run:
+          name: Build package
+          command: poetry build
+
+      - run:
+          name: Publish package to pypi
+          command: poetry publish -u $PYPI_USERNAME -p $PYPI_PASSWORD
 workflows:
   version: 2
   lint_and_test:
@@ -71,14 +73,16 @@ workflows:
       - lint:
           context: org-global
 
-  # test_and_deploy:
-  #   jobs:
-  #     - test:
-  #         filters: &filters-master
-  #           branches:
-  #             only: master
-  #     - deploy:
-  #         requires:
-  #           - test
-  #         filters:
-  #           <<: *filters-master
+  build_test_release:
+    jobs:
+      - test:
+          filters: &tagged-release-filter
+            tags:
+              only: /^\d+\.\d+\.\d+((a|b|rc)\d)?$/ # matches 1.2.3, 1.2.3a1, 1.2.3b1, 1.2.3rc1 etc..
+      - publish:
+          requires:
+            - test
+          filters:
+            <<: *tagged-release-filter
+            branches:
+              ignore: /.*/
