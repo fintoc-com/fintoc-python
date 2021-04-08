@@ -86,13 +86,15 @@ workflows:
   build_test_release:
     jobs:
       - test:
+          # Only runs when a commit is tagged with a release version
+          # 1.2.3, 1.2.3a1, 1.2.3b1, 1.2.3rc1 etc..
           filters: &tagged-release-filter
             tags:
-              only: /^\d+\.\d+\.\d+((a|b|rc)\d)?$/ # matches 1.2.3, 1.2.3a1, 1.2.3b1, 1.2.3rc1 etc..
+              only: /^\d+\.\d+\.\d+((a|b|rc)\d)?$/
+            branches:
+              ignore: /.*/
       - publish:
           requires:
             - test
           filters:
             <<: *tagged-release-filter
-            branches:
-              ignore: /.*/
