@@ -1,8 +1,7 @@
 Releasing
 =========
 
-1. Update the new version in  `pyproject.toml` and `fintoc/__init__.py`.
-2. Update the `CHANGELOG.md` for the impending release.
-3. `git commit -am "Release X.Y.Z."` (where X.Y.Z is the new version)
-4. `git tag -a X.Y.Z -m "Version X.Y.Z"` (where X.Y.Z is the new version).
-5. `git push origin X.Y.Z`
+1. From `master`, bump the package version, using `make bump! minor` (you can bump `patch`, `minor` or `major`).
+2. Push the new branch to `origin`.
+3. After merging the bumped version to `master`, make a Pull Request from `master` to `stable`. Make sure to include every change, using the template located at `.github/PULL_REQUEST_TEMPLATE/release.md`.
+4. Merge the Pull Request.
