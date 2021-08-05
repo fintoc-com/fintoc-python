@@ -32,30 +32,34 @@ class ManagerMixin(metaclass=ABCMeta):
     def _client(self):
         if not self.__client:
             self.__client = httpx.Client(
-                base_url=self._client_data.base_url, headers=self._client_data.headers
+                base_url=self._client_data.base_url,
+                headers=self._client_data.headers,
+                params=self._client_data.params,
             )
         return self.__client
 
     def _all(self, **kwargs):
         lazy = kwargs.pop("lazy", True)
-        response = self._client.get(
-            self._path, params={**kwargs, **self._client_data.params}
-        )
+        response = self._client.get(self._path, params=kwargs)
         data = response.json()
         klass = get_resource_class(self.resource)
         return [klass(self._client_data, **x) for x in data]
 
     def _get(self, id_, **kwargs):
-        response = self._client.get(
-            f"{self._path}/{id_}", params={**kwargs, **self._client_data.params}
-        )
+        response = self._client.get(f"{self._path}/{id_}", params=kwargs)
         data = response.json()
         klass = get_resource_class(self.resource)
         object_ = klass(self._client_data, **data)
         return self._post_get_handler(object_, id_, **kwargs)
 
     def _create(self, **kwargs):
-        pass
+        response = self._client.post(
+            self._path, json=kwargs
+        )
+        data = response.json()
+        klass = get_resource_class(self.resource)
+        object_ = klass(self._client_data, **data)
+        return self._post_create_handler(object_, **kwargs)
 
     def _delete(self, id, **kwargs):
         pass
@@ -66,7 +70,7 @@ class ManagerMixin(metaclass=ABCMeta):
     def _post_get_handler(self, object_, id_, **kwargs):
         return object_
 
-    def _post_create_handler(self, object_, id_, **kwargs):
+    def _post_create_handler(self, object_, **kwargs):
         return object_
 
     def _post_delete_handler(self, object_, id_, **kwargs):
