@@ -4,8 +4,10 @@ from importlib import import_module
 def snake_to_pascal(snake_string):
     return "".join(word.title() for word in snake_string.split("_"))
 
+
 def singularize(string):
     return string.rstrip("s")
+
 
 def get_resource_class(snake_resource_name):
     try:
