@@ -61,8 +61,9 @@ class ManagerMixin(metaclass=ABCMeta):
         object_ = klass(self._client_data, **data)
         return self._post_create_handler(object_, **kwargs)
 
-    def _delete(self, id, **kwargs):
-        pass
+    def _delete(self, id_, **kwargs):
+        response = self._client.delete(f"{self._path}/{id_}", params=kwargs)
+        return self._post_delete_handler(id_, **kwargs)
 
     def _post_all_handler(self, objects_, **kwargs):
         return objects_
@@ -73,5 +74,5 @@ class ManagerMixin(metaclass=ABCMeta):
     def _post_create_handler(self, object_, **kwargs):
         return object_
 
-    def _post_delete_handler(self, object_, id_, **kwargs):
-        return object_
+    def _post_delete_handler(self, id_, **kwargs):
+        return id_
