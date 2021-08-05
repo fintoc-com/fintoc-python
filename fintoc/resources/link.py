@@ -1,4 +1,4 @@
-from fintoc.managers.accounts_manager import AccountsManager
+from fintoc.managers import AccountsManager
 from fintoc.mixins import ResourceMixin
 
 

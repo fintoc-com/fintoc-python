@@ -8,10 +8,13 @@ class ResourceMixin(metaclass=ABCMeta):
         for key, value in kwargs.items():
             resource = singularize(key)
             if isinstance(value, list):
-                klass = get_resource_class(resource)
-                setattr(self, key, [klass(client_data, **x) for x in value])
+                klass = get_resource_class(resource, value=value)
+                if klass is str:
+                    setattr(self, key, [klass(x) for x in value])
+                else:
+                    setattr(self, key, [klass(client_data, **x) for x in value])
             elif isinstance(value, dict):
-                klass = get_resource_class(key)
+                klass = get_resource_class(key, value=value)
                 setattr(self, key, klass(client_data, **value))
             else:
                 setattr(self, key, value)

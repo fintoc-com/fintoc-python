@@ -3,7 +3,7 @@ Core module to house the Client object of the Fintoc Python SDK.
 """
 
 from fintoc.constants import API_BASE_URL, API_VERSION
-from fintoc.managers.links_manager import LinksManager
+from fintoc.managers import LinksManager, WebhookEndpointsManager
 from fintoc.version import __version__
 
 
@@ -18,6 +18,9 @@ class Client:
             user_agent=f"fintoc-python/{__version__}",
         )
         self.links = LinksManager("/links", self.data)
+        self.webhook_endpoints = WebhookEndpointsManager(
+            "/webhook_endpoints", self.data
+        )
 
 
 class ClientData:
