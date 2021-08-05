@@ -53,13 +53,18 @@ class ManagerMixin(metaclass=ABCMeta):
         return self._post_get_handler(object_, id_, **kwargs)
 
     def _create(self, **kwargs):
-        response = self._client.post(
-            self._path, json=kwargs
-        )
+        response = self._client.post(self._path, json=kwargs)
         data = response.json()
         klass = get_resource_class(self.resource)
         object_ = klass(self._client_data, **data)
         return self._post_create_handler(object_, **kwargs)
+
+    def _update(self, id_, **kwargs):
+        response = self._client.patch(f"{self._path}/{id_}", json=kwargs)
+        data = response.json()
+        klass = get_resource_class(self.resource)
+        object_ = klass(self._client_data, **data)
+        return self._post_update_handler(object_, id_, **kwargs)
 
     def _delete(self, id_, **kwargs):
         response = self._client.delete(f"{self._path}/{id_}", params=kwargs)
@@ -72,6 +77,9 @@ class ManagerMixin(metaclass=ABCMeta):
         return object_
 
     def _post_create_handler(self, object_, **kwargs):
+        return object_
+
+    def _post_update_handler(self, object_, id_, **kwargs):
         return object_
 
     def _post_delete_handler(self, id_, **kwargs):

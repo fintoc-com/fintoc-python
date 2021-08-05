@@ -11,10 +11,15 @@ class ResourceMixin(metaclass=ABCMeta):
                 klass = get_resource_class(resource, value=value)
                 if klass is str:
                     setattr(self, key, [klass(x) for x in value])
+                elif klass is dict:
+                    setattr(self, key, [klass(x) for x in value])
                 else:
                     setattr(self, key, [klass(client_data, **x) for x in value])
             elif isinstance(value, dict):
                 klass = get_resource_class(key, value=value)
-                setattr(self, key, klass(client_data, **value))
+                if klass is dict:
+                    setattr(self, key, klass(**value))
+                else:
+                    setattr(self, key, klass(client_data, **value))
             else:
                 setattr(self, key, value)
