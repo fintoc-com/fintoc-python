@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 import httpx
 
-from fintoc.helpers import get_resource_class
+from fintoc.helpers import can_raise_http_error, get_resource_class
 from fintoc.paginator import objetize_generator, paginate
 
 
@@ -39,6 +39,7 @@ class ManagerMixin(metaclass=ABCMeta):
             )
         return self.__client
 
+    @can_raise_http_error
     def _all(self, **kwargs):
         lazy = kwargs.pop("lazy", True)
         data = paginate(self._client, self._path, params=kwargs)
@@ -47,29 +48,37 @@ class ManagerMixin(metaclass=ABCMeta):
             return objetize_generator(data, self._client_data, klass)
         return [klass(self._client_data, **x) for x in data]
 
+    @can_raise_http_error
     def _get(self, id_, **kwargs):
         response = self._client.get(f"{self._path}/{id_}", params=kwargs)
+        response.raise_for_status()
         data = response.json()
         klass = get_resource_class(self.resource)
         object_ = klass(self._client_data, **data)
         return self._post_get_handler(object_, id_, **kwargs)
 
+    @can_raise_http_error
     def _create(self, **kwargs):
         response = self._client.post(self._path, json=kwargs)
+        response.raise_for_status()
         data = response.json()
         klass = get_resource_class(self.resource)
         object_ = klass(self._client_data, **data)
         return self._post_create_handler(object_, **kwargs)
 
+    @can_raise_http_error
     def _update(self, id_, **kwargs):
         response = self._client.patch(f"{self._path}/{id_}", json=kwargs)
+        response.raise_for_status()
         data = response.json()
         klass = get_resource_class(self.resource)
         object_ = klass(self._client_data, **data)
         return self._post_update_handler(object_, id_, **kwargs)
 
+    @can_raise_http_error
     def _delete(self, id_, **kwargs):
-        self._client.delete(f"{self._path}/{id_}", params=kwargs)
+        response = self._client.delete(f"{self._path}/{id_}", params=kwargs)
+        response.raise_for_status()
         return self._post_delete_handler(id_, **kwargs)
 
     def _post_all_handler(self, objects_, **kwargs):

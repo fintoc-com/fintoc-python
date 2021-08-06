@@ -23,6 +23,7 @@ def objetize_generator(generator, client_data, klass):
 
 def request(client, path, params={}):
     response = client.get(path, params=params)
+    response.raise_for_status()
     next_ = parse_link_headers(response.headers.get("link")).get("next")
     elements = response.json()
     return {
