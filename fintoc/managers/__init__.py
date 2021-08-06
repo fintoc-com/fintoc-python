@@ -1,4 +1,5 @@
 from .accounts_manager import AccountsManager
 from .links_manager import LinksManager
 from .movements_manager import MovementsManager
+from .subscriptions_manager import SubscriptionsManager
 from .webhook_endpoints_manager import WebhookEndpointsManager

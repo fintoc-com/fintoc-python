@@ -1,4 +1,4 @@
-from fintoc.managers import AccountsManager
+from fintoc.managers import AccountsManager, SubscriptionsManager
 from fintoc.mixins import ResourceMixin
 
 
@@ -10,6 +10,7 @@ class Link(ResourceMixin):
         super().__init__(client_data, **kwargs)
         self._client_data = client_data
         self.__accounts_manager = None
+        self.__subscriptions_manager = None
 
     @property
     def accounts(self):
@@ -19,4 +20,16 @@ class Link(ResourceMixin):
 
     @accounts.setter
     def accounts(self, new_value):
+        return
+
+    @property
+    def subscriptions(self):
+        if self.__subscriptions_manager is None:
+            self.__subscriptions_manager = SubscriptionsManager(
+                "/subscriptions", self._client_data
+            )
+        return self.__subscriptions_manager
+
+    @subscriptions.setter
+    def subscriptions(self, new_value):
         return
