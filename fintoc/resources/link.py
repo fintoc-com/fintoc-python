@@ -1,4 +1,4 @@
-from fintoc.managers import AccountsManager, SubscriptionsManager
+from fintoc.managers import AccountsManager, SubscriptionsManager, TaxRetunsManager
 from fintoc.mixins import ResourceMixin
 
 
@@ -11,6 +11,7 @@ class Link(ResourceMixin):
         self._client_data = client_data
         self.__accounts_manager = None
         self.__subscriptions_manager = None
+        self.__tax_returns_manager = None
 
     @property
     def accounts(self):
@@ -32,4 +33,16 @@ class Link(ResourceMixin):
 
     @subscriptions.setter
     def subscriptions(self, new_value):
+        return
+
+    @property
+    def tax_returns(self):
+        if self.__tax_returns_manager is None:
+            self.__tax_returns_manager = TaxRetunsManager(
+                "/tax_returns", self._client_data
+            )
+        return self.__tax_returns_manager
+
+    @tax_returns.setter
+    def tax_returns(self, new_value):
         return
