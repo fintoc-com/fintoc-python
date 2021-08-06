@@ -12,6 +12,7 @@ class Link(ResourceMixin):
         self.__accounts_manager = None
         self.__subscriptions_manager = None
         self.__tax_returns_manager = None
+        self.__invoices_manager = None
 
     @property
     def accounts(self):
@@ -45,4 +46,16 @@ class Link(ResourceMixin):
 
     @tax_returns.setter
     def tax_returns(self, new_value):
+        return
+
+    @property
+    def invoices(self):
+        if self.__invoices_manager is None:
+            self.__invoices_manager = TaxRetunsManager(
+                "/invoices", self._client_data
+            )
+        return self.__invoices_manager
+
+    @invoices.setter
+    def invoices(self, new_value):
         return
