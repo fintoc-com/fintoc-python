@@ -4,9 +4,11 @@ from fintoc.helpers import get_resource_class, singularize
 
 
 class ResourceMixin(metaclass=ABCMeta):
+    mappings = {}
+
     def __init__(self, client_data, **kwargs):
         for key, value in kwargs.items():
-            resource = singularize(key)
+            resource = singularize(self.__class__.mappings.get(key, key))
             if isinstance(value, list):
                 klass = get_resource_class(resource, value=value)
                 if klass is str:
@@ -16,7 +18,7 @@ class ResourceMixin(metaclass=ABCMeta):
                 else:
                     setattr(self, key, [klass(client_data, **x) for x in value])
             elif isinstance(value, dict):
-                klass = get_resource_class(key, value=value)
+                klass = get_resource_class(resource, value=value)
                 if klass is dict:
                     setattr(self, key, klass(**value))
                 else:
