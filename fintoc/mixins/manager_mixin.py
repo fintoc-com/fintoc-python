@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import httpx
 
 from fintoc.helpers import get_resource_class
+from fintoc.paginator import objetize_generator, paginate
 
 
 class ManagerMixin(metaclass=ABCMeta):
@@ -40,9 +41,10 @@ class ManagerMixin(metaclass=ABCMeta):
 
     def _all(self, **kwargs):
         lazy = kwargs.pop("lazy", True)
-        response = self._client.get(self._path, params=kwargs)
-        data = response.json()
+        data = paginate(self._client, self._path, params=kwargs)
         klass = get_resource_class(self.resource)
+        if lazy:
+            return objetize_generator(data, self._client_data, klass)
         return [klass(self._client_data, **x) for x in data]
 
     def _get(self, id_, **kwargs):
@@ -67,7 +69,7 @@ class ManagerMixin(metaclass=ABCMeta):
         return self._post_update_handler(object_, id_, **kwargs)
 
     def _delete(self, id_, **kwargs):
-        response = self._client.delete(f"{self._path}/{id_}", params=kwargs)
+        self._client.delete(f"{self._path}/{id_}", params=kwargs)
         return self._post_delete_handler(id_, **kwargs)
 
     def _post_all_handler(self, objects_, **kwargs):
