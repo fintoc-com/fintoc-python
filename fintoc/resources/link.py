@@ -6,9 +6,9 @@ class Link(ResourceMixin):
 
     """Represents a Fintoc Link."""
 
-    def __init__(self, client_data, **kwargs):
-        super().__init__(client_data, **kwargs)
-        self._client_data = client_data
+    def __init__(self, client, **kwargs):
+        super().__init__(client, **kwargs)
+        self._client = client
         self.__accounts_manager = None
         self.__subscriptions_manager = None
         self.__tax_returns_manager = None
@@ -17,7 +17,7 @@ class Link(ResourceMixin):
     @property
     def accounts(self):
         if self.__accounts_manager is None:
-            self.__accounts_manager = AccountsManager("/accounts", self._client_data)
+            self.__accounts_manager = AccountsManager("/accounts", self._client)
         return self.__accounts_manager
 
     @accounts.setter
@@ -28,7 +28,7 @@ class Link(ResourceMixin):
     def subscriptions(self):
         if self.__subscriptions_manager is None:
             self.__subscriptions_manager = SubscriptionsManager(
-                "/subscriptions", self._client_data
+                "/subscriptions", self._client
             )
         return self.__subscriptions_manager
 
@@ -39,9 +39,7 @@ class Link(ResourceMixin):
     @property
     def tax_returns(self):
         if self.__tax_returns_manager is None:
-            self.__tax_returns_manager = TaxRetunsManager(
-                "/tax_returns", self._client_data
-            )
+            self.__tax_returns_manager = TaxRetunsManager("/tax_returns", self._client)
         return self.__tax_returns_manager
 
     @tax_returns.setter
@@ -51,7 +49,7 @@ class Link(ResourceMixin):
     @property
     def invoices(self):
         if self.__invoices_manager is None:
-            self.__invoices_manager = TaxRetunsManager("/invoices", self._client_data)
+            self.__invoices_manager = TaxRetunsManager("/invoices", self._client)
         return self.__invoices_manager
 
     @invoices.setter

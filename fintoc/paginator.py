@@ -16,9 +16,9 @@ def paginate(client, path, params):
             yield element
 
 
-def objetize_generator(generator, client_data, klass):
+def objetize_generator(generator, client, klass):
     for element in generator:
-        yield klass(client_data, **element)
+        yield klass(client, **element)
 
 
 def request(client, path, params={}):
@@ -35,7 +35,7 @@ def request(client, path, params={}):
 def parse_link_headers(link_header):
     if link_header is None:
         return None
-    return reduce(lambda x, y: parse_link(x, y), link_header.split(","), {})
+    return reduce(parse_link, link_header.split(","), {})
 
 
 def parse_link(dictionary, link):

@@ -1,16 +1,13 @@
 from abc import ABCMeta, abstractmethod
 
-import httpx
-
 from fintoc.helpers import can_raise_http_error, get_resource_class
-from fintoc.paginator import objetize_generator, paginate
+from fintoc.paginator import objetize_generator
 
 
 class ManagerMixin(metaclass=ABCMeta):
-    def __init__(self, path, client_data):
+    def __init__(self, path, client):
         self._path = path
-        self._client_data = client_data
-        self.__client = None
+        self._client = client
 
     def __getattr__(self, attr):
         if attr not in self.methods:
@@ -29,56 +26,46 @@ class ManagerMixin(metaclass=ABCMeta):
     def methods(self):
         pass
 
-    @property
-    def _client(self):
-        if not self.__client:
-            self.__client = httpx.Client(
-                base_url=self._client_data.base_url,
-                headers=self._client_data.headers,
-                params=self._client_data.params,
-            )
-        return self.__client
-
     @can_raise_http_error
     def _all(self, **kwargs):
         lazy = kwargs.pop("lazy", True)
-        data = paginate(self._client, self._path, params=kwargs)
+        data = self._client.request(self._path, paginated=True, params=kwargs)
         klass = get_resource_class(self.resource)
         if lazy:
-            return objetize_generator(data, self._client_data, klass)
-        return [klass(self._client_data, **x) for x in data]
+            return objetize_generator(data, self._client, klass)
+        return [klass(self._client, **x) for x in data]
 
     @can_raise_http_error
     def _get(self, id_, **kwargs):
-        response = self._client.get(f"{self._path}/{id_}", params=kwargs)
-        response.raise_for_status()
+        response = self._client.request(
+            f"{self._path}/{id_}", method="get", params=kwargs
+        )
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client_data, **data)
+        object_ = klass(self._client, **data)
         return self._post_get_handler(object_, id_, **kwargs)
 
     @can_raise_http_error
     def _create(self, **kwargs):
-        response = self._client.post(self._path, json=kwargs)
-        response.raise_for_status()
+        response = self._client.request(self._path, method="post", json=kwargs)
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client_data, **data)
+        object_ = klass(self._client, **data)
         return self._post_create_handler(object_, **kwargs)
 
     @can_raise_http_error
     def _update(self, id_, **kwargs):
-        response = self._client.patch(f"{self._path}/{id_}", json=kwargs)
-        response.raise_for_status()
+        response = self._client.request(
+            f"{self._path}/{id_}", method="patch", json=kwargs
+        )
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client_data, **data)
+        object_ = klass(self._client, **data)
         return self._post_update_handler(object_, id_, **kwargs)
 
     @can_raise_http_error
     def _delete(self, id_, **kwargs):
-        response = self._client.delete(f"{self._path}/{id_}", params=kwargs)
-        response.raise_for_status()
+        self._client.request(f"{self._path}/{id_}", method="delete", params=kwargs)
         return self._post_delete_handler(id_, **kwargs)
 
     def _post_all_handler(self, objects_, **kwargs):
