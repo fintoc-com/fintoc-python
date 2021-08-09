@@ -2,8 +2,8 @@
 
 from abc import ABCMeta, abstractmethod
 
-from fintoc.utils import can_raise_http_error, get_resource_class
 from fintoc.resource_handlers import resource_all, resource_create, resource_get
+from fintoc.utils import can_raise_http_error, get_resource_class
 
 
 class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use

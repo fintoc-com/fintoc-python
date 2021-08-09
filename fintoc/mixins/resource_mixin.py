@@ -2,13 +2,8 @@
 
 from abc import ABCMeta
 
-from fintoc.utils import (
-    can_raise_http_error,
-    get_resource_class,
-    objetize,
-    singularize,
-)
 from fintoc.resource_handlers import resource_delete, resource_update
+from fintoc.utils import can_raise_http_error, get_resource_class, objetize, singularize
 
 
 class ResourceMixin(metaclass=ABCMeta):

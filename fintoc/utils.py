@@ -45,6 +45,7 @@ def can_raise_http_error(function):
     Decorator that catches HTTPError exceptions and raises custom
     Fintoc errors instead.
     """
+
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
