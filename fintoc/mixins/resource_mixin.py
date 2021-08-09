@@ -51,9 +51,9 @@ class ResourceMixin(metaclass=ABCMeta):
             methods=self._methods,
             params=kwargs,
         )
-        object_ = self._handlers.get("update")(object_, object_.id, **kwargs)
+        object_ = self._handlers.get("update")(object_, id_, **kwargs)
         self.__dict__.update(object_.__dict__)
-        return object_
+        return self
 
     @can_raise_http_error
     def _delete(self, **kwargs):

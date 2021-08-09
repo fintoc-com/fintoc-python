@@ -7,10 +7,10 @@ from fintoc.resource_handlers import resource_all, resource_create, resource_get
 class ManagerMixin(metaclass=ABCMeta):
     def __init__(self, path, client):
         self._path = path
-        self._client = client
+        self._client = client.extend()
         self._handlers = {
-            "update": self._post_update_handler,
-            "delete": self._post_delete_handler,
+            "update": self.post_update_handler,
+            "delete": self.post_delete_handler,
         }
 
     def __getattr__(self, attr):
@@ -41,7 +41,7 @@ class ManagerMixin(metaclass=ABCMeta):
             methods=self.methods,
             params=kwargs,
         )
-        return self._post_all_handler(objects, **kwargs)
+        return self.post_all_handler(objects, **kwargs)
 
     @can_raise_http_error
     def _get(self, identifier, **kwargs):
@@ -55,7 +55,7 @@ class ManagerMixin(metaclass=ABCMeta):
             methods=self.methods,
             params=kwargs,
         )
-        return self._post_get_handler(object_, identifier, **kwargs)
+        return self.post_get_handler(object_, identifier, **kwargs)
 
     @can_raise_http_error
     def _create(self, **kwargs):
@@ -68,7 +68,7 @@ class ManagerMixin(metaclass=ABCMeta):
             methods=self.methods,
             params=kwargs,
         )
-        return self._post_create_handler(object_, **kwargs)
+        return self.post_create_handler(object_, **kwargs)
 
     @can_raise_http_error
     def _update(self, identifier, **kwargs):
@@ -80,17 +80,17 @@ class ManagerMixin(metaclass=ABCMeta):
         object_ = self._get(identifier)
         return object_.delete(**kwargs)
 
-    def _post_all_handler(self, objects, **kwargs):
+    def post_all_handler(self, objects, **kwargs):
         return objects
 
-    def _post_get_handler(self, object_, identifier, **kwargs):
+    def post_get_handler(self, object_, identifier, **kwargs):
         return object_
 
-    def _post_create_handler(self, object_, **kwargs):
+    def post_create_handler(self, object_, **kwargs):
         return object_
 
-    def _post_update_handler(self, object_, identifier, **kwargs):
+    def post_update_handler(self, object_, identifier, **kwargs):
         return object_
 
-    def _post_delete_handler(self, identifier, **kwargs):
+    def post_delete_handler(self, identifier, **kwargs):
         return identifier
