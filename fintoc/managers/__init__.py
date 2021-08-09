@@ -1,3 +1,5 @@
+"""Init file for the managers module of the SDK."""
+
 from .accounts_manager import AccountsManager
 from .invoices_manager import InvoicesManager
 from .links_manager import LinksManager
