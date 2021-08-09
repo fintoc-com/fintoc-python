@@ -30,9 +30,13 @@ class Client:
 
     @property
     def headers(self):
+        """Return the appropriate headers for every request."""
         return {"Authorization": self.api_key, "User-Agent": self.user_agent}
 
     def request(self, path, paginated=False, method="get", params=None, json=None):
+        """
+        Uses the internal httpx client to make a simple or paginated request.
+        """
         if paginated:
             return paginate(self._client, path, params=params)
         response = self._client.request(method, path, params=params, json=json)
@@ -46,6 +50,10 @@ class Client:
         user_agent=None,
         params=None,
     ):
+        """
+        Creates a new instance using the data of the current object,
+        overwriting parts of it using the method parameters.
+        """
         return Client(
             base_url=base_url or self.base_url,
             api_key=api_key or self.api_key,

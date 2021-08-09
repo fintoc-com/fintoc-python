@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from fintoc.helpers import can_raise_http_error, get_resource_class
+from fintoc.utils import can_raise_http_error, get_resource_class
 from fintoc.resource_handlers import resource_all, resource_create, resource_get
 
 

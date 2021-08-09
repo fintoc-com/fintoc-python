@@ -1,6 +1,6 @@
 from abc import ABCMeta
 
-from fintoc.helpers import (
+from fintoc.utils import (
     can_raise_http_error,
     get_resource_class,
     objetize,

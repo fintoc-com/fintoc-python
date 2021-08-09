@@ -1,4 +1,10 @@
+"""Module to hold the Fintoc custom errors."""
+
+
 class FintocError(Exception):
+
+    """Represents the base custom error."""
+
     def __init__(self, error_data):
         error_type = error_data.get("type")
         error_code = error_data.get("code")
