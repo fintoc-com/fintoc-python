@@ -1,12 +1,21 @@
 from abc import ABCMeta, abstractmethod
 
-from fintoc.helpers import can_raise_http_error, get_resource_class, objetize_generator
+from fintoc.helpers import (
+    can_raise_http_error,
+    get_resource_class,
+    objetize,
+    objetize_generator,
+)
 
 
 class ManagerMixin(metaclass=ABCMeta):
     def __init__(self, path, client):
         self._path = path
         self._client = client
+        self._handlers = {
+            "update": self._post_update_handler,
+            "delete": self._post_delete_handler,
+        }
 
     def __getattr__(self, attr):
         if attr not in self.methods:
@@ -31,8 +40,25 @@ class ManagerMixin(metaclass=ABCMeta):
         data = self._client.request(self._path, paginated=True, params=kwargs)
         klass = get_resource_class(self.resource)
         if lazy:
-            return objetize_generator(data, klass, self._client)
-        return [klass(self._client, **x) for x in data]
+            return objetize_generator(
+                data,
+                klass,
+                self._client,
+                handlers=self._handlers,
+                methods=self.methods,
+                path=self._path,
+            )
+        return [
+            objetize(
+                klass,
+                self._client,
+                data,
+                handlers=self._handlers,
+                methods=self.methods,
+                path=self._path,
+            )
+            for x in data
+        ]
 
     @can_raise_http_error
     def _get(self, id_, **kwargs):
@@ -41,7 +67,14 @@ class ManagerMixin(metaclass=ABCMeta):
         )
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client, **data)
+        object_ = objetize(
+            klass,
+            self._client,
+            data,
+            handlers=self._handlers,
+            methods=self.methods,
+            path=self._path,
+        )
         return self._post_get_handler(object_, id_, **kwargs)
 
     @can_raise_http_error
@@ -49,7 +82,14 @@ class ManagerMixin(metaclass=ABCMeta):
         response = self._client.request(self._path, method="post", json=kwargs)
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client, **data)
+        object_ = objetize(
+            klass,
+            self._client,
+            data,
+            handlers=self._handlers,
+            methods=self.methods,
+            path=self._path,
+        )
         return self._post_create_handler(object_, **kwargs)
 
     @can_raise_http_error
@@ -59,7 +99,14 @@ class ManagerMixin(metaclass=ABCMeta):
         )
         data = response.json()
         klass = get_resource_class(self.resource)
-        object_ = klass(self._client, **data)
+        object_ = objetize(
+            klass,
+            self._client,
+            data,
+            handlers=self._handlers,
+            methods=self.methods,
+            path=self._path,
+        )
         return self._post_update_handler(object_, id_, **kwargs)
 
     @can_raise_http_error

@@ -40,12 +40,12 @@ def can_raise_http_error(function):
     return wrapper
 
 
-def objetize(klass, client, data):
+def objetize(klass, client, data, handlers={}, methods=[], path=None):
     if klass is str or klass is dict:
         return klass(data)
-    return klass(client, **data)
+    return klass(client, handlers, methods, path, **data)
 
 
-def objetize_generator(generator, klass, client):
+def objetize_generator(generator, klass, client, handlers={}, methods=[], path=None):
     for element in generator:
-        yield objetize(klass, client, element)
+        yield objetize(klass, client, element, handlers, methods, path)
