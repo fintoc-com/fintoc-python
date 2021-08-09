@@ -1,3 +1,5 @@
+"""Module to hold the mixin for the resources."""
+
 from abc import ABCMeta
 
 from fintoc.utils import (
@@ -10,6 +12,9 @@ from fintoc.resource_handlers import resource_delete, resource_update
 
 
 class ResourceMixin(metaclass=ABCMeta):
+
+    """Represents the mixin for the resources."""
+
     mappings = {}
     resource_identifier = "id"
 
