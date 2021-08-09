@@ -38,3 +38,14 @@ def can_raise_http_error(function):
             raise error(error_data["error"]) from None
 
     return wrapper
+
+
+def objetize(klass, client, data):
+    if klass is str or klass is dict:
+        return klass(data)
+    return klass(client, **data)
+
+
+def objetize_generator(generator, klass, client):
+    for element in generator:
+        yield objetize(klass, client, element)

@@ -16,11 +16,6 @@ def paginate(client, path, params):
             yield element
 
 
-def objetize_generator(generator, client, klass):
-    for element in generator:
-        yield klass(client, **element)
-
-
 def request(client, path, params={}):
     response = client.get(path, params=params)
     response.raise_for_status()

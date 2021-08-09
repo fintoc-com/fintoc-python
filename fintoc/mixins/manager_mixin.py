@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from fintoc.helpers import can_raise_http_error, get_resource_class
-from fintoc.paginator import objetize_generator
+from fintoc.helpers import can_raise_http_error, get_resource_class, objetize_generator
 
 
 class ManagerMixin(metaclass=ABCMeta):
@@ -32,7 +31,7 @@ class ManagerMixin(metaclass=ABCMeta):
         data = self._client.request(self._path, paginated=True, params=kwargs)
         klass = get_resource_class(self.resource)
         if lazy:
-            return objetize_generator(data, self._client, klass)
+            return objetize_generator(data, klass, self._client)
         return [klass(self._client, **x) for x in data]
 
     @can_raise_http_error
