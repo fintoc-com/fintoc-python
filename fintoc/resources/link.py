@@ -51,9 +51,7 @@ class Link(ResourceMixin):
     @property
     def invoices(self):
         if self.__invoices_manager is None:
-            self.__invoices_manager = TaxRetunsManager(
-                "/invoices", self._client_data
-            )
+            self.__invoices_manager = TaxRetunsManager("/invoices", self._client_data)
         return self.__invoices_manager
 
     @invoices.setter

@@ -36,4 +36,5 @@ def can_raise_http_error(function):
             error_data = exc.response.json()
             error = get_error_class(error_data["error"]["type"])
             raise error(error_data["error"]) from None
+
     return wrapper

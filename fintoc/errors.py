@@ -1,7 +1,20 @@
 class FintocError(Exception):
     def __init__(self, error_data):
-        super().__init__(error_data["message"])
-        self.code = error_data["code"]
+        error_type = error_data.get("type")
+        error_code = error_data.get("code")
+        error_message = error_data.get("message")
+        error_param = error_data.get("param")
+        error_doc_url = error_data.get("doc_url")
+        message = error_type
+        message += f": {error_code}" if error_code is not None else ""
+        message += f" ({error_param})" if error_param is not None else ""
+        message += f"\n{error_message}"
+        message += (
+            f"\nCheck the docs for more info: {error_doc_url}"
+            if error_doc_url is not None
+            else ""
+        )
+        super().__init__(message)
 
 
 class ApiError(FintocError):
