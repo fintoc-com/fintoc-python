@@ -1,3 +1,5 @@
+"""Module to hold the OtherTaxes resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

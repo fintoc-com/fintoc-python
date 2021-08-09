@@ -1,3 +1,5 @@
+"""Module to hold the Subscription resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

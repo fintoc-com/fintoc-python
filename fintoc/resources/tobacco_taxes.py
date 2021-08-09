@@ -1,3 +1,5 @@
+"""Module to hold the TobaccoTaxes resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

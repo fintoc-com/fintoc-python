@@ -1,3 +1,5 @@
+"""Module to hold the Institution resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

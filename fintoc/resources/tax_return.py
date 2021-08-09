@@ -1,3 +1,5 @@
+"""Module to hold the TaxReturn resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

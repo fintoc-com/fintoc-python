@@ -1,3 +1,5 @@
+"""Module to hold the Movement resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

@@ -1,3 +1,5 @@
+"""Module to hold the Account resource."""
+
 from fintoc.managers import MovementsManager
 from fintoc.mixins import ResourceMixin
 
@@ -12,6 +14,7 @@ class Account(ResourceMixin):
 
     @property
     def movements(self):
+        """Proxies the movements manager."""
         if self.__movements_manager is None:
             self.__movements_manager = MovementsManager(
                 f"/accounts/{self.id}/movements", self._client
@@ -19,5 +22,5 @@ class Account(ResourceMixin):
         return self.__movements_manager
 
     @movements.setter
-    def movements(self, new_value):
+    def movements(self, new_value):  # pylint: disable=no-self-use
         return

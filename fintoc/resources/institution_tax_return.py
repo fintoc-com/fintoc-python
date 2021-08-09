@@ -1,3 +1,5 @@
+"""Module to hold the InstitutionTaxReturn resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

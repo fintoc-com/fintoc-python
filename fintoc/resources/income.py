@@ -1,3 +1,5 @@
+"""Module to hold the Income resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

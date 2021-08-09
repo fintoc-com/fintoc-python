@@ -1,3 +1,5 @@
+"""Module to hold the WebhookEndpoint resource."""
+
 from fintoc.mixins import ResourceMixin
 
 

@@ -1,3 +1,5 @@
+"""Module to hold the TransferAccount resource."""
+
 from fintoc.mixins import ResourceMixin
 
 
