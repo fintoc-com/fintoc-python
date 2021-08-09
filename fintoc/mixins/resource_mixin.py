@@ -6,10 +6,12 @@ from fintoc.helpers import (
     objetize,
     singularize,
 )
+from fintoc.resource_handlers import resource_delete, resource_update
 
 
 class ResourceMixin(metaclass=ABCMeta):
     mappings = {}
+    resource_identifier = "id"
 
     def __init__(self, client, handlers, methods, path, **kwargs):
         self._client = client
@@ -39,17 +41,15 @@ class ResourceMixin(metaclass=ABCMeta):
 
     @can_raise_http_error
     def _update(self, **kwargs):
-        response = self._client.request(
-            f"{self._path}/{self.id}", method="patch", json=kwargs
-        )
-        data = response.json()
-        object_ = objetize(
-            self.__class__,
-            self._client,
-            data,
-            self._handlers,
-            self._methods,
-            self._path,
+        id_ = getattr(self, self.__class__.resource_identifier)
+        object_ = resource_update(
+            client=self._client,
+            path=self._path,
+            id_=id_,
+            klass=self.__class__,
+            handlers=self._handlers,
+            methods=self._methods,
+            params=kwargs,
         )
         object_ = self._handlers.get("update")(object_, object_.id, **kwargs)
         self.__dict__.update(object_.__dict__)
@@ -57,5 +57,11 @@ class ResourceMixin(metaclass=ABCMeta):
 
     @can_raise_http_error
     def _delete(self, **kwargs):
-        self._client.request(f"{self._path}/{self.id}", method="delete", params=kwargs)
-        return self._handlers.get("update")(self.id, **kwargs)
+        id_ = getattr(self, self.__class__.resource_identifier)
+        object_ = resource_delete(
+            client=self._client,
+            path=self._path,
+            id_=id_,
+            params=kwargs,
+        )
+        return self._handlers.get("delete")(object_, **kwargs)

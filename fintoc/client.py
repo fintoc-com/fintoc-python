@@ -37,7 +37,7 @@ class Client:
             return paginate(self._client, path, params=params)
         response = self._client.request(method, path, params=params, json=json)
         response.raise_for_status()
-        return response
+        return response.json()
 
     def extend(
         self,

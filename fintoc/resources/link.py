@@ -6,6 +6,8 @@ class Link(ResourceMixin):
 
     """Represents a Fintoc Link."""
 
+    resource_identifier = "link_token"
+
     def __init__(self, client, handlers, methods, path, **kwargs):
         super().__init__(client, handlers, methods, path, **kwargs)
         self.__accounts_manager = None
