@@ -94,25 +94,13 @@ class ManagerMixin(metaclass=ABCMeta):
 
     @can_raise_http_error
     def _update(self, id_, **kwargs):
-        response = self._client.request(
-            f"{self._path}/{id_}", method="patch", json=kwargs
-        )
-        data = response.json()
-        klass = get_resource_class(self.resource)
-        object_ = objetize(
-            klass,
-            self._client,
-            data,
-            handlers=self._handlers,
-            methods=self.methods,
-            path=self._path,
-        )
-        return self._post_update_handler(object_, id_, **kwargs)
+        object_ = self._get(id_)
+        return object_.update(**kwargs)
 
     @can_raise_http_error
     def _delete(self, id_, **kwargs):
-        self._client.request(f"{self._path}/{id_}", method="delete", params=kwargs)
-        return self._post_delete_handler(id_, **kwargs)
+        object_ = self._get(id_)
+        return object_.delete(**kwargs)
 
     def _post_all_handler(self, objects_, **kwargs):
         return objects_
