@@ -52,7 +52,7 @@ class ManagerMixin(metaclass=ABCMeta):
             objetize(
                 klass,
                 self._client,
-                data,
+                x,
                 handlers=self._handlers,
                 methods=self.methods,
                 path=self._path,
