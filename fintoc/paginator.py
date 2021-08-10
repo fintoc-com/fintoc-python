@@ -27,9 +27,10 @@ def request(client, path, params={}):
     Fetch a page of a resource and return its elements and the next
     page of the resource.
     """
-    response = client.get(path, params=params)
+    response = client.request("get", path, params=params)
     response.raise_for_status()
-    next_ = parse_link_headers(response.headers.get("link")).get("next")
+    headers = parse_link_headers(response.headers.get("link"))
+    next_ = headers and headers.get("next")
     elements = response.json()
     return {
         "next": next_,
