@@ -20,8 +20,9 @@ class ResourceMixin(metaclass=ABCMeta):
         self._path = path
 
         for key, value in kwargs.items():
-            resource = singularize(self.__class__.mappings.get(key, key))
+            resource = self.__class__.mappings.get(key, key)
             if isinstance(value, list):
+                resource = singularize(resource)
                 klass = get_resource_class(resource, value=value)
                 setattr(self, key, [objetize(klass, client, x) for x in value])
             elif isinstance(value, dict):

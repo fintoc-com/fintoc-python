@@ -23,11 +23,8 @@ def get_resource_class(snake_resource_name, value={}):
     name (in snake case) and its value.
     """
     if isinstance(value, dict):
-        try:
-            module = import_module(f"fintoc.resources.{snake_resource_name}")
-            return getattr(module, snake_to_pascal(snake_resource_name), dict)
-        except ModuleNotFoundError:
-            return dict
+        module = import_module("fintoc.resources")
+        return getattr(module, snake_to_pascal(snake_resource_name), dict)
     return str
 
 
