@@ -1,10 +1,18 @@
-# Python-related
-venv
-.venv
-*.egg
-*.egg-info
+# Python, linters and tests stuff
 __pycache__
-dist/
+.mypy_cache
+.pytest_cache
+.coverage
+coverage.xml
 
-# Mac OS
-.DS_Store
+# Build stuff
+build/
+dist/
+*.egg
+*.egg-info/
+
+# Editor stuff
+.vscode
+
+# Virtual Environment
+.venv

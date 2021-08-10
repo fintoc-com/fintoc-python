@@ -12,7 +12,7 @@ build-env:
 # Tests
 .PHONY: tests
 tests:
-	poetry run pytest -rP tests
+	poetry run pytest -rP --cov=fintoc --cov-report=term-missing --cov-report=xml tests
 
 # Passive linters
 .PHONY: black

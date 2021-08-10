@@ -10,6 +10,7 @@ homepage = "https://fintoc.com/"
 repository = "https://github.com/fintoc-com/fintoc-python"
 exclude = [
     ".github",
+    ".coveragerc",
     ".flake8",
     ".pylintrc",
     "Makefile",
@@ -27,6 +28,7 @@ flake8 = "^3.8.4"
 isort = "^5.6.4"
 pylint = "^2.6.0"
 pytest = "^6.1.1"
+pytest-cov = "^2.12.1"
 
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/fintoc-com/fintoc-python/issues"

@@ -1,0 +1,4 @@
+[run]
+omit =
+    fintoc/constants.py
+    fintoc/version.py
