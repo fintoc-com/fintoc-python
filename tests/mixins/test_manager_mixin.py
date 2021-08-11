@@ -3,9 +3,7 @@ from types import GeneratorType
 import pytest
 
 from fintoc.client import Client
-from fintoc.mixins import ManagerMixin
-
-from fintoc.mixins import ResourceMixin
+from fintoc.mixins import ManagerMixin, ResourceMixin
 
 
 class InvalidMethodsMockManager(ManagerMixin):

@@ -1,6 +1,6 @@
 from fintoc.client import Client
-from fintoc.resources import Link
 from fintoc.mixins import ManagerMixin
+from fintoc.resources import Link
 
 
 class TestLinkResource:
