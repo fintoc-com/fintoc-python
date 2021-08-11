@@ -23,7 +23,8 @@ class ResourceMixin(metaclass=ABCMeta):
             resource = self.__class__.mappings.get(key, key)
             if isinstance(value, list):
                 resource = singularize(resource)
-                klass = get_resource_class(resource, value=value)
+                element = {} if not value else value[0]
+                klass = get_resource_class(resource, value=element)
                 setattr(self, key, [objetize(klass, client, x) for x in value])
             elif isinstance(value, dict):
                 klass = get_resource_class(resource, value=value)
@@ -32,13 +33,11 @@ class ResourceMixin(metaclass=ABCMeta):
                 setattr(self, key, value)
 
     def __getattr__(self, attr):
-        if attr in ["update", "delete"]:
-            if attr not in self._methods:
-                raise AttributeError(
-                    f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
-                )
-            return getattr(self, f"_{attr}")
-        return self.__dict__[attr]
+        if attr not in self._methods:
+            raise AttributeError(
+                f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
+            )
+        return getattr(self, f"_{attr}")
 
     @can_raise_http_error
     def _update(self, **kwargs):
@@ -59,10 +58,10 @@ class ResourceMixin(metaclass=ABCMeta):
     @can_raise_http_error
     def _delete(self, **kwargs):
         id_ = getattr(self, self.__class__.resource_identifier)
-        object_ = resource_delete(
+        resource_delete(
             client=self._client,
             path=self._path,
             id_=id_,
             params=kwargs,
         )
-        return self._handlers.get("delete")(object_, **kwargs)
+        return self._handlers.get("delete")(id_, **kwargs)
