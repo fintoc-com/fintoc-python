@@ -45,7 +45,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         """
 
     @can_raise_http_error
-    def all(self, **kwargs):
+    def _all(self, **kwargs):
         """
         Return all instances of the resource being handled by the manager.
         :kwargs: can be used to filter the results, using the API parameters.
@@ -62,7 +62,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_all_handler(objects, **kwargs)
 
     @can_raise_http_error
-    def get(self, identifier, **kwargs):
+    def _get(self, identifier, **kwargs):
         """
         Return an instance of the resource being handled by the manager,
         identified by :identifier:.
@@ -80,7 +80,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_get_handler(object_, identifier, **kwargs)
 
     @can_raise_http_error
-    def create(self, **kwargs):
+    def _create(self, **kwargs):
         """
         Create an instance of the resource being handled by the manager.
         Data is passed using :kwargs:, as specified by the API.
@@ -97,7 +97,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_create_handler(object_, **kwargs)
 
     @can_raise_http_error
-    def update(self, identifier, **kwargs):
+    def _update(self, identifier, **kwargs):
         """
         Update an instance of the resource being handled by the manager,
         identified by :identifier:. Data is passed using :kwargs:, as
@@ -107,7 +107,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return object_.update(**kwargs)
 
     @can_raise_http_error
-    def delete(self, identifier, **kwargs):
+    def _delete(self, identifier, **kwargs):
         """
         Delete an instance of the resource being handled by the manager,
         identified by :identifier:.

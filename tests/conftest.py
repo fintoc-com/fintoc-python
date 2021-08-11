@@ -65,6 +65,7 @@ def patch_http_client(monkeypatch):
             if self._method == "get" and self._url[-1] == "s":
                 return [
                     {
+                        "id": "idx",
                         "method": self._method,
                         "url": self._url,
                         "params": self._params,
@@ -74,6 +75,7 @@ def patch_http_client(monkeypatch):
                     for _ in range(10)
                 ]
             return {
+                "id": "idx",
                 "method": self._method,
                 "url": self._url,
                 "params": self._params,

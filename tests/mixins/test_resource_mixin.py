@@ -30,7 +30,7 @@ class TestResourceMixinCreation:
             self.user_agent,
             params=self.params,
         )
-        self.path = "/movements"
+        self.path = "/resources"
         self.handlers = {
             "update": lambda object_, identifier: print("Calling update...") or object_,
             "delete": lambda identifier: print("Calling delete...") or identifier,
@@ -116,7 +116,7 @@ class TestMixinUpdateAndDeleteMethods:
             self.user_agent,
             params=self.params,
         )
-        self.path = "/movements"
+        self.path = "/resources"
         self.handlers = {
             "update": lambda object_, identifier: print("Calling update...") or object_,
             "delete": lambda identifier: print("Calling delete...") or identifier,
