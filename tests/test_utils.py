@@ -4,7 +4,7 @@ import httpx
 import pytest
 
 from fintoc.errors import ApiError, FintocError
-from fintoc.resources.link import Link
+from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
     can_raise_http_error,
     get_error_class,
@@ -59,12 +59,17 @@ class TestGetResourceClass:
     def test_default_invalid_resource(self):
         resource = "this_resource_does_not_exist"
         klass = get_resource_class(resource)
-        assert klass is dict
+        assert klass is GenericFintocResource
 
     def test_string_resource(self):
         resource = "any_resource"
         klass = get_resource_class(resource, value="test-value")
         assert klass is str
+
+    def test_integer_resource(self):
+        resource = "any_resource"
+        klass = get_resource_class(resource, value=15)
+        assert klass is int
 
 
 class TestGetErrorClass:

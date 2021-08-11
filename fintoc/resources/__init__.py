@@ -2,6 +2,7 @@
 
 from .account import Account
 from .balance import Balance
+from .generic_fintoc_resource import GenericFintocResource
 from .income import Income
 from .institution import Institution
 from .institution_invoice import InstitutionInvoice

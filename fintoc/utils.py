@@ -24,8 +24,11 @@ def get_resource_class(snake_resource_name, value={}):
     """
     if isinstance(value, dict):
         module = import_module("fintoc.resources")
-        return getattr(module, snake_to_pascal(snake_resource_name), dict)
-    return str
+        try:
+            return getattr(module, snake_to_pascal(snake_resource_name))
+        except AttributeError:
+            return getattr(module, "GenericFintocResource")
+    return type(value)
 
 
 def get_error_class(snake_error_name):
