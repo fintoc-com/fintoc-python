@@ -58,5 +58,5 @@ class Client:
             base_url=base_url or self.base_url,
             api_key=api_key or self.api_key,
             user_agent=user_agent or self.user_agent,
-            params=params or self.params,
+            params={**self.params, **params} if params else self.params,
         )
