@@ -1,88 +1,43 @@
-"""
-errors.py
-=========
-
-A module with several errors you can encounter using Fintoc.
-"""
+"""Module to hold the Fintoc custom errors."""
 
 
 class FintocError(Exception):
-    def __init__(self, error):
-        super().__init__()
-        self.message = error.get("message")
-        self.doc_url = error.get("doc_url") or "https://fintoc.com/docs"
 
-    def __str__(self):
-        return f"\n{self.message}" f"\nPlease check the docs at: {self.doc_url}"
+    """Represents the base custom error."""
 
-
-class InvalidRequestError(FintocError):
-    pass
-
-
-class LinkError(FintocError):
-    pass
-
-
-class AuthenticationError(FintocError):
-    pass
-
-
-class InstitutionError(FintocError):
-    pass
+    def __init__(self, error_data):
+        error_type = error_data.get("type")
+        error_code = error_data.get("code")
+        error_message = error_data.get("message")
+        error_param = error_data.get("param")
+        error_doc_url = error_data.get("doc_url")
+        message = error_type
+        message += f": {error_code}" if error_code is not None else ""
+        message += f" ({error_param})" if error_param is not None else ""
+        message += f"\n{error_message}"
+        message += (
+            f"\nCheck the docs for more info: {error_doc_url}"
+            if error_doc_url is not None
+            else ""
+        )
+        super().__init__(message)
 
 
 class ApiError(FintocError):
-    pass
+    """Represents an error with the API server."""
 
 
-class MissingResourceError(InvalidRequestError):
-    pass
+class AuthenticationError(FintocError):
+    """Represents an error with the authentication."""
 
 
-class InvalidLinkTokenError(InvalidRequestError):
-    pass
+class LinkError(FintocError):
+    """Represents an error with a Link object."""
 
 
-class InvalidUsernameError(InvalidRequestError):
-    pass
+class InstitutionError(FintocError):
+    """Represents an error with an Institution object."""
 
 
-class InvalidHolderTypeError(InvalidRequestError):
-    pass
-
-
-class MissingParameterError(InvalidRequestError):
-    pass
-
-
-class EmptyStringError(InvalidRequestError):
-    pass
-
-
-class UnrecognizedRequestError(InvalidRequestError):
-    pass
-
-
-class InvalidDateError(InvalidRequestError):
-    pass
-
-
-class InvalidCredentialsError(LinkError):
-    pass
-
-
-class LockedCredentialsError(LinkError):
-    pass
-
-
-class InvalidApiKeyError(AuthenticationError):
-    pass
-
-
-class UnavailableInstitutionError(InstitutionError):
-    pass
-
-
-class InternalServerError(ApiError):
-    pass
+class InvalidRequestError(FintocError):
+    """Represents an error because of an invalid request."""

@@ -1,81 +1,73 @@
-"""
-utils.py
-========
+"""Module to hold every generalized utility on the SDK."""
 
-A module with a handful of run-of-the-mill utilities.
-And they're here to make this codebase more readable.
-"""
+from importlib import import_module
 
-import itertools
+import httpx
+
+from fintoc.errors import FintocError
 
 
-fieldsubs = ("id", "id_"), ("type", "type_")
+def snake_to_pascal(snake_string):
+    """Return the snake-cased string as pascal case."""
+    return "".join(word.title() for word in snake_string.split("_"))
 
 
-def flatten(sequence):
+def singularize(string):
+    """Remove the last 's' from a string if exists."""
+    return string.rstrip("s")
+
+
+def get_resource_class(snake_resource_name, value={}):
     """
-    Get a flat list out of a list of lists.
+    Get the class that corresponds to a resource using its
+    name (in snake case) and its value.
     """
+    if isinstance(value, dict):
+        module = import_module("fintoc.resources")
+        try:
+            return getattr(module, snake_to_pascal(snake_resource_name))
+        except AttributeError:
+            return getattr(module, "GenericFintocResource")
+    return type(value)
 
-    return list(itertools.chain(*sequence))
 
-
-def pick(dict_, key):
+def get_error_class(snake_error_name):
     """
-    If the key exists, you will get that key-value pair.
-    And if it doesn't, well... you'll get an empty dict.
-    Better luck next time!
-
-    >>> test = {"spam": 42, "ham": "spam"}
-    >>> pick(test, "ham")
-    {"ham": "spam"}
-    >>> pick(test, "eggs")
-    {}
+    Given an error name (in snake case), return the appropriate
+    error class.
     """
+    module = import_module("fintoc.errors")
+    return getattr(module, snake_to_pascal(snake_error_name), FintocError)
 
-    return dict_.get(key, {}) and {key: dict_.get(key)}
 
-
-def pluralize(amount: int, noun: str, *, suffix: str = "s") -> str:
+def can_raise_http_error(function):
     """
-    Get a pluralized noun with its appropriate quantifier.
-    """
-
-    quantifier = amount or "no"
-    return f"{quantifier} {noun if amount == 1 else noun + suffix}"
-
-
-def rename_keys(dist, keys):
-    """
-    Rename all the dictionary keys *in-place* inside a *dist*,
-    which is a nested structure that could be a dict or a list.
-    Hence, I named it as dist... which is much better than lict.
-
-    >>> test = {"spam": 42, "ham": "spam", "bacon": {"spam": -1}}
-    >>> rename_keys(test, ("spam", "eggs"))
-    {"eggs": 42, "ham": "spam", "bacon": {"eggs": -1}}
+    Decorator that catches HTTPError exceptions and raises custom
+    Fintoc errors instead.
     """
 
-    if isinstance(dist, list):
-        for item in dist:
-            rename_keys(item, keys)
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except httpx.HTTPError as exc:
+            error_data = exc.response.json()
+            error = get_error_class(error_data["error"]["type"])
+            raise error(error_data["error"]) from None
 
-    elif isinstance(dist, dict):
-        oldkey, newkey = keys
-        if oldkey in dist:
-            dist[newkey] = dist.pop(oldkey)
-        for value in dist.values():
-            rename_keys(value, keys)
-
-    return dist
+    return wrapper
 
 
-def snake_to_pascal(name: str) -> str:
+def objetize(klass, client, data, handlers={}, methods=[], path=None):
+    """Transform the :data: object into an object with class :klass:."""
+    if klass is str or klass is dict:
+        return klass(data)
+    return klass(client, handlers, methods, path, **data)
+
+
+def objetize_generator(generator, klass, client, handlers={}, methods=[], path=None):
     """
-    Transform a snake-cased name to its pascal-cased version.
-
-    >>> snake_to_pascal("this_example_should_be_good_enough")
-    "ThisExampleShouldBeGoodEnough"
+    Transform a generator of dictionaries into a generator of
+    objects with class :klass:.
     """
-
-    return "".join(word.title() for word in name.split("_"))
+    for element in generator:
+        yield objetize(klass, client, element, handlers, methods, path)

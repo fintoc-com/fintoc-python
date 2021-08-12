@@ -1,159 +1,332 @@
+<h1 align="center">Fintoc meets Python 🐍</h1>
 
-# Fintoc meets :snake:
-[![fintoc-com](https://circleci.com/gh/fintoc-com/fintoc-python.svg?style=shield)](https://circleci.com/gh/fintoc-com/fintoc-python)
-![PyPI](https://img.shields.io/pypi/v/fintoc?color=g)
+<p align="center">
+    <em>
+        You have just found the Python-flavored client of <a href="https://fintoc.com/" target="_blank">Fintoc</a>.
+    </em>
+</p>
 
-You have just found the [Python](https://www.python.org/)-flavored client of [Fintoc](https://fintoc.com/).
+<p align="center">
+<a href="https://pypi.org/project/fintoc" target="_blank">
+    <img src="https://img.shields.io/pypi/v/fintoc?label=version&logo=python&logoColor=%23fff&color=306998" alt="PyPI - Version">
+</a>
+
+<a href="https://github.com/fintoc-com/fintoc-python/actions?query=workflow%3Atests" target="_blank">
+    <img src="https://img.shields.io/github/workflow/status/fintoc-com/fintoc-python/tests?label=tests&logo=python&logoColor=%23fff" alt="Tests">
+</a>
+
+<a href="https://codecov.io/gh/fintoc-com/fintoc-python" target="_blank">
+    <img src="https://img.shields.io/codecov/c/gh/fintoc-com/fintoc-python?label=coverage&logo=codecov&logoColor=ffffff" alt="Coverage">
+</a>
+
+<a href="https://github.com/fintoc-com/fintoc-python/actions?query=workflow%3Alinters" target="_blank">
+    <img src="https://img.shields.io/github/workflow/status/fintoc-com/fintoc-python/linters?label=linters&logo=github" alt="Linters">
+</a>
+</p>
 
 ## Why?
 
 You can think of [Fintoc API](https://fintoc.com/docs) as a piscola.
-And the key ingredient to a properly made piscola are the ice cubes.  
+And the key ingredient to a properly made piscola are the ice cubes.
 Sure, you can still have a [piscola without ice cubes](https://curl.haxx.se/).
-But hey… that’s not enjoyable -- why would you do that?  
+But hey… that’s not enjoyable -- why would you do that?
 Do yourself a favor: go grab some ice cubes by installing this refreshing library.
 
----
+## Installation
 
-## Table of contents
-
-* [How to install](#how-to-install)
-* [Quickstart](#quickstart)
-* [Documentation](#documentation)
-* [Examples](#examples)
-  + [Get accounts](#get-accounts)
-  + [Get movements](#get-movements)
-* [Dependencies](#dependencies)
-* [How to test...](#how-to-test)
-* [Roadmap](#roadmap)
-* [Acknowledgements](#acknowledgements)
-
-## How to install
-
-Install it with [Poetry](https://python-poetry.org/), the modern package manager.
+Install using pip!
 
 ```sh
-$ poetry add fintoc
+pip install fintoc
 ```
 
-Don’t worry: if poetry is not your thing, you can also use [pip](https://pip.pypa.io/en/stable/).
+**Note:** This SDK requires [**Python 3.6+**](https://docs.python.org/3/whatsnew/3.6.html).
 
-```sh
-$ pip install fintoc
-```
+## Usage
 
-**Note:** This client requires [**Python 3.6+**](https://docs.python.org/3/whatsnew/3.6.html).
+The idea behind this SDK is to stick to the API design as much as possible, so that it feels ridiculously natural to use even while only reading the raw API documentation.
 
-## Quickstart
+### Quickstart
 
-1. Get your API key and link your bank account using the [Fintoc dashboard](https://app.fintoc.com/login).
-2. Open your command-line interface.
-3. Write a few lines of Python to see your bank movements.
+To be able to use this SDK, you first need to have a [Fintoc](https://app.fintoc.com/login) account. You will need to get your secret API key from the dashboard to be able to use the SDK. Once you have your API key, all you need to do is initialize a `Fintoc` object with it and you're ready to start enjoying Fintoc!
 
 ```python
->>> from fintoc import Client
->>> client = Client("your_api_key")
->>> link = client.get_link("your_link_token")
->>> account = link.find(type_="checking_account")
->>> account.get_movements(since='2020-01-01')
+from fintoc import Fintoc
+
+fintoc_client = Fintoc("your_api_key")
 ```
 
-And that’s it!
+Now you can start using the SDK!
 
-## Documentation
+### Managers
 
-This client supports all Fintoc API endpoints. For complete information about the API, head to the [docs](https://fintoc.com/docs).
+To make the usage of the SDK feel natural, resources are managed by **managers** (_wow_). These **managers** correspond to objects with some methods that allow you to get the resources that you want. Each manager is _attached_ to another resource, following the API structure. For example, the `Fintoc` object has `links` and `webhook_endpoints` managers, while `Link` objects have an `accounts` manager (we will see more examples soon). Notice that **not every manager has all of the methods**, as they correspond to the API capabilities. The methods of the managers are the following (we will use the `webhook_endpoints` manager as an example):
 
-## Examples
+#### `all`
 
-### Get accounts
+You can use the `all` method of the managers as follows:
 
 ```python
-from fintoc import Client
-
-client = Client("your_api_key")
-link = client.get_link("your_link_token")
-
-for account in link:
-    print(account.name)
-
-# Or... you can pretty print all the accounts in a Link
-link.show_accounts()
+webhook_endpoints = fintoc_client.webhook_endpoints.all()
 ```
 
-If you want to find a specific account in a link, you can use **find**. You can search by any account field:
+The `all` method of the managers returns **a generator** with all the instances of the resource. This method can also receive `kwargs`! The arguments that can be passed are the arguments that the API receives for that specific resource! For example, the `Movement` resource can be filtered using `since` and `until`, so if you wanted to get a range of `movements` from an `account`, all you need to do is to pass the parameters to the method!
 
 ```python
-account = link.find(type_="checking_account")
-account = link.find(number="1111111")
-account = link.find(id_="sdfsdf234")
+movements = account.movements.all(since="2019-07-24", until="2021-05-12")
 ```
 
-You can also search for multiple accounts matching a specific criteria with **find_all**:
+You can also pass the `lazy=False` parameter to the method to force the SDK to return a list of all the instances of the resource instead of the generator. **Beware**: this could take **very long**, depending on the amount of instances that exist of said resource:
 
 ```python
-clp_accounts = link.find_all(currency="CLP")
+webhook_endpoints = fintoc_client.webhook_endpoints.all(lazy=False)
+
+isinstance(webhook_endpoints, list)  # True
 ```
 
-To update the account balance you can use **update_balance**:
+#### `get`
+
+You can use the `get` method of the managers as follows:
 
 ```python
-account.update_balance()
-print(account.balance.available)
+webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
 ```
 
-### Get movements
+The `get` method of the managers returns an existing instance of the resource using its identifier to find it.
+
+#### `create`
+
+You can use the `create` method of the managers as follows:
 
 ```python
-from datetime import date, timedelta
-from fintoc import Client
-
-client = Client("your_api_key")
-link = client.get_link("your_link_token")
-account = link.find(type_="checking_account")
-
-# You can get the account movements since a specific datetime
-yesterday = date.today() - timedelta(days=1)
-movements = account.get_movements(since=yesterday)
-
-# Or... you can use an ISO 8601 formatted string representation of the datetime
-movements = account.get_movements(since='2020-01-01')
+webhook_endpoint = fintoc_client.webhook_endpoints.create(
+    url="https://webhook.site/58gfb429-c33c-20c7-584b-d5ew3y3202a0",
+    enabled_events=["link.credentials_changed"],
+    description="Fantasting webhook endpoint",
+)
 ```
 
-Calling **get_movements** without arguments gets the last 30 movements of the account.
+The `create` method of the managers creates and returns a new instance of the resource. The attributes of the created object are passed as `kwargs`, and correspond to the parameters specified by the API documentation for the creation of said resource.
 
-## Dependencies
+#### `update`
 
-This project relies on these useful libraries.
+You can use the `update` method of the managers as follows:
 
-- [**httpx**](https://github.com/encode/httpx) -- a next-generation HTTP client
-- [**tabulate**](https://github.com/astanin/python-tabulate) -- pretty-print tabular data
-- [**python-dateutil**](https://github.com/dateutil/dateutil) -- useful extensions to the standard Python datetime features
+```python
+webhook_endpoint = fintoc_client.webhook_endpoints.update(
+    "we_8anqVLlBC8ROodem",
+    enabled_events=["account.refresh_intent.succeeded"],
+    disabled=True,
+)
+```
 
-## How to test…
+The `update` method of the managers updates and returns an existing instance of the resource using its identifier to find it. The first parameter of the method corresponds to the identifier being used to find the existing instance of the resource. The attributes to be modified are passed as `kwargs`, and correspond to the parameters specified by the API documentation for the update action of said resource.
 
-### The web API
+Notice that using the manager to update an instance of a resource is equivalent to calling the `update` directly on the object itself:
 
-That’s a [🍰](https://en.wiktionary.org/wiki/piece_of_cake).
 
-1. Log in into your bank account and send me some money.
-2. Use this library to check if the movement is correct.
-3. You’re welcome.
+```python
+# Using the manager
+webhook_endpoint = fintoc_client.webhook_endpoints.update(
+    "we_8anqVLlBC8ROodem",
+    enabled_events=["account.refresh_intent.succeeded"],
+    disabled=True,
+)
 
-### The library
+# Using the object
+webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
+webhook_endpoint.update(
+    enabled_events=["account.refresh_intent.succeeded"],
+    disabled=True,
+)
+```
 
-You can run all the [discoverable tests](https://docs.python.org/3/library/unittest.html#test-discovery).
+When using the SDK, you will probably almost always want to use the object directly to update, just because it is way less verbose if you already have the object itself.
 
-`$ python -m unittest`
+#### `delete`
 
-## Roadmap
+You can use the `delete` method of the managers as follows:
 
-- Add more docstrings
-- Add more unit tests
-- Add more type hints
+```python
+deleted_identifier = fintoc_client.webhook_endpoints.delete("we_8anqVLlBC8ROodem")
+```
+
+The `delete` method of the managers deletes an existing instance of the resource using its identifier to find it and returns the identifier.
+
+Notice that using the manager to delete an instance of a resource is equivalent to calling the `delete` directly on the object itself:
+
+
+```python
+# Using the manager
+deleted_identifier = fintoc_client.webhook_endpoints.delete("we_8anqVLlBC8ROodem")
+
+# Using the object
+webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
+deleted_identifier = webhook_endpoint.delete()
+```
+
+When using the SDK, you will probably almost always want to use the object directly to delete, just because it is way less verbose if you already have the object itself.
+
+### The shape of the SDK
+
+For complete information about the API, head to [the docs](https://fintoc.com/docs). You will notice that the shape of the SDK is very similar to the shape of the API. Let's start with the `Fintoc` object.
+
+#### The `Fintoc` object
+
+To create a `Fintoc` object, instantiate it using your secret API key:
+
+```python
+from fintoc import Fintoc
+
+fintoc_client = Fintoc("your_api_key")
+```
+
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains two [managers](#managers): `links` and `webhook_endpoints`.
+
+#### The `webhook_endpoints` manager
+
+Available methods: `all`, `get`, `create`, `update`, `delete`.
+
+From the Fintoc client, you can manage your webhook endpoints swiftly! Start by creating a new Webhook Endpoint!
+
+```python
+webhook_endpoint = fintoc_client.webhook_endpoints.create(
+    url="https://webhook.site/58gfb429-c33c-20c7-584b-d5ew3y3202a0",
+    enabled_events=["account.refresh_intent.succeeded"],
+    disabled=True,
+)
+
+print(webhook_endpoint.id)  # we_8anqVLlBC8ROodem
+```
+
+You can update this webhook endpoint any time you want! Just run the following command:
+
+```python
+webhook_endpoint = fintoc_client.webhook_endpoints.update(
+    "we_8anqVLlBC8ROodem",
+    enabled_events=["link.credentials_changed"],
+    description="Fantasting webhook endpoint",
+)
+
+print(webhook_endpoint.status)  # disabled
+```
+
+Maybe you no longer want this webhook endpoint. Let's delete it!
+
+```python
+fintoc_client.webhook_endpoints.delete("we_8anqVLlBC8ROodem")
+```
+
+Now, let's list every webhook endpoint we have:
+
+```python
+for webhook_endpoint in fintoc_client.webhook_endpoints.all():
+    print(webhook_endpoint.id)
+```
+
+If you see a webhook endpoint you want to use, just use the `get` method!
+
+```python
+webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
+
+print(webhook_endpoint.id)  # we_8anqVLlBC8ROodem
+```
+
+#### The `links` manager
+
+Available methods: `all`, `get`, `update`, `delete`.
+
+Links are probably the most importat resource. Let's list them!
+
+```python
+print(len(fintoc_client.links.all(lazy=False)))  # 3
+
+for link in fintoc_client.links.all():
+    print(link.id)
+```
+
+Links are a bit different than the rest of the resources, because their identifier is not really their `id`, but their `link_token`. This means that, in order to `get`, `update` or `delete` a link, you need to pass the `link_token`!
+
+```python
+link = fintoc_client.links.get("link_Y75EXAKiIVj7w489_token_NCqjwRVoTX3cmnx8pnbpqd11")
+```
+
+Notice that the Link objects generated from the `all` method will have their `link_token` attribute set to `None`, while the Link object generated from `get` or `update` will have its `link_token` set to the correct link token (given that the link token is necessary to `get` or `update` on the first place).
+
+The Link resource has a lot of **managers**!
+
+```python
+invoices = link.invoices.all()  # Invoices
+tax_returns = link.tax_returns.all()  # Tax Returns
+subscriptions = link.subscriptions.all()  # Subscriptions
+accounts = link.accounts.all()  # Accounts
+```
+
+#### The `invoices` manager
+
+Available methods: `all`.
+
+Once you have a Link, you can use the `invoices` manager to get all the invoices associated to a link!
+
+```python
+for invoice in link.invoices.all():
+    print(invoice.id)
+```
+
+#### The `tax_returns` manager
+
+Available methods: `all`, `get`.
+
+Once you have a Link, you can use the `tax_returns` manager to get all the tax returns associated to a link!
+
+```python
+for tax_return in link.tax_returns.all():
+    print(tax_return.id)
+```
+
+#### The `subscriptions` manager
+
+Available methods: `all`, `get`.
+
+Once you have a Link, you can use the `subscriptions` manager to get all the subscriptions associated to a link!
+
+```python
+for subscription in link.subscriptions.all():
+    print(subscription.id)
+```
+
+#### The `accounts` manager
+
+Available methods: `all`, `get`.
+
+Once you have a Link, you can use the `accounts` manager to get all the accounts associated to a link!
+
+```python
+for account in link.accounts.all():
+    print(account.id)
+```
+
+Notice that accounts also have a `movements` manager, to get all of the movements of an account:
+
+```python
+account = link.accounts.all(lazy=False)[0]
+
+movements = account.movements.all(lazy=False)
+```
+
+#### The `movements` manager
+
+Available methods: `all`, `get`.
+
+Once you have an Account, you can use the `movements` manager to get all the movements associated to that account!
+
+```python
+for movement in account.movements.all():
+    print(movement.id)
+```
 
 ## Acknowledgements
 
-This library was initially designed and handcrafted by [**@nebil**](https://github.com/nebil),
-[ad](https://en.wikipedia.org/wiki/Ad_honorem) [piscolem](https://en.wiktionary.org/wiki/piscola).  
+The first version of this SDK was originally designed and handcrafted by [**@nebil**](https://github.com/nebil),
+[ad](https://en.wikipedia.org/wiki/Ad_honorem) [piscolem](https://en.wiktionary.org/wiki/piscola).
 He built it with the help of Gianni Roberto’s [Picchi 2](https://www.youtube.com/watch?v=WqjUlmkYr2g).
