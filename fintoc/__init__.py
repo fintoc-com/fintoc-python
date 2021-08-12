@@ -1,17 +1,6 @@
 """
-__init__.py
-===========
-
-Let's initialize this machine.
+Init file for the Fintoc Python SDK.
 """
 
-__version__ = "0.3.1"
-
-import locale
-
-from fintoc.client import Client
-
-try:
-    locale.setlocale(locale.LC_ALL, "")
-except locale.Error:
-    pass
+from fintoc.core import Fintoc
+from fintoc.version import __version__
