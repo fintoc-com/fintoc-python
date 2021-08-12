@@ -19,7 +19,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         }
 
     def __getattr__(self, attr):
-        if attr not in self.methods:
+        if attr not in self.__class__.methods:
             raise AttributeError(
                 f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
             )
@@ -50,13 +50,13 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         Return all instances of the resource being handled by the manager.
         :kwargs: can be used to filter the results, using the API parameters.
         """
-        klass = get_resource_class(self.resource)
+        klass = get_resource_class(self.__class__.resource)
         objects = resource_all(
             client=self._client,
             path=self._path,
             klass=klass,
             handlers=self._handlers,
-            methods=self.methods,
+            methods=self.__class__.methods,
             params=kwargs,
         )
         return self.post_all_handler(objects, **kwargs)
@@ -67,14 +67,14 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         Return an instance of the resource being handled by the manager,
         identified by :identifier:.
         """
-        klass = get_resource_class(self.resource)
+        klass = get_resource_class(self.__class__.resource)
         object_ = resource_get(
             client=self._client,
             path=self._path,
             id_=identifier,
             klass=klass,
             handlers=self._handlers,
-            methods=self.methods,
+            methods=self.__class__.methods,
             params=kwargs,
         )
         return self.post_get_handler(object_, identifier, **kwargs)
@@ -85,13 +85,13 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         Create an instance of the resource being handled by the manager.
         Data is passed using :kwargs:, as specified by the API.
         """
-        klass = get_resource_class(self.resource)
+        klass = get_resource_class(self.__class__.resource)
         object_ = resource_create(
             client=self._client,
             path=self._path,
             klass=klass,
             handlers=self._handlers,
-            methods=self.methods,
+            methods=self.__class__.methods,
             params=kwargs,
         )
         return self.post_create_handler(object_, **kwargs)

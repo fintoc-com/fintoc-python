@@ -7,5 +7,5 @@ class SubscriptionsManager(ManagerMixin):
 
     """Represents a subscriptions manager."""
 
-    resource = "subscriptions"
+    resource = "subscription"
     methods = ["all", "get"]
