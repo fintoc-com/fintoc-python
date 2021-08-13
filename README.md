@@ -325,6 +325,18 @@ for movement in account.movements.all():
     print(movement.id)
 ```
 
+### Serialization
+
+Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!
+
+```python
+account = link.accounts.all(lazy=False)[0]
+
+serialization = account.serialize()
+```
+
+The serialization corresponds to a dictionary with only simple types, that can be JSON-serialized.
+
 ## Acknowledgements
 
 The first version of this SDK was originally designed and handcrafted by [**@nebil**](https://github.com/nebil),
