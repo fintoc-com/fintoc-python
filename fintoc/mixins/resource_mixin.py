@@ -37,6 +37,7 @@ class ResourceMixin(metaclass=ABCMeta):
                 else:
                     klass = get_resource_class(resource, value=value)
                     setattr(self, key, objetize(klass, client, value))
+                self._attributes.append(key)
             except NameError:  # pragma: no cover
                 pass
 
