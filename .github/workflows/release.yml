@@ -79,7 +79,7 @@ jobs:
         uses: jwalton/gh-find-current-pr@v1
         id: find-pr
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          state: all
 
       - name: Tag and Release
         uses: actions/create-release@latest
