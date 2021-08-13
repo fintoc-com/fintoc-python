@@ -37,7 +37,7 @@ class ResourceMixin(metaclass=ABCMeta):
                 else:
                     klass = get_resource_class(resource, value=value)
                     setattr(self, key, objetize(klass, client, value))
-            except NameError:
+            except NameError:  # pragma: no cover
                 pass
 
     def __getattr__(self, attr):
@@ -49,7 +49,15 @@ class ResourceMixin(metaclass=ABCMeta):
 
     def serialize(self):
         """Serialize the resource."""
-        return {key: serialize(self.__dict__[key]) for key in self._attributes}
+        serialized = {}
+        for key in self._attributes:
+            element = (
+                [serialize(x) for x in self.__dict__[key]]
+                if isinstance(self.__dict__[key], list)
+                else serialize(self.__dict__[key])
+            )
+            serialized = {**serialized, key: element}
+        return serialized
 
     @can_raise_http_error
     def _update(self, **kwargs):
