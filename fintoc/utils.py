@@ -1,5 +1,6 @@
 """Module to hold every generalized utility on the SDK."""
 
+import datetime
 from importlib import import_module
 
 import httpx
@@ -70,6 +71,15 @@ def can_raise_http_error(function):
             raise error(error_data["error"]) from None
 
     return wrapper
+
+
+def serialize(object_):
+    """Serializes an object."""
+    if callable(getattr(object_, "serialize", None)):
+        return object_.serialize()
+    if isinstance(object_, datetime.datetime):
+        return object_.isoformat()
+    return object_
 
 
 def objetize(klass, client, data, handlers={}, methods=[], path=None):

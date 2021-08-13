@@ -3,7 +3,13 @@
 from abc import ABCMeta
 
 from fintoc.resource_handlers import resource_delete, resource_update
-from fintoc.utils import can_raise_http_error, get_resource_class, objetize, singularize
+from fintoc.utils import (
+    can_raise_http_error,
+    get_resource_class,
+    objetize,
+    serialize,
+    singularize,
+)
 
 
 class ResourceMixin(metaclass=ABCMeta):
@@ -40,6 +46,10 @@ class ResourceMixin(metaclass=ABCMeta):
                 f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
             )
         return getattr(self, f"_{attr}")
+
+    def serialize(self):
+        """Serialize the resource."""
+        return {key: serialize(self.__dict__[key]) for key in self._attributes}
 
     @can_raise_http_error
     def _update(self, **kwargs):
