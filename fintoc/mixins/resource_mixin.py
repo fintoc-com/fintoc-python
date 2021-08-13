@@ -30,7 +30,8 @@ class ResourceMixin(metaclass=ABCMeta):
                 klass = get_resource_class(resource, value=value)
                 setattr(self, key, objetize(klass, client, value))
             else:
-                setattr(self, key, value)
+                klass = get_resource_class(resource, value=value)
+                setattr(self, key, objetize(klass, client, value))
 
     def __getattr__(self, attr):
         if attr not in self._methods:
