@@ -1,5 +1,6 @@
 from types import GeneratorType
 
+from dateutil import parser
 import httpx
 import pytest
 
@@ -9,6 +10,7 @@ from fintoc.utils import (
     can_raise_http_error,
     get_error_class,
     get_resource_class,
+    is_iso_datetime,
     objetize,
     objetize_generator,
     singularize,
@@ -50,6 +52,16 @@ class TestSingularize:
         assert singular != "formula"
 
 
+class TestIsISODateTime:
+    def test_valid_iso_format(self):
+        valid_iso_datetime_string = "2021-08-13T13:40:40.811Z"
+        assert is_iso_datetime(valid_iso_datetime_string)
+
+    def test_invalid_iso_format(self):
+        invalid_iso_datetime_string = "This is not a date"
+        assert not is_iso_datetime(invalid_iso_datetime_string)
+
+
 class TestGetResourceClass:
     def test_default_valid_resource(self):
         resource = "link"
@@ -61,10 +73,25 @@ class TestGetResourceClass:
         klass = get_resource_class(resource)
         assert klass is GenericFintocResource
 
+    def test_iso_datetime_resource(self):
+        resource = "any_resource"
+        klass = get_resource_class(resource, value="2021-08-13T13:40:40.811Z")
+        assert klass is parser.isoparse
+
     def test_string_resource(self):
         resource = "any_resource"
         klass = get_resource_class(resource, value="test-value")
         assert klass is str
+
+    def test_int_resource(self):
+        resource = "any_resource"
+        klass = get_resource_class(resource, value=15)
+        assert klass is int
+
+    def test_bool_resource(self):
+        resource = "any_resource"
+        klass = get_resource_class(resource, value=True)
+        assert klass is bool
 
     def test_integer_resource(self):
         resource = "any_resource"
