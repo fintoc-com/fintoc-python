@@ -26,11 +26,9 @@ class ResourceMixin(metaclass=ABCMeta):
                 element = {} if not value else value[0]
                 klass = get_resource_class(resource, value=element)
                 setattr(self, key, [objetize(klass, client, x) for x in value])
-            elif isinstance(value, dict):
+            else:
                 klass = get_resource_class(resource, value=value)
                 setattr(self, key, objetize(klass, client, value))
-            else:
-                setattr(self, key, value)
 
     def __getattr__(self, attr):
         if attr not in self._methods:
