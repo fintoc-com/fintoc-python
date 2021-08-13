@@ -2,6 +2,7 @@
 
 from importlib import import_module
 
+from dateutil import parser
 import httpx
 
 from fintoc.errors import FintocError
@@ -17,6 +18,18 @@ def singularize(string):
     return string.rstrip("s")
 
 
+def is_iso_datetime(string):
+    """
+    Try to parse a string as an ISO date. If it succeeds, return True.
+    Otherwise, return False.
+    """
+    try:
+        parser.isoparse(string)
+        return True
+    except ValueError:
+        return False
+
+
 def get_resource_class(snake_resource_name, value={}):
     """
     Get the class that corresponds to a resource using its
@@ -28,6 +41,8 @@ def get_resource_class(snake_resource_name, value={}):
             return getattr(module, snake_to_pascal(snake_resource_name))
         except AttributeError:
             return getattr(module, "GenericFintocResource")
+    if isinstance(value, str) and is_iso_datetime(value):
+        return parser.isoparse
     return type(value)
 
 
@@ -59,7 +74,9 @@ def can_raise_http_error(function):
 
 def objetize(klass, client, data, handlers={}, methods=[], path=None):
     """Transform the :data: object into an object with class :klass:."""
-    if klass is str or klass is dict:
+    if data is None:
+        return None
+    if klass in [str, int, dict, bool, parser.isoparse]:
         return klass(data)
     return klass(client, handlers, methods, path, **data)
 
