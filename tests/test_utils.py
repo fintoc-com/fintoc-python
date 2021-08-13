@@ -1,8 +1,8 @@
 from types import GeneratorType
 
-from dateutil import parser
 import httpx
 import pytest
+from dateutil import parser
 
 from fintoc.errors import ApiError, FintocError
 from fintoc.resources import GenericFintocResource, Link

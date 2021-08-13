@@ -2,8 +2,8 @@
 
 from importlib import import_module
 
-from dateutil import parser
 import httpx
+from dateutil import parser
 
 from fintoc.errors import FintocError
 
