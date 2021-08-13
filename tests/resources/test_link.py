@@ -1,3 +1,5 @@
+import pytest
+
 from fintoc.client import Client
 from fintoc.mixins import ManagerMixin
 from fintoc.resources import Link
@@ -30,7 +32,9 @@ class TestLinkResource:
         assert link._Link__accounts_manager is not None
         assert isinstance(link._Link__accounts_manager, ManagerMixin)
 
-        link.accounts = None
+        with pytest.raises(NameError):
+            link.accounts = None
+
         assert link.accounts is not None
         assert isinstance(link.accounts, ManagerMixin)
         assert isinstance(link._Link__accounts_manager, ManagerMixin)
@@ -44,7 +48,9 @@ class TestLinkResource:
         assert link._Link__subscriptions_manager is not None
         assert isinstance(link._Link__subscriptions_manager, ManagerMixin)
 
-        link.subscriptions = None
+        with pytest.raises(NameError):
+            link.subscriptions = None
+
         assert link.subscriptions is not None
         assert isinstance(link.subscriptions, ManagerMixin)
         assert isinstance(link._Link__subscriptions_manager, ManagerMixin)
@@ -58,7 +64,9 @@ class TestLinkResource:
         assert link._Link__tax_returns_manager is not None
         assert isinstance(link._Link__tax_returns_manager, ManagerMixin)
 
-        link.tax_returns = None
+        with pytest.raises(NameError):
+            link.tax_returns = None
+
         assert link.tax_returns is not None
         assert isinstance(link.tax_returns, ManagerMixin)
         assert isinstance(link._Link__tax_returns_manager, ManagerMixin)
@@ -72,7 +80,9 @@ class TestLinkResource:
         assert link._Link__invoices_manager is not None
         assert isinstance(link._Link__invoices_manager, ManagerMixin)
 
-        link.invoices = None
+        with pytest.raises(NameError):
+            link.invoices = None
+
         assert link.invoices is not None
         assert isinstance(link.invoices, ManagerMixin)
         assert isinstance(link._Link__invoices_manager, ManagerMixin)

@@ -26,7 +26,7 @@ class Link(ResourceMixin):
 
     @accounts.setter
     def accounts(self, new_value):  # pylint: disable=no-self-use
-        return
+        raise NameError("Attribute name corresponds to a manager")
 
     @property
     def subscriptions(self):
@@ -39,7 +39,7 @@ class Link(ResourceMixin):
 
     @subscriptions.setter
     def subscriptions(self, new_value):  # pylint: disable=no-self-use
-        return
+        raise NameError("Attribute name corresponds to a manager")
 
     @property
     def tax_returns(self):
@@ -50,7 +50,7 @@ class Link(ResourceMixin):
 
     @tax_returns.setter
     def tax_returns(self, new_value):  # pylint: disable=no-self-use
-        return
+        raise NameError("Attribute name corresponds to a manager")
 
     @property
     def invoices(self):
@@ -61,4 +61,4 @@ class Link(ResourceMixin):
 
     @invoices.setter
     def invoices(self, new_value):  # pylint: disable=no-self-use
-        return
+        raise NameError("Attribute name corresponds to a manager")

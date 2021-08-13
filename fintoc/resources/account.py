@@ -23,4 +23,4 @@ class Account(ResourceMixin):
 
     @movements.setter
     def movements(self, new_value):  # pylint: disable=no-self-use
-        return
+        raise NameError("Attribute name corresponds to a manager")

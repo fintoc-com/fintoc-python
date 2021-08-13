@@ -3,7 +3,13 @@
 from abc import ABCMeta
 
 from fintoc.resource_handlers import resource_delete, resource_update
-from fintoc.utils import can_raise_http_error, get_resource_class, objetize, singularize
+from fintoc.utils import (
+    can_raise_http_error,
+    get_resource_class,
+    objetize,
+    serialize,
+    singularize,
+)
 
 
 class ResourceMixin(metaclass=ABCMeta):
@@ -18,19 +24,22 @@ class ResourceMixin(metaclass=ABCMeta):
         self._handlers = handlers
         self._methods = methods
         self._path = path
+        self._attributes = []
 
         for key, value in kwargs.items():
-            resource = self.__class__.mappings.get(key, key)
-            if isinstance(value, list):
-                resource = singularize(resource)
-                element = {} if not value else value[0]
-                klass = get_resource_class(resource, value=element)
-                setattr(self, key, [objetize(klass, client, x) for x in value])
-            elif isinstance(value, dict):
-                klass = get_resource_class(resource, value=value)
-                setattr(self, key, objetize(klass, client, value))
-            else:
-                setattr(self, key, value)
+            try:
+                resource = self.__class__.mappings.get(key, key)
+                if isinstance(value, list):
+                    resource = singularize(resource)
+                    element = {} if not value else value[0]
+                    klass = get_resource_class(resource, value=element)
+                    setattr(self, key, [objetize(klass, client, x) for x in value])
+                else:
+                    klass = get_resource_class(resource, value=value)
+                    setattr(self, key, objetize(klass, client, value))
+                self._attributes.append(key)
+            except NameError:  # pragma: no cover
+                pass
 
     def __getattr__(self, attr):
         if attr not in self._methods:
@@ -38,6 +47,18 @@ class ResourceMixin(metaclass=ABCMeta):
                 f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
             )
         return getattr(self, f"_{attr}")
+
+    def serialize(self):
+        """Serialize the resource."""
+        serialized = {}
+        for key in self._attributes:
+            element = (
+                [serialize(x) for x in self.__dict__[key]]
+                if isinstance(self.__dict__[key], list)
+                else serialize(self.__dict__[key])
+            )
+            serialized = {**serialized, key: element}
+        return serialized
 
     @can_raise_http_error
     def _update(self, **kwargs):
