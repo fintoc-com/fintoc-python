@@ -1,3 +1,5 @@
+import pytest
+
 from fintoc.client import Client
 from fintoc.mixins import ManagerMixin
 from fintoc.resources import Account
@@ -30,7 +32,9 @@ class TestAccountResource:
         assert account._Account__movements_manager is not None
         assert isinstance(account._Account__movements_manager, ManagerMixin)
 
-        account.movements = None
+        with pytest.raises(NameError):
+            account.movements = None
+
         assert account.movements is not None
         assert isinstance(account.movements, ManagerMixin)
         assert isinstance(account._Account__movements_manager, ManagerMixin)

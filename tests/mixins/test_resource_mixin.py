@@ -100,6 +100,57 @@ class TestResourceMixinCreation:
         resource.delete()
 
 
+class TestMixinSerializeMethod:
+    @pytest.fixture(autouse=True)
+    def patch_http_client(self, patch_http_client):
+        pass
+
+    def setup_method(self):
+        self.base_url = "https://test.com"
+        self.api_key = "super_secret_api_key"
+        self.user_agent = "fintoc-python/test"
+        self.params = {"first_param": "first_value", "second_param": "second_value"}
+        self.client = Client(
+            self.base_url,
+            self.api_key,
+            self.user_agent,
+            params=self.params,
+        )
+        self.path = "/resources"
+        self.handlers = {
+            "update": lambda object_, identifier: print("Calling update...") or object_,
+            "delete": lambda identifier: print("Calling delete...") or identifier,
+        }
+
+    def test_serialization_method(self):
+        methods = ["delete"]
+        data = {
+            "id": "id0",
+            "identifier": "identifier0",
+            "resource": {"id": "id3", "identifier": "identifier3"},
+        }
+        resource = EmptyMockResource(
+            self.client, self.handlers, methods, self.path, **data
+        )
+        assert resource.serialize() == data
+
+    def test_array_serialization_method(self):
+        methods = ["delete"]
+        data = {
+            "id": "id0",
+            "identifier": "identifier0",
+            "resources": [
+                {"id": "id1", "identifier": "identifier1"},
+                {"id": "id2", "identifier": "identifier2"},
+            ],
+            "resource": {"id": "id3", "identifier": "identifier3"},
+        }
+        resource = EmptyMockResource(
+            self.client, self.handlers, methods, self.path, **data
+        )
+        assert resource.serialize() == data
+
+
 class TestMixinUpdateAndDeleteMethods:
     @pytest.fixture(autouse=True)
     def patch_http_client(self, patch_http_client):

@@ -1,3 +1,4 @@
+import datetime
 from types import GeneratorType
 
 import httpx
@@ -13,6 +14,7 @@ from fintoc.utils import (
     is_iso_datetime,
     objetize,
     objetize_generator,
+    serialize,
     singularize,
     snake_to_pascal,
 )
@@ -155,6 +157,38 @@ class ExampleClass:
         self.methods = methods
         self.path = path
         self.data = kwargs
+
+    def serialize(self):
+        return self.data
+
+
+class TestSerialize:
+    def test_string_serialization(self):
+        string = "This is a string"
+        assert serialize(string) == string
+
+    def test_boolean_serialization(self):
+        boolean = True
+        assert serialize(boolean) == boolean
+
+    def test_int_serialization(self):
+        integer = 3
+        assert serialize(integer) == integer
+
+    def test_none_serialization(self):
+        none = None
+        assert serialize(none) == none
+
+    def test_datetime_serialization(self):
+        now = datetime.datetime.now()
+        assert isinstance(now, datetime.datetime)
+        assert isinstance(serialize(now), str)
+        assert serialize(now) == now.isoformat()
+
+    def test_object_with_serialize_method_serialization(self):
+        data = {"a": "b", "c": "d"}
+        object_ = ExampleClass("client", ["handler"], ["method"], "path", **data)
+        assert serialize(object_) == object_.serialize()
 
 
 class TestObjetize:
