@@ -27,7 +27,6 @@ class TestLinksManagerHandlers:
         # pylint: disable=protected-access
         id_ = "idx"
         object_ = self.manager.get(id_)
-        assert object_.link_token == id_
         assert object_._client is not self.manager._client
         assert "link_token" not in self.manager._client.params
         assert "link_token" in object_._client.params
@@ -36,7 +35,6 @@ class TestLinksManagerHandlers:
         # pylint: disable=protected-access
         id_ = "idx"
         object_ = self.manager.update(id_)
-        assert object_.link_token == id_
         assert object_._client is not self.manager._client
         assert "link_token" not in self.manager._client.params
         assert "link_token" in object_._client.params
