@@ -33,4 +33,4 @@ sed -i.tmp "s#$OLD_VERSION_SUBSTITUTION#$NEW_VERSION_SUBSTITUTION#g" $METADATA &
 # Commit changes into release branch
 git add $BASEDIR/pyproject.toml $BASEDIR/fintoc/__init__.py &&
 git checkout -b release/prepare-$NEW_VERSION &&
-git commit --message "Prepare $NEW_VERSION release"
+git commit --message "pre-release: prepare $NEW_VERSION release"
