@@ -122,7 +122,7 @@ webhook_endpoint = fintoc_client.webhook_endpoints.update(
 
 The `update` method of the managers updates and returns an existing instance of the resource using its identifier to find it. The first parameter of the method corresponds to the identifier being used to find the existing instance of the resource. The attributes to be modified are passed as `kwargs`, and correspond to the parameters specified by the API documentation for the update action of said resource.
 
-Notice that using the manager to update an instance of a resource is equivalent to calling the `update` directly on the object itself:
+Notice that using the manager to update an instance of a resource is equivalent (in terms of outcome) to calling the `update` directly on the object itself:
 
 
 ```python
@@ -141,7 +141,7 @@ webhook_endpoint.update(
 )
 ```
 
-When using the SDK, you will probably almost always want to use the object directly to update, just because it is way less verbose if you already have the object itself.
+When using the SDK, you will probably almost always want to use the object directly to update, just because it is way less verbose if you already have the object itself. Also, using the `update` method from the manager first needs to `get` the resource and then updates it, so it translates to 2 API calls. If you already have the object to update, using the `update` method directly from the object just updates it, so it translates to just 1 API call.
 
 #### `delete`
 
@@ -153,7 +153,7 @@ deleted_identifier = fintoc_client.webhook_endpoints.delete("we_8anqVLlBC8ROodem
 
 The `delete` method of the managers deletes an existing instance of the resource using its identifier to find it and returns the identifier.
 
-Notice that using the manager to delete an instance of a resource is equivalent to calling the `delete` directly on the object itself:
+Notice that using the manager to delete an instance of a resource is equivalent (in terms of outcome) to calling the `delete` directly on the object itself:
 
 
 ```python
@@ -165,7 +165,7 @@ webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
 deleted_identifier = webhook_endpoint.delete()
 ```
 
-When using the SDK, you will probably almost always want to use the object directly to delete, just because it is way less verbose if you already have the object itself.
+When using the SDK, you will probably almost always want to use the object directly to delete, just because it is way less verbose if you already have the object itself. Also, using the `delete` method from the manager first needs to `get` the resource and then deletes it, so it translates to 2 API calls. If you already have the object to delete, using the `delete` method directly from the object just deletes it, so it translates to just 1 API call.
 
 ### The shape of the SDK
 
@@ -251,7 +251,7 @@ Links are a bit different than the rest of the resources, because their identifi
 link = fintoc_client.links.get("link_Y75EXAKiIVj7w489_token_NCqjwRVoTX3cmnx8pnbpqd11")
 ```
 
-Notice that the Link objects generated from the `all` method will have their `link_token` attribute set to `None`, while the Link object generated from `get` or `update` will have its `link_token` set to the correct link token (given that the link token is necessary to `get` or `update` on the first place).
+Notice that the Link objects generated from the `all` method will won't be able to execute `update` or `delete` operations, while any Link object generated from `get` or `update` will have permission to `update` or `delete` (given that the link token is necessary to `get` or `update` in the first place).
 
 The Link resource has a lot of **managers**!
 
