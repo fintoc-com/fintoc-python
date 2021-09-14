@@ -251,7 +251,7 @@ Links are a bit different than the rest of the resources, because their identifi
 link = fintoc_client.links.get("link_Y75EXAKiIVj7w489_token_NCqjwRVoTX3cmnx8pnbpqd11")
 ```
 
-Notice that the Link objects generated from the `all` method will have their `link_token` attribute set to `None`, while the Link object generated from `get` or `update` will have its `link_token` set to the correct link token (given that the link token is necessary to `get` or `update` on the first place).
+Notice that the Link objects generated from the `all` method will won't be able to execute `update` or `delete` operations, while any Link object generated from `get` or `update` will have permission to `update` or `delete` (given that the link token is necessary to `get` or `update` in the first place).
 
 The Link resource has a lot of **managers**!
 
