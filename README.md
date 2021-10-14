@@ -181,7 +181,7 @@ from fintoc import Fintoc
 fintoc_client = Fintoc("your_api_key")
 ```
 
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains two [managers](#managers): `links` and `webhook_endpoints`.
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links`, `webhook_endpoints` and `refresh_intents`.
 
 #### The `webhook_endpoints` manager
 
@@ -230,6 +230,33 @@ If you see a webhook endpoint you want to use, just use the `get` method!
 webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
 
 print(webhook_endpoint.id)  # we_8anqVLlBC8ROodem
+```
+
+#### The `refresh_intents` manager
+
+Available methods: `all`, `get`, `create`.
+
+Refresh intents allow you to control how an account gets refreshed on Fintoc! Start by creating a new Refresh Intent:
+
+```python
+refresh_intent = fintoc_client.refresh_intents.create()
+
+print(refresh_intent.id)  # ari_5A94DVCJ7xNM3MEo
+```
+
+Notice that the success of this Refresh Intent will be notified through a Webhook. Now, let's list every Refresh Intent we have:
+
+```python
+for refresh_intent in fintoc_client.refresh_intents.all():
+    print(refresh_intent.id)
+```
+
+If you see a Refresh Intent you want to use, just use the `get` method!
+
+```python
+refresh_intent = fintoc_client.refresh_intents.get("ari_5A94DVCJ7xNM3MEo")
+
+print(refresh_intent.id)  # ari_5A94DVCJ7xNM3MEo
 ```
 
 #### The `links` manager
