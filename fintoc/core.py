@@ -4,7 +4,7 @@ Core module to house the Fintoc object of the Fintoc Python SDK.
 
 from fintoc.client import Client
 from fintoc.constants import API_BASE_URL, API_VERSION
-from fintoc.managers import LinksManager, RefreshIntentsManager, WebhookEndpointsManager
+from fintoc.managers import LinksManager, WebhookEndpointsManager
 from fintoc.version import __version__
 
 
@@ -22,4 +22,3 @@ class Fintoc:
         self.webhook_endpoints = WebhookEndpointsManager(
             "/webhook_endpoints", self._client
         )
-        self.refresh_intents = RefreshIntentsManager("/refresh_intents", self._client)
