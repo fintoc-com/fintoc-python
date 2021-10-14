@@ -86,3 +86,19 @@ class TestLinkResource:
         assert link.invoices is not None
         assert isinstance(link.invoices, ManagerMixin)
         assert isinstance(link._Link__invoices_manager, ManagerMixin)
+
+    def test_refresh_intents_manager(self):
+        # pylint: disable=protected-access
+        link = Link(self.client, self.handlers, [], self.path, **{})
+
+        assert link._Link__refresh_intents_manager is None
+        assert isinstance(link.refresh_intents, ManagerMixin)
+        assert link._Link__refresh_intents_manager is not None
+        assert isinstance(link._Link__refresh_intents_manager, ManagerMixin)
+
+        with pytest.raises(NameError):
+            link.refresh_intents = None
+
+        assert link.refresh_intents is not None
+        assert isinstance(link.refresh_intents, ManagerMixin)
+        assert isinstance(link._Link__refresh_intents_manager, ManagerMixin)

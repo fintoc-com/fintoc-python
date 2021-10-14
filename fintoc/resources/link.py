@@ -1,6 +1,11 @@
 """Module to hold the Link resource."""
 
-from fintoc.managers import AccountsManager, SubscriptionsManager, TaxRetunsManager
+from fintoc.managers import (
+    AccountsManager,
+    RefreshIntentsManager,
+    SubscriptionsManager,
+    TaxRetunsManager,
+)
 from fintoc.mixins import ResourceMixin
 
 
@@ -16,6 +21,7 @@ class Link(ResourceMixin):
         self.__subscriptions_manager = None
         self.__tax_returns_manager = None
         self.__invoices_manager = None
+        self.__refresh_intents_manager = None
 
     @property
     def accounts(self):
@@ -61,4 +67,17 @@ class Link(ResourceMixin):
 
     @invoices.setter
     def invoices(self, new_value):  # pylint: disable=no-self-use
+        raise NameError("Attribute name corresponds to a manager")
+
+    @property
+    def refresh_intents(self):
+        """Proxies the refresh_intents manager."""
+        if self.__refresh_intents_manager is None:
+            self.__refresh_intents_manager = RefreshIntentsManager(
+                "/refresh_intents", self._client
+            )
+        return self.__refresh_intents_manager
+
+    @refresh_intents.setter
+    def refresh_intents(self, new_value):  # pylint: disable=no-self-use
         raise NameError("Attribute name corresponds to a manager")
