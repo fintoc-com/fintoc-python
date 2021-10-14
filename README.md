@@ -241,7 +241,7 @@ Refresh intents allow you to control how an account gets refreshed on Fintoc! St
 ```python
 refresh_intent = fintoc_client.refresh_intents.create()
 
-print(refresh_intent.id)  # ari_5A94DVCJ7xNM3MEo
+print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
 ```
 
 Notice that the success of this Refresh Intent will be notified through a Webhook. Now, let's list every Refresh Intent we have:
@@ -254,9 +254,9 @@ for refresh_intent in fintoc_client.refresh_intents.all():
 If you see a Refresh Intent you want to use, just use the `get` method!
 
 ```python
-refresh_intent = fintoc_client.refresh_intents.get("ari_5A94DVCJ7xNM3MEo")
+refresh_intent = fintoc_client.refresh_intents.get("ri_5A94DVCJ7xNM3MEo")
 
-print(refresh_intent.id)  # ari_5A94DVCJ7xNM3MEo
+print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
 ```
 
 #### The `links` manager
