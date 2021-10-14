@@ -181,7 +181,7 @@ from fintoc import Fintoc
 fintoc_client = Fintoc("your_api_key")
 ```
 
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links`, `webhook_endpoints` and `refresh_intents`.
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links` and `webhook_endpoints`.
 
 #### The `webhook_endpoints` manager
 
@@ -232,33 +232,6 @@ webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
 print(webhook_endpoint.id)  # we_8anqVLlBC8ROodem
 ```
 
-#### The `refresh_intents` manager
-
-Available methods: `all`, `get`, `create`.
-
-Refresh intents allow you to control how an account gets refreshed on Fintoc! Start by creating a new Refresh Intent:
-
-```python
-refresh_intent = fintoc_client.refresh_intents.create()
-
-print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
-```
-
-Notice that the success of this Refresh Intent will be notified through a Webhook. Now, let's list every Refresh Intent we have:
-
-```python
-for refresh_intent in fintoc_client.refresh_intents.all():
-    print(refresh_intent.id)
-```
-
-If you see a Refresh Intent you want to use, just use the `get` method!
-
-```python
-refresh_intent = fintoc_client.refresh_intents.get("ri_5A94DVCJ7xNM3MEo")
-
-print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
-```
-
 #### The `links` manager
 
 Available methods: `all`, `get`, `update`, `delete`.
@@ -286,6 +259,7 @@ The Link resource has a lot of **managers**!
 invoices = link.invoices.all()  # Invoices
 tax_returns = link.tax_returns.all()  # Tax Returns
 subscriptions = link.subscriptions.all()  # Subscriptions
+refresh_intents = link.refresh_intents.all()  # Refresh Intents
 accounts = link.accounts.all()  # Accounts
 ```
 
@@ -320,6 +294,33 @@ Once you have a Link, you can use the `subscriptions` manager to get all the sub
 ```python
 for subscription in link.subscriptions.all():
     print(subscription.id)
+```
+
+#### The `refresh_intents` manager
+
+Available methods: `all`, `get`, `create`.
+
+Refresh intents allow you to control how an account gets refreshed on Fintoc! Once you have a Link, you can use the `refresh_intents` manager to create a new refresh intent:
+
+```python
+refresh_intent = link.refresh_intents.create()
+
+print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
+```
+
+Notice that the success of this refresh intent will be notified through a Webhook. Now, let's list every refresh intent we have:
+
+```python
+for refresh_intent in link.refresh_intents.all():
+    print(refresh_intent.id)
+```
+
+If you see a refresh intent you want to use, just use the `get` method!
+
+```python
+refresh_intent = link.refresh_intents.get("ri_5A94DVCJ7xNM3MEo")
+
+print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
 ```
 
 #### The `accounts` manager
