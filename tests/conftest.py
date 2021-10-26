@@ -3,6 +3,8 @@ Module to hold all the fixtures and stuff that needs to get auto-imported
 by PyTest.
 """
 
+from json.decoder import JSONDecodeError
+
 import httpx
 import pytest
 
@@ -61,7 +63,7 @@ def patch_http_client(monkeypatch):
 
         def json(self):
             if self._method == "delete":
-                return {}
+                raise JSONDecodeError("Expecting value", "doc", 0)
             if self._method == "get" and self._url[-1] == "s":
                 return [
                     {
