@@ -2,6 +2,8 @@
 Module to house the Client object of the Fintoc Python SDK.
 """
 
+from json.decoder import JSONDecodeError
+
 import httpx
 
 from fintoc.paginator import paginate
@@ -41,7 +43,10 @@ class Client:
             return paginate(self._client, path, params=params)
         response = self._client.request(method, path, params=params, json=json)
         response.raise_for_status()
-        return response.json()
+        try:
+            return response.json()
+        except JSONDecodeError:
+            return {}
 
     def extend(
         self,
