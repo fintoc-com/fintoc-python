@@ -78,11 +78,11 @@ class ResourceMixin(metaclass=ABCMeta):
 
     @can_raise_http_error
     def _delete(self, **kwargs):
-        id_ = getattr(self, self.__class__.resource_identifier)
+        identifier = getattr(self, self.__class__.resource_identifier)
         resource_delete(
             client=self._client,
             path=self._path,
-            id_=id_,
+            id_=self.id,
             params=kwargs,
         )
-        return self._handlers.get("delete")(id_, **kwargs)
+        return self._handlers.get("delete")(identifier, **kwargs)
