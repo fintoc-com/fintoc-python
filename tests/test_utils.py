@@ -95,11 +95,6 @@ class TestGetResourceClass:
         klass = get_resource_class(resource, value=True)
         assert klass is bool
 
-    def test_integer_resource(self):
-        resource = "any_resource"
-        klass = get_resource_class(resource, value=15)
-        assert klass is int
-
 
 class TestGetErrorClass:
     def test_valid_error(self):
