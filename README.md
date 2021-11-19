@@ -181,7 +181,7 @@ from fintoc import Fintoc
 fintoc_client = Fintoc("your_api_key")
 ```
 
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links` and `webhook_endpoints`.
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains two [managers](#managers): `links` and `webhook_endpoints`.
 
 #### The `webhook_endpoints` manager
 
