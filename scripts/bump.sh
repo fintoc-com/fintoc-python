@@ -20,17 +20,17 @@ poetry version $1 && NEW_VERSION=$(poetry version | rev | cut -d' ' -f1 | rev)
 SCRIPTS=$(cd $(dirname $0) && pwd)
 BASEDIR=$(dirname $SCRIPTS)
 
-# Get the metadata file
-METADATA="$BASEDIR/fintoc/__init__.py"
+# Get the version file
+VERSION_FILE="$BASEDIR/fintoc/version.py"
 
 # Get substitution strings
 OLD_VERSION_SUBSTITUTION=$(echo $OLD_VERSION | sed "s/\./, /g")
 NEW_VERSION_SUBSTITUTION=$(echo $NEW_VERSION | sed "s/\./, /g")
 
-# Substitute the version in the python metadata file
-sed -i.tmp "s#$OLD_VERSION_SUBSTITUTION#$NEW_VERSION_SUBSTITUTION#g" $METADATA && rm $METADATA.tmp
+# Substitute the version in the python version file
+sed -i.tmp "s#$OLD_VERSION_SUBSTITUTION#$NEW_VERSION_SUBSTITUTION#g" $VERSION_FILE && rm $VERSION_FILE.tmp
 
 # Commit changes into release branch
-git add $BASEDIR/pyproject.toml $BASEDIR/fintoc/__init__.py &&
+git add $BASEDIR/pyproject.toml $BASEDIR/fintoc/version.py &&
 git checkout -b release/prepare-$NEW_VERSION &&
 git commit --message "pre-release: prepare $NEW_VERSION release"
