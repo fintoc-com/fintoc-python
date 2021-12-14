@@ -181,7 +181,7 @@ from fintoc import Fintoc
 fintoc_client = Fintoc("your_api_key")
 ```
 
-This gives us access to a bunch of operations already. The object created using this _snippet_ contains two [managers](#managers): `links` and `webhook_endpoints`.
+This gives us access to a bunch of operations already. The object created using this _snippet_ contains three [managers](#managers): `links`, `payment_intents` and `webhook_endpoints`.
 
 #### The `webhook_endpoints` manager
 
@@ -230,6 +230,44 @@ If you see a webhook endpoint you want to use, just use the `get` method!
 webhook_endpoint = fintoc_client.webhook_endpoints.get("we_8anqVLlBC8ROodem")
 
 print(webhook_endpoint.id)  # we_8anqVLlBC8ROodem
+```
+
+#### The `payment_intents` manager
+
+Available methods: `all`, `get`, `create`.
+
+Payment intents allow you to start a payment using Fintoc! Start by creating a new payment intent:
+
+```python
+payment_intent = fintoc_client.payment_intents.create(
+    currency="CLP",
+    amount=5990,
+    recipient_account={
+        "holder_id": "111111111",
+        "number": "123123123",
+        "type": "checking_account",
+        "institution_id": "cl_banco_de_chile",
+    }
+)
+
+print(payment_intent.id)            # pi_BO381oEATXonG6bj
+print(payment_intent.widget_token)  # pi_BO381oEATXonG6bj_sec_a4xK32BanKWYn
+```
+
+Notice that the success of this payment intent will be notified through a Webhook. Now, let's list every payment intent we have:
+
+```python
+for payment_intent in fintoc_client.payment_intents.all():
+    print(payment_intent.id)
+```
+
+If you see a payment intent you want to use, just use the `get` method!
+
+```python
+payment_intent = fintoc_client.payment_intents.get("pi_BO381oEATXonG6bj")
+
+print(payment_intent.id)      # pi_BO381oEATXonG6bj
+print(payment_intent.status)  # succeeded
 ```
 
 #### The `links` manager
@@ -320,7 +358,8 @@ If you see a refresh intent you want to use, just use the `get` method!
 ```python
 refresh_intent = link.refresh_intents.get("ri_5A94DVCJ7xNM3MEo")
 
-print(refresh_intent.id)  # ri_5A94DVCJ7xNM3MEo
+print(refresh_intent.id)      # ri_5A94DVCJ7xNM3MEo
+print(refresh_intent.status)  # succeeded
 ```
 
 #### The `accounts` manager

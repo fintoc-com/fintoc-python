@@ -4,7 +4,7 @@ Core module to house the Fintoc object of the Fintoc Python SDK.
 
 from fintoc.client import Client
 from fintoc.constants import API_BASE_URL, API_VERSION
-from fintoc.managers import LinksManager, WebhookEndpointsManager
+from fintoc.managers import LinksManager, PaymentIntentsManager, WebhookEndpointsManager
 from fintoc.version import __version__
 
 
@@ -19,6 +19,7 @@ class Fintoc:
             user_agent=f"fintoc-python/{__version__}",
         )
         self.links = LinksManager("/links", self._client)
+        self.payment_intents = PaymentIntentsManager("/payment_intents", self._client)
         self.webhook_endpoints = WebhookEndpointsManager(
             "/webhook_endpoints", self._client
         )
