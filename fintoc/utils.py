@@ -4,7 +4,6 @@ import datetime
 from importlib import import_module
 
 import httpx
-from dateutil import parser
 
 from fintoc.constants import DATE_TIME_PATTERN
 from fintoc.errors import FintocError
