@@ -3,8 +3,8 @@ from types import GeneratorType
 
 import httpx
 import pytest
-from dateutil import parser
 
+from fintoc.constants import DATE_TIME_PATTERN
 from fintoc.errors import ApiError, FintocError
 from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
@@ -13,6 +13,7 @@ from fintoc.utils import (
     get_resource_class,
     is_iso_datetime,
     objetize,
+    objetize_datetime,
     objetize_generator,
     serialize,
     singularize,
@@ -59,8 +60,12 @@ class TestIsISODateTime:
         valid_iso_datetime_string = "2021-08-13T13:40:40.811Z"
         assert is_iso_datetime(valid_iso_datetime_string)
 
-    def test_invalid_iso_format(self):
+    def test_invalid_iso_string_format(self):
         invalid_iso_datetime_string = "This is not a date"
+        assert not is_iso_datetime(invalid_iso_datetime_string)
+
+    def test_invalid_iso_number_format(self):
+        invalid_iso_datetime_string = "1105122"
         assert not is_iso_datetime(invalid_iso_datetime_string)
 
 
@@ -78,7 +83,7 @@ class TestGetResourceClass:
     def test_iso_datetime_resource(self):
         resource = "any_resource"
         klass = get_resource_class(resource, value="2021-08-13T13:40:40.811Z")
-        assert klass is parser.isoparse
+        assert klass is objetize_datetime
 
     def test_string_resource(self):
         resource = "any_resource"
@@ -178,7 +183,7 @@ class TestSerialize:
         now = datetime.datetime.now()
         assert isinstance(now, datetime.datetime)
         assert isinstance(serialize(now), str)
-        assert serialize(now) == now.isoformat()
+        assert serialize(now) == now.strftime(DATE_TIME_PATTERN)
 
     def test_object_with_serialize_method_serialization(self):
         data = {"a": "b", "c": "d"}
@@ -210,6 +215,25 @@ class TestObjetize:
         object_ = objetize(ExampleClass, self.client, self.data)
         assert isinstance(object_, ExampleClass)
         assert object_.data["id"] == self.data["id"]
+
+
+class TestObjetizeDateTime:
+    def setup_method(self):
+        self.valid_string = "2021-12-16T12:24:44.397000Z"
+        self.obviously_invalid_string = "This is not a date"
+        self.deceptively_invalid_string = "1105122"
+
+    def test_valid_string(self):
+        parsed = objetize_datetime(self.valid_string)
+        assert isinstance(parsed, datetime.datetime)
+
+    def test_obviously_invalid_string(self):
+        with pytest.raises(ValueError):
+            objetize_datetime(self.obviously_invalid_string)
+
+    def test_deceptively_invalid_string(self):
+        with pytest.raises(ValueError):
+            objetize_datetime(self.deceptively_invalid_string)
 
 
 class TestObjetizeGenerator:

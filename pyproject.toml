@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fintoc"
-version = "2.2.0"
+version = "2.2.1"
 description = "The official Python client for the Fintoc API."
 authors = ["Daniel Leal <daniel@fintoc.com>", "Nebil Kawas <nebil@uc.cl>"]
 maintainers = ["Daniel Leal <daniel@fintoc.com>"]
@@ -21,7 +21,6 @@ exclude = [
 [tool.poetry.dependencies]
 python = "^3.6"
 httpx = ">=0.16, < 1.0"
-python-dateutil = ">=2.8, < 3.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
