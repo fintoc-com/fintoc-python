@@ -79,7 +79,7 @@ def serialize(object_):
     if callable(getattr(object_, "serialize", None)):
         return object_.serialize()
     if isinstance(object_, datetime.datetime):
-        return object_.isoformat()
+        return object_.strftime(DATE_TIME_PATTERN)
     return object_
 
 
