@@ -4,8 +4,8 @@ import datetime
 from importlib import import_module
 
 import httpx
-from dateutil import parser
 
+from fintoc.constants import DATE_TIME_PATTERN
 from fintoc.errors import FintocError
 
 
@@ -25,7 +25,7 @@ def is_iso_datetime(string):
     Otherwise, return False.
     """
     try:
-        parser.isoparse(string)
+        datetime.datetime.strptime(string, DATE_TIME_PATTERN)
         return True
     except ValueError:
         return False
@@ -43,7 +43,7 @@ def get_resource_class(snake_resource_name, value={}):
         except AttributeError:
             return getattr(module, "GenericFintocResource")
     if isinstance(value, str) and is_iso_datetime(value):
-        return parser.isoparse
+        return objetize_datetime
     return type(value)
 
 
@@ -78,15 +78,20 @@ def serialize(object_):
     if callable(getattr(object_, "serialize", None)):
         return object_.serialize()
     if isinstance(object_, datetime.datetime):
-        return object_.isoformat()
+        return object_.strftime(DATE_TIME_PATTERN)
     return object_
+
+
+def objetize_datetime(string):
+    """Objetizes a datetime string without checking for correctness."""
+    return datetime.datetime.strptime(string, DATE_TIME_PATTERN)
 
 
 def objetize(klass, client, data, handlers={}, methods=[], path=None):
     """Transform the :data: object into an object with class :klass:."""
     if data is None:
         return None
-    if klass in [str, int, dict, bool, parser.isoparse]:
+    if klass in [str, int, dict, bool, objetize_datetime]:
         return klass(data)
     return klass(client, handlers, methods, path, **data)
 
