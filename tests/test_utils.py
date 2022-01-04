@@ -57,8 +57,12 @@ class TestSingularize:
 
 class TestIsISODateTime:
     def test_valid_iso_format(self):
-        valid_iso_datetime_string = "2021-08-13T13:40:40.811Z"
+        valid_iso_datetime_string = "2021-08-13T13:40:40Z"
         assert is_iso_datetime(valid_iso_datetime_string)
+
+    def test_valid_iso_miliseconds_format(self):  # TEMPORARY
+        valid_iso_miliseconds_datetime_string = "2021-08-13T13:40:40.811Z"
+        assert is_iso_datetime(valid_iso_miliseconds_datetime_string)
 
     def test_invalid_iso_string_format(self):
         invalid_iso_datetime_string = "This is not a date"
@@ -219,12 +223,17 @@ class TestObjetize:
 
 class TestObjetizeDateTime:
     def setup_method(self):
-        self.valid_string = "2021-12-16T12:24:44.397000Z"
+        self.valid_string = "2021-12-16T12:24:44Z"
+        self.valid_miliseconds_string = "2021-12-16T12:24:44.397Z"
         self.obviously_invalid_string = "This is not a date"
         self.deceptively_invalid_string = "1105122"
 
     def test_valid_string(self):
         parsed = objetize_datetime(self.valid_string)
+        assert isinstance(parsed, datetime.datetime)
+
+    def test_valid_miliseconds_string(self):  # TEMPORARY
+        parsed = objetize_datetime(self.valid_miliseconds_string)
         assert isinstance(parsed, datetime.datetime)
 
     def test_obviously_invalid_string(self):

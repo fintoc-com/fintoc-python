@@ -28,7 +28,13 @@ def is_iso_datetime(string):
         datetime.datetime.strptime(string, DATE_TIME_PATTERN)
         return True
     except ValueError:
-        return False
+        pass
+    try:
+        datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return True
+    except ValueError:
+        pass
+    return False
 
 
 def get_resource_class(snake_resource_name, value={}):
@@ -84,7 +90,10 @@ def serialize(object_):
 
 def objetize_datetime(string):
     """Objetizes a datetime string without checking for correctness."""
-    return datetime.datetime.strptime(string, DATE_TIME_PATTERN)
+    try:
+        return datetime.datetime.strptime(string, DATE_TIME_PATTERN)
+    except ValueError:
+        return datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S.%fZ")
 
 
 def objetize(klass, client, data, handlers={}, methods=[], path=None):
