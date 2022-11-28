@@ -15,6 +15,7 @@ from .payment_intent import PaymentIntent
 from .refresh_intent import RefreshIntent
 from .services_invoice import ServicesInvoice
 from .subscription import Subscription
+from .subscription_intent import SubscriptionIntent
 from .tax_return import TaxReturn
 from .taxpayer import Taxpayer
 from .tobacco_taxes import TobaccoTaxes
