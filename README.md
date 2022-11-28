@@ -24,14 +24,6 @@
 </a>
 </p>
 
-## Why?
-
-You can think of [Fintoc API](https://fintoc.com/docs) as a piscola.
-And the key ingredient to a properly made piscola are the ice cubes.
-Sure, you can still have a [piscola without ice cubes](https://curl.haxx.se/).
-But hey… that’s not enjoyable -- why would you do that?
-Do yourself a favor: go grab some ice cubes by installing this refreshing library.
-
 ## Installation
 
 Install using pip!
