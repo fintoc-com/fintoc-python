@@ -29,7 +29,7 @@ jobs:
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
       - name: Set up environment cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: environment-cache
         with:
           key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
@@ -59,7 +59,7 @@ jobs:
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
       - name: Set up environment cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: environment-cache
         with:
           key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
@@ -89,7 +89,7 @@ jobs:
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
       - name: Set up environment cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: environment-cache
         with:
           key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
@@ -119,7 +119,7 @@ jobs:
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
       - name: Set up environment cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: environment-cache
         with:
           key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
