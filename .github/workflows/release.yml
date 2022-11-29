@@ -7,7 +7,7 @@ on:
 
 jobs:
   pypi-release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout to commit code
 
@@ -44,7 +44,7 @@ jobs:
   github-release:
     needs: pypi-release
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
