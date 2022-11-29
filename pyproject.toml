@@ -19,11 +19,11 @@ exclude = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 httpx = ">=0.16, < 1.0"
 
 [tool.poetry.dev-dependencies]
-black = "^20.8b1"
+black = "^22.10.0"
 flake8 = "^3.8.4"
 isort = "^5.6.4"
 pylint = "^2.6.0"
