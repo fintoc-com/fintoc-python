@@ -7,26 +7,25 @@ on:
 
 jobs:
   pypi-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout to commit code
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.6
+          python-version: "3.10.6"
 
       - name: Install Poetry
         run: |
           make get-poetry
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
-      # Cache the .venv directory
-      - name: Set up Poetry cache
+      - name: Set up environment cache
         uses: actions/cache@v2
-        id: poetry-cache
+        id: environment-cache
         with:
-          key: poetry-cache-v1-${{ hashFiles('**/poetry.lock') }}
+          key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
           path: .venv
 
       - name: Install dependencies
@@ -45,26 +44,26 @@ jobs:
   github-release:
     needs: pypi-release
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout to commit code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.6
+          python-version: "3.10.6"
 
       - name: Install Poetry
         run: |
           make get-poetry
           echo $HOME/.poetry/bin >> $GITHUB_PATH
 
-      # Cache the .venv directory
-      - name: Set up Poetry cache
+      - name: Set up environment cache
         uses: actions/cache@v2
-        id: poetry-cache
+        id: environment-cache
         with:
-          key: poetry-cache-v1-${{ hashFiles('**/poetry.lock') }}
+          key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
           path: .venv
 
       - name: Install dependencies
