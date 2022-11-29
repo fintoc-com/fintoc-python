@@ -315,17 +315,6 @@ for tax_return in link.tax_returns.all():
     print(tax_return.id)
 ```
 
-#### The `subscriptions` manager
-
-Available methods: `all`, `get`.
-
-Once you have a Link, you can use the `subscriptions` manager to get all the subscriptions associated to a link!
-
-```python
-for subscription in link.subscriptions.all():
-    print(subscription.id)
-```
-
 #### The `refresh_intents` manager
 
 Available methods: `all`, `get`, `create`.
@@ -383,6 +372,41 @@ Once you have an Account, you can use the `movements` manager to get all the mov
 for movement in account.movements.all():
     print(movement.id)
 ```
+
+### Direct Debit managers
+The SDK contains all necessary managers to use Fintocs' Direct Debit product
+
+#### The `subscription_intents` manager
+
+Available methods: `all`, `get`, `create`
+
+#### The `subscriptions` manager
+
+Available methods: `all`, `get`
+
+#### The `charges` manager
+
+Available methods: `all`, `get`, `create`
+
+You can use the three of them together somehow like this
+
+```python
+# create the subscription intent and get the corresponding widget_token
+subscription_intent = fintoc_client.subscription_intents.create()
+
+# Once the user finishes creating the subscription through the widget you can
+# inspect it
+subscription = fintoc_client.subscriptions.get('<subscription_id>')
+
+# Create charges for the corresponging subscription
+charge = fintoc_client.charges.create(
+    currency='CLP',
+    amount=1250,
+    subscription_id='<subscription_id>',
+)
+```
+
+More details of the Direct Debit workflow can be found on the [Fintoc Docs](https://docs.fintoc.com/docs/integration-flow-for-direct-debit)
 
 ### Serialization
 
