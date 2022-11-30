@@ -373,40 +373,43 @@ for movement in account.movements.all():
     print(movement.id)
 ```
 
-### Direct Debit managers
-The SDK contains all necessary managers to use Fintocs' Direct Debit product
-
 #### The `subscription_intents` manager
 
 Available methods: `all`, `get`, `create`
+
+Subscription intents allow you to start a subscription using Fintoc!:
+
+```python
+subscription_intent = fintoc_client.subscription_intents.create()
+
+print(subscription_intent.id)            # si_BO381oEATXonG6bj
+print(subscription_intent.widget_token)  # si_BO381oEATXonG6bj_sec_a4xK32BanKWYn
+```
 
 #### The `subscriptions` manager
 
 Available methods: `all`, `get`
 
+You can check the status of the created subscription with the `subscriptions` manager
+
+```python
+subscription = fintoc_client.subscriptions.get('<subscription_id>')
+print(subscription.status)
+```
+
 #### The `charges` manager
 
 Available methods: `all`, `get`, `create`
 
-You can use the three of them together somehow like this
+Once you have active subscriptions, you can use the `charges` manager to create charges to thosse subscriptions
 
 ```python
-# create the subscription intent and get the corresponding widget_token
-subscription_intent = fintoc_client.subscription_intents.create()
-
-# Once the user finishes creating the subscription through the widget you can
-# inspect it
-subscription = fintoc_client.subscriptions.get('<subscription_id>')
-
-# Create charges for the corresponging subscription
 charge = fintoc_client.charges.create(
     currency='CLP',
     amount=1250,
     subscription_id='<subscription_id>',
 )
 ```
-
-More details of the Direct Debit workflow can be found on the [Fintoc Docs](https://docs.fintoc.com/docs/integration-flow-for-direct-debit)
 
 ### Serialization
 
