@@ -1,0 +1,6 @@
+comment:
+  behavior: default
+  layout: reach, diff, flags, files
+  require_head: true
+  require_base: false
+  require_changes: false
