@@ -2,6 +2,7 @@
 
 from .account import Account
 from .balance import Balance
+from .charge import Charge
 from .generic_fintoc_resource import GenericFintocResource
 from .income import Income
 from .institution import Institution
@@ -15,6 +16,7 @@ from .payment_intent import PaymentIntent
 from .refresh_intent import RefreshIntent
 from .services_invoice import ServicesInvoice
 from .subscription import Subscription
+from .subscription_intent import SubscriptionIntent
 from .tax_return import TaxReturn
 from .taxpayer import Taxpayer
 from .tobacco_taxes import TobaccoTaxes
