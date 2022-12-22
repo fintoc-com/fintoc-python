@@ -24,14 +24,6 @@
 </a>
 </p>
 
-## Why?
-
-You can think of [Fintoc API](https://fintoc.com/docs) as a piscola.
-And the key ingredient to a properly made piscola are the ice cubes.
-Sure, you can still have a [piscola without ice cubes](https://curl.haxx.se/).
-But hey… that’s not enjoyable -- why would you do that?
-Do yourself a favor: go grab some ice cubes by installing this refreshing library.
-
 ## Installation
 
 Install using pip!
@@ -323,17 +315,6 @@ for tax_return in link.tax_returns.all():
     print(tax_return.id)
 ```
 
-#### The `subscriptions` manager
-
-Available methods: `all`, `get`.
-
-Once you have a Link, you can use the `subscriptions` manager to get all the subscriptions associated to a link!
-
-```python
-for subscription in link.subscriptions.all():
-    print(subscription.id)
-```
-
 #### The `refresh_intents` manager
 
 Available methods: `all`, `get`, `create`.
@@ -390,6 +371,44 @@ Once you have an Account, you can use the `movements` manager to get all the mov
 ```python
 for movement in account.movements.all():
     print(movement.id)
+```
+
+#### The `subscription_intents` manager
+
+Available methods: `all`, `get`, `create`
+
+Subscription intents allow you to start a subscription using Fintoc!:
+
+```python
+subscription_intent = fintoc_client.subscription_intents.create()
+
+print(subscription_intent.id)            # si_BO381oEATXonG6bj
+print(subscription_intent.widget_token)  # si_BO381oEATXonG6bj_sec_a4xK32BanKWYn
+```
+
+#### The `subscriptions` manager
+
+Available methods: `all`, `get`
+
+You can check the status of the created subscription with the `subscriptions` manager
+
+```python
+subscription = fintoc_client.subscriptions.get('<subscription_id>')
+print(subscription.status)
+```
+
+#### The `charges` manager
+
+Available methods: `all`, `get`, `create`
+
+Once you have active subscriptions, you can use the `charges` manager to create charges to thosse subscriptions
+
+```python
+charge = fintoc_client.charges.create(
+    currency='CLP',
+    amount=1250,
+    subscription_id='<subscription_id>',
+)
 ```
 
 ### Serialization
