@@ -60,7 +60,6 @@ class Client:
         self,
         base_url=None,
         api_key=None,
-        api_version=None,
         user_agent=None,
         params=None,
     ):
@@ -71,7 +70,7 @@ class Client:
         return Client(
             base_url=base_url or self.base_url,
             api_key=api_key or self.api_key,
-            api_version=api_version or self.api_version,
+            api_version=self.api_version,
             user_agent=user_agent or self.user_agent,
             params={**self.params, **params} if params else self.params,
         )
