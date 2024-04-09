@@ -16,13 +16,13 @@ from fintoc.version import __version__
 
 
 class Fintoc:
-
     """Encapsulates the core object's behaviour and methods."""
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, api_version=None):
         self._client = Client(
             base_url=f"{API_BASE_URL}/{API_VERSION}",
             api_key=api_key,
+            api_version=api_version,
             user_agent=f"fintoc-python/{__version__}",
         )
         self.charges = ChargesManager("/charges", self._client)
