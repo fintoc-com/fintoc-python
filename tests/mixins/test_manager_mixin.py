@@ -57,11 +57,13 @@ class TestManagerMixinCreation:
     def setup_method(self):
         self.base_url = "https://test.com"
         self.api_key = "super_secret_api_key"
+        self.api_version = None
         self.user_agent = "fintoc-python/test"
         self.params = {"first_param": "first_value", "second_param": "second_value"}
         self.client = Client(
             self.base_url,
             self.api_key,
+            self.api_version,
             self.user_agent,
             params=self.params,
         )
@@ -95,11 +97,13 @@ class TestManagerMixinMethods:
     def setup_method(self):
         self.base_url = "https://test.com"
         self.api_key = "super_secret_api_key"
+        self.api_version = None
         self.user_agent = "fintoc-python/test"
         self.params = {"first_param": "first_value", "second_param": "second_value"}
         self.client = Client(
             self.base_url,
             self.api_key,
+            self.api_version,
             self.user_agent,
             params=self.params,
         )
@@ -148,11 +152,13 @@ class TestManagerMixinHandlers:
     def setup_method(self):
         self.base_url = "https://test.com"
         self.api_key = "super_secret_api_key"
+        self.api_version = None
         self.user_agent = "fintoc-python/test"
         self.params = {"first_param": "first_value", "second_param": "second_value"}
         self.client = Client(
             self.base_url,
             self.api_key,
+            self.api_version,
             self.user_agent,
             params=self.params,
         )
