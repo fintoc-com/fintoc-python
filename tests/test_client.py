@@ -12,11 +12,19 @@ class TestClientCreationFunctionality:
         self.api_key = "super_secret_api_key"
         self.user_agent = "fintoc-python/test"
         self.params = {"first_param": "first_value", "second_param": "second_value"}
+        self.api_version = None
 
-    def create_client(self, params=False):
+    def create_client(self, params=False, api_version=None):
         if not params:
-            return Client(self.base_url, self.api_key, self.user_agent)
-        return Client(self.base_url, self.api_key, self.user_agent, params=self.params)
+            return Client(self.base_url, self.api_key, api_version, self.user_agent)
+
+        return Client(
+            self.base_url,
+            self.api_key,
+            self.api_version,
+            self.user_agent,
+            params=self.params,
+        )
 
     def test_client_creation_without_params(self):
         client = self.create_client()
@@ -34,7 +42,17 @@ class TestClientCreationFunctionality:
         assert client.user_agent == self.user_agent
         assert client.params == self.params
 
-    def test_client_headers(self):
+    def test_client_headers_with_api_version(self):
+        client = self.create_client(api_version="2023-01-01")
+        assert isinstance(client.headers, dict)
+        assert len(client.headers.keys()) == 3
+        assert "Authorization" in client.headers
+        assert "User-Agent" in client.headers
+        assert client.headers["Authorization"] == self.api_key
+        assert client.headers["User-Agent"] == self.user_agent
+        assert client.headers["Fintoc-Version"] == "2023-01-01"
+
+    def test_client_headers_without_api_version(self):
         client = self.create_client()
         assert isinstance(client.headers, dict)
         assert len(client.headers.keys()) == 2
@@ -87,11 +105,13 @@ class TestClientRequestFunctionality:
     def setup_method(self):
         self.base_url = "https://test.com"
         self.api_key = "super_secret_api_key"
+        self.api_version = None
         self.user_agent = "fintoc-python/test"
         self.params = {"first_param": "first_value", "second_param": "second_value"}
         self.client = Client(
             self.base_url,
             self.api_key,
+            self.api_version,
             self.user_agent,
             params=self.params,
         )
