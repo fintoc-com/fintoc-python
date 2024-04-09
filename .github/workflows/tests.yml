@@ -42,9 +42,3 @@ jobs:
 
       - name: Run Pytest
         run: make tests
-
-      - name: Upload coverage to CodeCov
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
-          verbose: true
