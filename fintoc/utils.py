@@ -64,14 +64,14 @@ def get_error_class(snake_error_name):
 
 def can_raise_fintoc_error(function):
     """
-    Decorator that catches HTTPError exceptions and raises custom
+    Decorator that catches HTTPStatusError exceptions and raises custom
     Fintoc errors instead.
     """
 
     def wrapper(*args, **kwargs):
         try:
             return function(*args, **kwargs)
-        except httpx.HTTPError as exc:
+        except httpx.HTTPStatusError as exc:
             error_data = exc.response.json()
             error = get_error_class(error_data["error"]["type"])
             raise error(error_data["error"]) from None

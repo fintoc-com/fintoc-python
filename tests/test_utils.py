@@ -126,14 +126,24 @@ class TestCanRaiseFintocError:
         def no_error():
             pass
 
-            raise httpx.HTTPError("F")
         def raise_http_status_error():
+            raise httpx.HTTPStatusError(
+                message="HTTP Status Error",
+                response=httpx.Response(
+                    status_code=400, json={"error": {"type": "api_error"}}
+                ),
+                request=httpx.Request("GET", "/"),
+            )
+
+        def raise_connect_error():
+            raise httpx.ConnectError(message="Connection Error")
 
         def raise_generic_error():
             raise ValueError("Not HTTP Error")
 
         self.no_error = no_error
         self.raise_http_status_error = raise_http_status_error
+        self.raise_connect_error = raise_connect_error
         self.raise_generic_error = raise_generic_error
 
     def test_no_error(self):
@@ -145,6 +155,12 @@ class TestCanRaiseFintocError:
         with pytest.raises(Exception) as execinfo:
             wrapped()
         assert isinstance(execinfo.value, FintocError)
+
+    def test_connect_error(self):
+        wrapped = can_raise_fintoc_error(self.raise_connect_error)
+        with pytest.raises(Exception) as execinfo:
+            wrapped()
+        assert not isinstance(execinfo.value, FintocError)
 
     def test_generic_error(self):
         wrapped = can_raise_fintoc_error(self.raise_generic_error)
