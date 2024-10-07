@@ -4,7 +4,7 @@ from abc import ABCMeta
 
 from fintoc.resource_handlers import resource_delete, resource_update
 from fintoc.utils import (
-    can_raise_http_error,
+    can_raise_fintoc_error,
     get_resource_class,
     objetize,
     serialize,
@@ -60,7 +60,7 @@ class ResourceMixin(metaclass=ABCMeta):
             serialized = {**serialized, key: element}
         return serialized
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _update(self, **kwargs):
         id_ = getattr(self, self.__class__.resource_identifier)
         object_ = resource_update(
@@ -76,7 +76,7 @@ class ResourceMixin(metaclass=ABCMeta):
         self.__dict__.update(object_.__dict__)
         return self
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _delete(self, **kwargs):
         identifier = getattr(self, self.__class__.resource_identifier)
         resource_delete(

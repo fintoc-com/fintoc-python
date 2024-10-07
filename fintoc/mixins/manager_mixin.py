@@ -3,7 +3,7 @@
 from abc import ABCMeta, abstractmethod
 
 from fintoc.resource_handlers import resource_all, resource_create, resource_get
-from fintoc.utils import can_raise_http_error, get_resource_class
+from fintoc.utils import can_raise_fintoc_error, get_resource_class
 
 
 class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
@@ -44,7 +44,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         one of: ['all', 'get', 'create', 'update', 'delete'].
         """
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _all(self, **kwargs):
         """
         Return all instances of the resource being handled by the manager.
@@ -61,7 +61,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         )
         return self.post_all_handler(objects, **kwargs)
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _get(self, identifier, **kwargs):
         """
         Return an instance of the resource being handled by the manager,
@@ -79,7 +79,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         )
         return self.post_get_handler(object_, identifier, **kwargs)
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _create(self, **kwargs):
         """
         Create an instance of the resource being handled by the manager.
@@ -96,7 +96,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         )
         return self.post_create_handler(object_, **kwargs)
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _update(self, identifier, **kwargs):
         """
         Update an instance of the resource being handled by the manager,
@@ -106,7 +106,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         object_ = self._get(identifier)
         return object_.update(**kwargs)
 
-    @can_raise_http_error
+    @can_raise_fintoc_error
     def _delete(self, identifier, **kwargs):
         """
         Delete an instance of the resource being handled by the manager,

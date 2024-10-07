@@ -8,7 +8,7 @@ from fintoc.constants import DATE_TIME_PATTERN
 from fintoc.errors import ApiError, FintocError
 from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
-    can_raise_http_error,
+    can_raise_fintoc_error,
     get_error_class,
     get_resource_class,
     is_iso_datetime,
@@ -117,7 +117,7 @@ class TestGetErrorClass:
         assert error is FintocError
 
 
-class TestCanRaiseHTTPError:
+class TestCanRaiseFintocError:
     @pytest.fixture(autouse=True)
     def patch_http_error(self, patch_http_error):
         pass
@@ -126,28 +126,28 @@ class TestCanRaiseHTTPError:
         def no_error():
             pass
 
-        def raise_http_error():
             raise httpx.HTTPError("F")
+        def raise_http_status_error():
 
         def raise_generic_error():
             raise ValueError("Not HTTP Error")
 
         self.no_error = no_error
-        self.raise_http_error = raise_http_error
+        self.raise_http_status_error = raise_http_status_error
         self.raise_generic_error = raise_generic_error
 
     def test_no_error(self):
-        wrapped = can_raise_http_error(self.no_error)
+        wrapped = can_raise_fintoc_error(self.no_error)
         wrapped()
 
-    def test_http_error(self):
-        wrapped = can_raise_http_error(self.raise_http_error)
+    def test_http_status_error(self):
+        wrapped = can_raise_fintoc_error(self.raise_http_status_error)
         with pytest.raises(Exception) as execinfo:
             wrapped()
         assert isinstance(execinfo.value, FintocError)
 
     def test_generic_error(self):
-        wrapped = can_raise_http_error(self.raise_generic_error)
+        wrapped = can_raise_fintoc_error(self.raise_generic_error)
         with pytest.raises(Exception) as execinfo:
             wrapped()
         assert not isinstance(execinfo.value, FintocError)
