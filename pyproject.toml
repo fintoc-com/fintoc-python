@@ -21,6 +21,7 @@ exclude = [
 [tool.poetry.dependencies]
 python = "^3.7"
 httpx = ">=0.16, < 1.0"
+cryptography = "<44.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.10.0"
