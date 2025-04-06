@@ -41,3 +41,7 @@ class InstitutionError(FintocError):
 
 class InvalidRequestError(FintocError):
     """Represents an error because of an invalid request."""
+
+
+class WebhookSignatureError(Exception):
+    """Exception raised for webhook signature validation errors."""

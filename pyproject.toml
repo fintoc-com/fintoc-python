@@ -32,3 +32,7 @@ pytest-cov = "^2.12.1"
 
 [tool.poetry.urls]
 "Issue Tracker" = "https://github.com/fintoc-com/fintoc-python/issues"
+
+[tool.poetry.group.test.dependencies]
+freezegun = "^1.5.1"
+
