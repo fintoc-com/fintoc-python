@@ -45,12 +45,18 @@ def patch_http_client(monkeypatch):
             self._url = url
             self._json = json
 
+            # Extract the ID from the URL if it's a specific resource request
+            self._id = None
+            if '/' in url and not url.endswith('s'):
+                self._id = url.split('/')[-1]
+
         @property
         def headers(self):
             if self._page is not None and self._page < 10:
                 params = "&".join([*self.formatted_params, f"page={self._page + 1}"])
+                url = f"/{self._url}" if not self._url.startswith('/') else self._url
                 return {
-                    "link": (f"<{self._base_url}/{self._url}?{params}>; " 'rel="next"')
+                    "link": (f"<{self._base_url}/{url}?{params}>; " 'rel="next"')
                 }
             return {}
 
@@ -77,7 +83,8 @@ def patch_http_client(monkeypatch):
                     for _ in range(10)
                 ]
             return {
-                "id": "idx",
+                # Use the ID from the URL if available, otherwise use "idx"
+                "id": self._id if self._id else "idx",
                 "method": self._method,
                 "url": self._url,
                 "params": self._params,
