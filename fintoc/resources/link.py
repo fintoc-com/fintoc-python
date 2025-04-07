@@ -4,7 +4,7 @@ from fintoc.managers import (
     AccountsManager,
     RefreshIntentsManager,
     SubscriptionsManager,
-    TaxRetunsManager,
+    TaxReturnsManager,
 )
 from fintoc.mixins import ResourceMixin
 
@@ -51,7 +51,7 @@ class Link(ResourceMixin):
     def tax_returns(self):
         """Proxies the tax_returns manager."""
         if self.__tax_returns_manager is None:
-            self.__tax_returns_manager = TaxRetunsManager("/tax_returns", self._client)
+            self.__tax_returns_manager = TaxReturnsManager("/tax_returns", self._client)
         return self.__tax_returns_manager
 
     @tax_returns.setter
