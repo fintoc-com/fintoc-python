@@ -62,12 +62,11 @@ class TestFintocIntegration:
 
         accounts = list(link.accounts.all())
 
-        assert link.accounts._client.params["link_token"] == link_token
-
         assert len(accounts) > 0
         for account in accounts:
             assert account.method == "get"
             assert account.url == "accounts"
+            assert account.params.link_token == link_token
 
     def test_link_account_get(self):
         """Test getting a specific account from a link."""
@@ -78,10 +77,8 @@ class TestFintocIntegration:
         account = link.accounts.get(account_id)
 
         assert account.method == "get"
+        assert account.params.link_token == link_token
         assert account.url == f"accounts/{account_id}"
-
-        assert link.accounts._client.params["link_token"] == link_token
-        assert account._client.params["link_token"] == link_token
 
     def test_account_movements_all(self):
         """Test getting movements from an account."""
@@ -93,13 +90,11 @@ class TestFintocIntegration:
 
         movements = list(account.movements.all())
 
-        assert account.movements._client.params["link_token"] == link_token
-
         assert len(movements) > 0
         for movement in movements:
             assert movement.method == "get"
             assert movement.url == f"accounts/{account.id}/movements"
-            assert movement._client.params["link_token"] == link_token
+            assert movement.params.link_token == link_token
 
     def test_account_movement_get(self):
         """Test getting a specific movement from an account."""
@@ -114,8 +109,7 @@ class TestFintocIntegration:
 
         assert movement.method == "get"
         assert movement.url == f"accounts/{account.id}/movements/{movement_id}"
-
-        assert movement._client.params["link_token"] == link_token
+        assert movement.params.link_token == link_token
 
     def test_link_subscriptions_all(self):
         """Test getting all subscriptions from a link."""
@@ -124,13 +118,10 @@ class TestFintocIntegration:
 
         subscriptions = list(link.subscriptions.all())
 
-        assert link.subscriptions._client.params["link_token"] == link_token
-
         assert len(subscriptions) > 0
         for subscription in subscriptions:
             assert subscription.method == "get"
             assert subscription.url == "subscriptions"
-            assert subscription._client.params["link_token"] == link_token
 
     def test_link_subscription_get(self):
         """Test getting a specific subscription from a link."""
@@ -143,8 +134,6 @@ class TestFintocIntegration:
         assert subscription.method == "get"
         assert subscription.url == f"subscriptions/{subscription_id}"
 
-        assert subscription._client.params["link_token"] == link_token
-
     def test_link_tax_returns_all(self):
         """Test getting all tax returns from a link."""
         link_token = "test_link_token"
@@ -152,13 +141,11 @@ class TestFintocIntegration:
 
         tax_returns = list(link.tax_returns.all())
 
-        assert link.tax_returns._client.params["link_token"] == link_token
-
         assert len(tax_returns) > 0
         for tax_return in tax_returns:
             assert tax_return.method == "get"
             assert tax_return.url == "tax_returns"
-            assert tax_return._client.params["link_token"] == link_token
+            assert tax_return.params.link_token == link_token
 
     def test_link_tax_return_get(self):
         """Test getting a specific tax return from a link."""
@@ -171,7 +158,7 @@ class TestFintocIntegration:
         assert tax_return.method == "get"
         assert tax_return.url == f"tax_returns/{tax_return_id}"
 
-        assert tax_return._client.params["link_token"] == link_token
+        assert tax_return.params.link_token == link_token
 
     def test_link_invoices_all(self):
         """Test getting all invoices from a link."""
@@ -180,13 +167,11 @@ class TestFintocIntegration:
 
         invoices = list(link.invoices.all())
 
-        assert link.invoices._client.params["link_token"] == link_token
-
         assert len(invoices) > 0
         for invoice in invoices:
             assert invoice.method == "get"
             assert invoice.url == "invoices"
-            assert invoice._client.params["link_token"] == link_token
+            assert invoice.params.link_token == link_token
 
     def test_link_invoice_get(self):
         """Test getting a specific invoice from a link."""
@@ -198,8 +183,7 @@ class TestFintocIntegration:
 
         assert invoice.method == "get"
         assert invoice.url == f"invoices/{invoice_id}"
-
-        assert invoice._client.params["link_token"] == link_token
+        assert invoice.params.link_token == link_token
 
     def test_link_refresh_intents_all(self):
         """Test getting all refresh intents from a link."""
@@ -208,13 +192,11 @@ class TestFintocIntegration:
 
         refresh_intents = list(link.refresh_intents.all())
 
-        assert link.refresh_intents._client.params["link_token"] == link_token
-
         assert len(refresh_intents) > 0
         for refresh_intent in refresh_intents:
             assert refresh_intent.method == "get"
             assert refresh_intent.url == "refresh_intents"
-            assert refresh_intent._client.params["link_token"] == link_token
+            assert refresh_intent.params.link_token == link_token
 
     def test_link_refresh_intent_get(self):
         """Test getting a specific refresh intent from a link."""
@@ -227,7 +209,7 @@ class TestFintocIntegration:
         assert refresh_intent.method == "get"
         assert refresh_intent.url == f"refresh_intents/{refresh_intent_id}"
 
-        assert refresh_intent._client.params["link_token"] == link_token
+        assert refresh_intent.params.link_token == link_token
 
     def test_link_refresh_intent_create(self):
         """Test creating a refresh intent for a link."""
@@ -239,8 +221,7 @@ class TestFintocIntegration:
         assert refresh_intent.method == "post"
         assert refresh_intent.url == "refresh_intents"
         assert refresh_intent.json.refresh_type == "only_last"
-
-        assert refresh_intent._client.params["link_token"] == link_token
+        assert refresh_intent.json.link_token == link_token
 
     def test_charges_all(self):
         """Test getting all charges."""

@@ -74,28 +74,6 @@ class TestClientCreationFunctionality:
         # Now the internal client should exist
         assert isinstance(client._Client__client, httpx.Client)
 
-    def test_client_extension(self):
-        # pylint: disable=protected-access
-        client = self.create_client()
-        assert isinstance(client._client, httpx.Client)  # Create httpx sub client
-        assert client._Client__client is not None
-
-        new_url = "https://new-test.com"
-        new_api_key = "new_super_secret_api_key"
-        new_client = client.extend(base_url=new_url, api_key=new_api_key)
-        assert isinstance(new_client, Client)
-        assert new_client is not client
-        assert new_client._Client__client is None
-
-    def test_client_params_extension(self):
-        # pylint: disable=protected-access
-        client = self.create_client(params=True)
-
-        new_params = {"link_token": "link_token", "first_param": "new_first_value"}
-        new_client = client.extend(params=new_params)
-        assert len(new_client.params) == len(client.params) + 1
-        assert new_client.params["first_param"] != client.params["first_param"]
-
 
 class TestClientRequestFunctionality:
     @pytest.fixture(autouse=True)
