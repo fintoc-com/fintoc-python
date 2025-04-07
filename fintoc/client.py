@@ -55,22 +55,3 @@ class Client:
             return response.json()
         except JSONDecodeError:
             return {}
-
-    def extend(
-        self,
-        base_url=None,
-        api_key=None,
-        user_agent=None,
-        params=None,
-    ):
-        """
-        Creates a new instance using the data of the current object,
-        overwriting parts of it using the method parameters.
-        """
-        return Client(
-            base_url=base_url or self.base_url,
-            api_key=api_key or self.api_key,
-            api_version=self.api_version,
-            user_agent=user_agent or self.user_agent,
-            params={**self.params, **params} if params else self.params,
-        )
