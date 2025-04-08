@@ -24,6 +24,33 @@
 </a>
 </p>
 
+## Table of Contents
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Quickstart](#quickstart)
+  - [Managers](#managers)
+    - [all](#all)
+    - [get](#get)
+    - [create](#create)
+    - [update](#update)
+    - [delete](#delete)
+  - [The shape of the SDK](#the-shape-of-the-sdk)
+    - [The `Fintoc` object](#the-fintoc-object)
+    - [The `webhook_endpoints` manager](#the-webhook_endpoints-manager)
+    - [The `payment_intents` manager](#the-payment_intents-manager)
+    - [The `links` manager](#the-links-manager)
+    - [The `invoices` manager](#the-invoices-manager)
+    - [The `tax_returns` manager](#the-tax_returns-manager)
+    - [The `refresh_intents` manager](#the-refresh_intents-manager)
+    - [The `accounts` manager](#the-accounts-manager)
+    - [The `movements` manager](#the-movements-manager)
+    - [The `subscription_intents` manager](#the-subscription_intents-manager)
+    - [The `subscriptions` manager](#the-subscriptions-manager)
+    - [The `charges` manager](#the-charges-manager)
+  - [Webhook Signature Validation](#webhook-signature-validation)
+  - [Serialization](#serialization)
+- [Acknowledgements](#acknowledgements)
+
 ## Installation
 
 Install using pip!
@@ -411,6 +438,29 @@ charge = fintoc_client.charges.create(
 )
 ```
 
+### Webhook Signature Validation
+
+To ensure the authenticity of incoming webhooks from Fintoc, you should always validate the signature. The SDK provides a `WebhookSignature` class to verify the `Fintoc-Signature` header
+
+```python
+WebhookSignature.verify_header(
+    payload=request.get_data().decode('utf-8'),
+    header=request.headers.get('Fintoc-Signature'),
+    secret='your_webhook_secret'
+)
+```
+
+The `verify_header` method takes the following parameters:
+- `payload`: The raw request body as a string
+- `header`: The Fintoc-Signature header value
+- `secret`: Your webhook secret key (found in your Fintoc dashboard)
+- `tolerance`: (Optional) Number of seconds to tolerate when checking timestamp (default: 300)
+
+If the signature is invalid or the timestamp is outside the tolerance window, a `WebhookSignatureError` will be raised with a descriptive message.
+
+
+For a complete example of handling webhooks, see [examples/webhook.py](examples/webhook.py).
+
 ### Serialization
 
 Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!
@@ -427,4 +477,4 @@ The serialization corresponds to a dictionary with only simple types, that can b
 
 The first version of this SDK was originally designed and handcrafted by [**@nebil**](https://github.com/nebil),
 [ad](https://en.wikipedia.org/wiki/Ad_honorem) [piscolem](https://en.wiktionary.org/wiki/piscola).
-He built it with the help of Gianni Roberto’s [Picchi 2](https://www.youtube.com/watch?v=WqjUlmkYr2g).
+He built it with the help of Gianni Roberto's [Picchi 2](https://www.youtube.com/watch?v=WqjUlmkYr2g).
