@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import httpx
 import pytest
@@ -57,7 +57,7 @@ TIMESTAMP = 1743890251
 HEADER = (
     f"t={TIMESTAMP},v1=11b98dd8f5500109246aa4d9875fad2e97d462560b012a5f50ff924411de0b0f"
 )
-SIGNATURE_DATETIME = datetime.fromtimestamp(TIMESTAMP)
+SIGNATURE_DATETIME = datetime.fromtimestamp(TIMESTAMP, tz=timezone.utc)
 
 
 class TestWebhookSignature:
