@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import httpx
 import pytest
@@ -53,14 +53,15 @@ PAYLOAD = """
 # Remove whitespace and line returns from PAYLOAD
 PAYLOAD = "".join(PAYLOAD.split())
 
-HEADER = (
-    "t=1743890251,v1=11b98dd8f5500109246aa4d9875fad2e97d462560b012a5f50ff924411de0b0f"
-)
 TIMESTAMP = 1743890251
+HEADER = (
+    f"t={TIMESTAMP},v1=11b98dd8f5500109246aa4d9875fad2e97d462560b012a5f50ff924411de0b0f"
+)
+SIGNATURE_DATETIME = datetime.fromtimestamp(TIMESTAMP)
 
 
 class TestWebhookSignature:
-    @freeze_time("2025-04-05T21:57:31.834Z")
+    @freeze_time(SIGNATURE_DATETIME)
     def test_valid_signature(self):
         assert (
             WebhookSignature.verify_header(
@@ -69,7 +70,7 @@ class TestWebhookSignature:
             is True
         )
 
-    @freeze_time("2025-04-05T21:57:31.834Z")
+    @freeze_time(SIGNATURE_DATETIME)
     def test_invalid_secret(self):
         """Test that an incorrect secret key fails verification"""
         with pytest.raises(WebhookSignatureError, match="Signature mismatch"):
@@ -77,7 +78,7 @@ class TestWebhookSignature:
                 payload=PAYLOAD, header=HEADER, secret="whsec_wrong_secret"
             )
 
-    @freeze_time("2025-04-05T21:57:31.834Z")
+    @freeze_time(SIGNATURE_DATETIME)
     def test_modified_payload(self):
         """Test that a modified payload fails verification"""
         modified_payload = PAYLOAD.replace(
@@ -87,6 +88,12 @@ class TestWebhookSignature:
         with pytest.raises(WebhookSignatureError, match="Signature mismatch"):
             WebhookSignature.verify_header(
                 payload=modified_payload, header=HEADER, secret=SECRET
+            )
+
+        # Should fail with no tolerance
+        with pytest.raises(WebhookSignatureError, match="Signature mismatch"):
+            WebhookSignature.verify_header(
+                payload=modified_payload, header=HEADER, secret=SECRET, tolerance=None
             )
 
     def test_malformed_header(self):
@@ -104,7 +111,7 @@ class TestWebhookSignature:
                     payload=PAYLOAD, header=header, secret=SECRET
                 )
 
-    @freeze_time("2025-04-05T21:57:31.834Z")
+    @freeze_time(SIGNATURE_DATETIME)
     def test_header_contains_valid_signature(self):
         header = HEADER + ",v2=bad_signature"
         assert (
@@ -116,7 +123,7 @@ class TestWebhookSignature:
 
     def test_timestamp_validation(self):
         # Should pass with custom tolerance and timestamp on
-        with freeze_time("2025-04-05T22:05:31.834Z"):
+        with freeze_time(SIGNATURE_DATETIME + timedelta(seconds=500)):
             assert (
                 WebhookSignature.verify_header(
                     payload=PAYLOAD, header=HEADER, secret=SECRET, tolerance=600
@@ -125,7 +132,7 @@ class TestWebhookSignature:
             )
 
         # Should pass with default tolerance and timestamp on
-        with freeze_time("2025-04-05T22:02:31.834Z"):
+        with freeze_time(SIGNATURE_DATETIME + timedelta(seconds=200)):
             assert (
                 WebhookSignature.verify_header(
                     payload=PAYLOAD, header=HEADER, secret=SECRET
@@ -134,7 +141,7 @@ class TestWebhookSignature:
             )
 
         # Should fail with default tolerance and timestamp off
-        with freeze_time("2025-04-05T22:02:35.834Z"):
+        with freeze_time(SIGNATURE_DATETIME + timedelta(seconds=400)):
             with pytest.raises(
                 WebhookSignatureError, match="Timestamp outside the tolerance zone"
             ):
@@ -145,7 +152,7 @@ class TestWebhookSignature:
                 )
 
         # Should fail with custom tolerance and timestamp off
-        with freeze_time("2025-04-05T21:58:31.834Z"):
+        with freeze_time(SIGNATURE_DATETIME + timedelta(seconds=100)):
             with pytest.raises(
                 WebhookSignatureError, match="Timestamp outside the tolerance zone"
             ):
@@ -154,7 +161,7 @@ class TestWebhookSignature:
                 )
 
         # Should pass with no tolerance and timestamp off
-        with freeze_time("2025-04-05T22:02:35.834Z"):
+        with freeze_time(SIGNATURE_DATETIME + timedelta(seconds=10100)):
             WebhookSignature.verify_header(
                 payload=PAYLOAD, header=HEADER, secret=SECRET, tolerance=None
             )
