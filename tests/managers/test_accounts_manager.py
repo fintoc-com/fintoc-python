@@ -24,7 +24,9 @@ class TestAccountsManagerHandlers:
         )
         self._link_token = "link_token"
         self.path = "/accounts"
-        self.manager = AccountsManager(self.path, self.client, link_token=self._link_token)
+        self.manager = AccountsManager(
+            self.path, self.client, link_token=self._link_token
+        )
 
     def test_post_get_handler(self):
         # pylint: disable=protected-access
@@ -40,7 +42,7 @@ class TestAccountsManagerHandlers:
             assert obj._link_token is not None
 
     def test_post_all_handler_generator(self):
-        # pylint: disable=protected-access        
+        # pylint: disable=protected-access
         objects = self.manager.all()
         assert not isinstance(objects, list)
         for obj in objects:

@@ -20,7 +20,7 @@ class Account(ResourceMixin):
             self.__movements_manager = MovementsManager(
                 f"/accounts/{self.id}/movements",
                 self._client,
-                link_token=self._link_token
+                link_token=self._link_token,
             )
         return self.__movements_manager
 

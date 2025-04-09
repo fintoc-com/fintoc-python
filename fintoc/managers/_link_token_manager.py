@@ -1,5 +1,7 @@
 """Module to hold the link token manager."""
 
+from abc import abstractmethod
+
 from fintoc.mixins import ManagerMixin
 
 
@@ -9,6 +11,16 @@ class LinkTokenManager(ManagerMixin):
     def __init__(self, path, client, link_token=None):
         super().__init__(path, client)
         self._link_token = link_token
+
+    @property
+    @abstractmethod
+    def resource(self):
+        pass
+
+    @property
+    @abstractmethod
+    def methods(self):
+        pass
 
     def _all(self, **kwargs):
         return super()._all(**{**kwargs, "link_token": self._link_token})
