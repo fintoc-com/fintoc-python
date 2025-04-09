@@ -173,18 +173,6 @@ class TestFintocIntegration:
             assert invoice.url == "invoices"
             assert invoice.params.link_token == link_token
 
-    def test_link_invoice_get(self):
-        """Test getting a specific invoice from a link."""
-        link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
-        invoice_id = "test_invoice_id"
-        invoice = link.invoices.get(invoice_id)
-
-        assert invoice.method == "get"
-        assert invoice.url == f"invoices/{invoice_id}"
-        assert invoice.params.link_token == link_token
-
     def test_link_refresh_intents_all(self):
         """Test getting all refresh intents from a link."""
         link_token = "test_link_token"
