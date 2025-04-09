@@ -57,159 +57,261 @@ class TestFintocIntegration:
 
     def test_link_accounts_all(self):
         """Test getting accounts from a link."""
+
+        def assert_accounts(accounts):
+            assert len(accounts) > 0
+            for account in accounts:
+                assert account.method == "get"
+                assert account.url == "v1/accounts"
+                assert account.params.link_token == link_token
+
         link_token = "test_link_token"
+
+        # Test using the resource
         link = self.fintoc.links.get(link_token)
+        assert_accounts(list(link.accounts.all()))
 
-        accounts = list(link.accounts.all())
-
-        assert len(accounts) > 0
-        for account in accounts:
-            assert account.method == "get"
-            assert account.url == "v1/accounts"
-            assert account.params.link_token == link_token
+        # Test using directly the manager
+        assert_accounts(list(self.fintoc.accounts.all(link_token=link_token)))
 
     def test_link_account_get(self):
         """Test getting a specific account from a link."""
+
+        def assert_account(account):
+            assert account.method == "get"
+            assert account.params.link_token == link_token
+            assert account.url == f"v1/accounts/{account_id}"
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         account_id = "test_account_id"
-        account = link.accounts.get(account_id)
 
-        assert account.method == "get"
-        assert account.params.link_token == link_token
-        assert account.url == f"v1/accounts/{account_id}"
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        account = link.accounts.get(account_id)
+        assert_account(account)
+
+        # Test using directly the manager
+        account = self.fintoc.accounts.get(account_id, link_token=link_token)
+        assert_account(account)
 
     def test_account_movements_all(self):
         """Test getting movements from an account."""
+
+        def assert_movements(movements):
+            assert len(movements) > 0
+            for movement in movements:
+                assert movement.method == "get"
+                assert movement.url == f"v1/accounts/{account_id}/movements"
+                assert movement.params.link_token == link_token
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         account_id = "test_account_id"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
         account = link.accounts.get(account_id)
+        assert_movements(list(account.movements.all()))
 
-        movements = list(account.movements.all())
-
-        assert len(movements) > 0
-        for movement in movements:
-            assert movement.method == "get"
-            assert movement.url == f"v1/accounts/{account.id}/movements"
-            assert movement.params.link_token == link_token
+        # Test using directly the manager
+        assert_movements(
+            list(
+                self.fintoc.movements.all(account_id=account_id, link_token=link_token)
+            )
+        )
 
     def test_account_movement_get(self):
         """Test getting a specific movement from an account."""
+
+        def assert_movement(movement):
+            assert movement.method == "get"
+            assert movement.url == f"v1/accounts/{account_id}/movements/{movement_id}"
+            assert movement.params.link_token == link_token
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         account_id = "test_account_id"
-        account = link.accounts.get(account_id)
-
         movement_id = "test_movement_id"
-        movement = account.movements.get(movement_id)
 
-        assert movement.method == "get"
-        assert movement.url == f"v1/accounts/{account.id}/movements/{movement_id}"
-        assert movement.params.link_token == link_token
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        account = link.accounts.get(account_id)
+        movement = account.movements.get(movement_id)
+        assert_movement(movement)
+
+        # Test using directly the manager
+        movement = self.fintoc.movements.get(
+            movement_id, account_id=account_id, link_token=link_token
+        )
+        assert_movement(movement)
 
     def test_link_subscriptions_all(self):
         """Test getting all subscriptions from a link."""
+
+        def assert_subscriptions(subscriptions):
+            assert len(subscriptions) > 0
+            for subscription in subscriptions:
+                assert subscription.method == "get"
+                assert subscription.url == "v1/subscriptions"
+
         link_token = "test_link_token"
+
+        # Test using the resource. This actually should be removed, because
+        # subscriptions do not depend on a link.
         link = self.fintoc.links.get(link_token)
+        assert_subscriptions(list(link.subscriptions.all()))
 
-        subscriptions = list(link.subscriptions.all())
-
-        assert len(subscriptions) > 0
-        for subscription in subscriptions:
-            assert subscription.method == "get"
-            assert subscription.url == "v1/subscriptions"
+        # Test using directly the manager
+        assert_subscriptions(list(self.fintoc.subscriptions.all()))
 
     def test_link_subscription_get(self):
         """Test getting a specific subscription from a link."""
+
+        def assert_subscription(subscription):
+            assert subscription.method == "get"
+            assert subscription.url == f"v1/subscriptions/{subscription_id}"
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         subscription_id = "test_subscription_id"
-        subscription = link.subscriptions.get(subscription_id)
 
-        assert subscription.method == "get"
-        assert subscription.url == f"v1/subscriptions/{subscription_id}"
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        subscription = link.subscriptions.get(subscription_id)
+        assert_subscription(subscription)
+
+        # Test using directly the manager
+        subscription = self.fintoc.subscriptions.get(
+            subscription_id, link_token=link_token
+        )
+        assert_subscription(subscription)
 
     def test_link_tax_returns_all(self):
         """Test getting all tax returns from a link."""
+
+        def assert_tax_returns(tax_returns):
+            assert len(tax_returns) > 0
+            for tax_return in tax_returns:
+                assert tax_return.method == "get"
+                assert tax_return.url == "v1/tax_returns"
+                assert tax_return.params.link_token == link_token
+
         link_token = "test_link_token"
+
+        # Test using the resource
         link = self.fintoc.links.get(link_token)
+        assert_tax_returns(list(link.tax_returns.all()))
 
-        tax_returns = list(link.tax_returns.all())
-
-        assert len(tax_returns) > 0
-        for tax_return in tax_returns:
-            assert tax_return.method == "get"
-            assert tax_return.url == "v1/tax_returns"
-            assert tax_return.params.link_token == link_token
+        # Test using directly the manager
+        assert_tax_returns(list(self.fintoc.tax_returns.all(link_token=link_token)))
 
     def test_link_tax_return_get(self):
         """Test getting a specific tax return from a link."""
+
+        def assert_tax_return(tax_return):
+            assert tax_return.method == "get"
+            assert tax_return.url == f"v1/tax_returns/{tax_return_id}"
+            assert tax_return.params.link_token == link_token
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         tax_return_id = "test_tax_return_id"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
         tax_return = link.tax_returns.get(tax_return_id)
+        assert_tax_return(tax_return)
 
-        assert tax_return.method == "get"
-        assert tax_return.url == f"v1/tax_returns/{tax_return_id}"
-
-        assert tax_return.params.link_token == link_token
+        # Test using directly the manager
+        tax_return = self.fintoc.tax_returns.get(tax_return_id, link_token=link_token)
+        assert_tax_return(tax_return)
 
     def test_link_invoices_all(self):
         """Test getting all invoices from a link."""
+
+        def assert_invoices(invoices):
+            assert len(invoices) > 0
+            for invoice in invoices:
+                assert invoice.method == "get"
+                assert invoice.url == "v1/invoices"
+                assert invoice.params.link_token == link_token
+
         link_token = "test_link_token"
+
+        # Test using the resource
         link = self.fintoc.links.get(link_token)
+        assert_invoices(list(link.invoices.all()))
 
-        invoices = list(link.invoices.all())
-
-        assert len(invoices) > 0
-        for invoice in invoices:
-            assert invoice.method == "get"
-            assert invoice.url == "v1/invoices"
-            assert invoice.params.link_token == link_token
+        # Test using directly the manager
+        assert_invoices(list(self.fintoc.invoices.all(link_token=link_token)))
 
     def test_link_refresh_intents_all(self):
         """Test getting all refresh intents from a link."""
+
+        def assert_refresh_intents(refresh_intents):
+            assert len(refresh_intents) > 0
+            for refresh_intent in refresh_intents:
+                assert refresh_intent.method == "get"
+                assert refresh_intent.url == "v1/refresh_intents"
+                assert refresh_intent.params.link_token == link_token
+
         link_token = "test_link_token"
+
+        # Test using the resource
         link = self.fintoc.links.get(link_token)
+        assert_refresh_intents(list(link.refresh_intents.all()))
 
-        refresh_intents = list(link.refresh_intents.all())
-
-        assert len(refresh_intents) > 0
-        for refresh_intent in refresh_intents:
-            assert refresh_intent.method == "get"
-            assert refresh_intent.url == "v1/refresh_intents"
-            assert refresh_intent.params.link_token == link_token
+        # Test using directly the manager
+        assert_refresh_intents(
+            list(self.fintoc.refresh_intents.all(link_token=link_token))
+        )
 
     def test_link_refresh_intent_get(self):
         """Test getting a specific refresh intent from a link."""
+
+        def assert_refresh_intent(refresh_intent):
+            assert refresh_intent.method == "get"
+            assert refresh_intent.url == f"v1/refresh_intents/{refresh_intent_id}"
+            assert refresh_intent.params.link_token == link_token
+
         link_token = "test_link_token"
-        link = self.fintoc.links.get(link_token)
-
         refresh_intent_id = "test_refresh_intent_id"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
         refresh_intent = link.refresh_intents.get(refresh_intent_id)
+        assert_refresh_intent(refresh_intent)
 
-        assert refresh_intent.method == "get"
-        assert refresh_intent.url == f"v1/refresh_intents/{refresh_intent_id}"
-
-        assert refresh_intent.params.link_token == link_token
+        # Test using directly the manager
+        refresh_intent = self.fintoc.refresh_intents.get(
+            refresh_intent_id, link_token=link_token
+        )
+        assert_refresh_intent(refresh_intent)
 
     def test_link_refresh_intent_create(self):
         """Test creating a refresh intent for a link."""
+
+        def assert_refresh_intent(refresh_intent):
+            assert refresh_intent.method == "post"
+            assert refresh_intent.url == "v1/refresh_intents"
+            assert refresh_intent.json.refresh_type == "only_last"
+            # Check link_token in either params or json
+            assert (
+                hasattr(refresh_intent.json, "link_token")
+                and refresh_intent.json.link_token == link_token
+            ) or (
+                hasattr(refresh_intent.params, "link_token")
+                and refresh_intent.params.link_token == link_token
+            )
+
         link_token = "test_link_token"
+
+        # Test using the resource
         link = self.fintoc.links.get(link_token)
-
         refresh_intent = link.refresh_intents.create(refresh_type="only_last")
+        assert_refresh_intent(refresh_intent)
 
-        assert refresh_intent.method == "post"
-        assert refresh_intent.url == "v1/refresh_intents"
-        assert refresh_intent.json.refresh_type == "only_last"
-        assert refresh_intent.params.link_token == link_token
+        # Test using directly the manager
+        refresh_intent = self.fintoc.refresh_intents.create(
+            refresh_type="only_last", link_token=link_token
+        )
+        assert_refresh_intent(refresh_intent)
 
     def test_charges_all(self):
         """Test getting all charges."""
