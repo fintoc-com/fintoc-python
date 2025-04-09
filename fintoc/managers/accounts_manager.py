@@ -21,10 +21,10 @@ class AccountsManager(LinkTokenManager):
             for obj in objects:
                 obj._link_token = self._link_token
             return objects
-        else:
-            def modified_generator():
-                for obj in objects:
-                    obj._link_token = self._link_token
-                    yield obj
 
-            return modified_generator()
+        def modified_generator():
+            for obj in objects:
+                obj._link_token = self._link_token
+                yield obj
+
+        return modified_generator()

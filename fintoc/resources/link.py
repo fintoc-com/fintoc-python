@@ -2,10 +2,10 @@
 
 from fintoc.managers import (
     AccountsManager,
+    InvoicesManager,
     RefreshIntentsManager,
     SubscriptionsManager,
     TaxReturnsManager,
-    InvoicesManager
 )
 from fintoc.mixins import ResourceMixin
 
@@ -30,9 +30,7 @@ class Link(ResourceMixin):
         """Proxies the accounts manager."""
         if self.__accounts_manager is None:
             self.__accounts_manager = AccountsManager(
-                "/accounts",
-                self._client,
-                self._link_token
+                "/accounts", self._client, self._link_token
             )
         return self.__accounts_manager
 
@@ -60,9 +58,7 @@ class Link(ResourceMixin):
         """Proxies the tax_returns manager."""
         if self.__tax_returns_manager is None:
             self.__tax_returns_manager = TaxReturnsManager(
-                "/tax_returns",
-                self._client,
-                self._link_token
+                "/tax_returns", self._client, self._link_token
             )
         return self.__tax_returns_manager
 
@@ -75,9 +71,7 @@ class Link(ResourceMixin):
         """Proxies the invoices manager."""
         if self.__invoices_manager is None:
             self.__invoices_manager = InvoicesManager(
-                "/invoices",
-                self._client,
-                self._link_token
+                "/invoices", self._client, self._link_token
             )
         return self.__invoices_manager
 
@@ -90,9 +84,7 @@ class Link(ResourceMixin):
         """Proxies the refresh_intents manager."""
         if self.__refresh_intents_manager is None:
             self.__refresh_intents_manager = RefreshIntentsManager(
-                "/refresh_intents",
-                self._client,
-                self._link_token
+                "/refresh_intents", self._client, self._link_token
             )
         return self.__refresh_intents_manager
 
