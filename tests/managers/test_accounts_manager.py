@@ -1,10 +1,10 @@
 import pytest
 
 from fintoc.client import Client
-from fintoc.managers import LinksManager
+from fintoc.managers import AccountsManager
 
 
-class TestLinksManagerHandlers:
+class TestAccountsManagerHandlers:
     @pytest.fixture(autouse=True)
     def patch_http_client(self, patch_http_client):
         pass
@@ -22,8 +22,11 @@ class TestLinksManagerHandlers:
             self.user_agent,
             params=self.params,
         )
-        self.path = "/links"
-        self.manager = LinksManager(self.path, self.client)
+        self._link_token = "link_token"
+        self.path = "/accounts"
+        self.manager = AccountsManager(
+            self.path, self.client, link_token=self._link_token
+        )
 
     def test_post_get_handler(self):
         # pylint: disable=protected-access
@@ -31,8 +34,16 @@ class TestLinksManagerHandlers:
         object_ = self.manager.get(id_)
         assert object_._link_token is not None
 
-    def test_post_update_handler(self):
+    def test_post_all_handler_list(self):
         # pylint: disable=protected-access
-        id_ = "idx"
-        object_ = self.manager.update(id_)
-        assert object_._link_token is not None
+        objects = self.manager.all(lazy=False)
+        assert isinstance(objects, list)
+        for obj in objects:
+            assert obj._link_token is not None
+
+    def test_post_all_handler_generator(self):
+        # pylint: disable=protected-access
+        objects = self.manager.all()
+        assert not isinstance(objects, list)
+        for obj in objects:
+            assert obj._link_token is not None

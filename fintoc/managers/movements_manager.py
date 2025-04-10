@@ -1,9 +1,9 @@
 """Module to hold the movements manager."""
 
-from fintoc.mixins import ManagerMixin
+from fintoc.managers._link_token_manager import LinkTokenManager
 
 
-class MovementsManager(ManagerMixin):
+class MovementsManager(LinkTokenManager):
 
     """Represents a movements manager."""
 

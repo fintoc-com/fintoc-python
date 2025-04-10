@@ -1,9 +1,9 @@
 """Module to hold the invoices manager."""
 
-from fintoc.mixins import ManagerMixin
+from fintoc.managers._link_token_manager import LinkTokenManager
 
 
-class InvoicesManager(ManagerMixin):
+class InvoicesManager(LinkTokenManager):
 
     """Represents an invoices manager."""
 
