@@ -1,9 +1,9 @@
 """Module to hold the refresh_intents manager."""
 
-from fintoc.managers._link_token_manager import LinkTokenManager
+from fintoc.mixins import ManagerMixin
 
 
-class RefreshIntentsManager(LinkTokenManager):
+class RefreshIntentsManager(ManagerMixin):
 
     """Represents a refresh_intents manager."""
 

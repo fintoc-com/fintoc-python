@@ -1,9 +1,9 @@
 """Module to hold the tax_returns manager."""
 
-from fintoc.managers._link_token_manager import LinkTokenManager
+from fintoc.mixins import ManagerMixin
 
 
-class TaxReturnsManager(LinkTokenManager):
+class TaxReturnsManager(ManagerMixin):
 
     """Represents a tax_returns manager."""
 

@@ -23,15 +23,12 @@ class Link(ResourceMixin):
         self.__tax_returns_manager = None
         self.__invoices_manager = None
         self.__refresh_intents_manager = None
-        self._link_token = None
 
     @property
     def accounts(self):
         """Proxies the accounts manager."""
         if self.__accounts_manager is None:
-            self.__accounts_manager = AccountsManager(
-                "/accounts", self._client, self._link_token
-            )
+            self.__accounts_manager = AccountsManager("/accounts", self._client)
         return self.__accounts_manager
 
     @accounts.setter
@@ -57,9 +54,7 @@ class Link(ResourceMixin):
     def tax_returns(self):
         """Proxies the tax_returns manager."""
         if self.__tax_returns_manager is None:
-            self.__tax_returns_manager = TaxReturnsManager(
-                "/tax_returns", self._client, self._link_token
-            )
+            self.__tax_returns_manager = TaxReturnsManager("/tax_returns", self._client)
         return self.__tax_returns_manager
 
     @tax_returns.setter
@@ -70,9 +65,7 @@ class Link(ResourceMixin):
     def invoices(self):
         """Proxies the invoices manager."""
         if self.__invoices_manager is None:
-            self.__invoices_manager = InvoicesManager(
-                "/invoices", self._client, self._link_token
-            )
+            self.__invoices_manager = InvoicesManager("/invoices", self._client)
         return self.__invoices_manager
 
     @invoices.setter
@@ -84,7 +77,7 @@ class Link(ResourceMixin):
         """Proxies the refresh_intents manager."""
         if self.__refresh_intents_manager is None:
             self.__refresh_intents_manager = RefreshIntentsManager(
-                "/refresh_intents", self._client, self._link_token
+                "/refresh_intents", self._client
             )
         return self.__refresh_intents_manager
 

@@ -61,18 +61,27 @@ class TestClientCreationFunctionality:
         assert client.headers["Authorization"] == self.api_key
         assert client.headers["User-Agent"] == self.user_agent
 
-    def test_client_http_subclient_lazy_initialization(self):
+    def test_client_extension(self):
         # pylint: disable=protected-access
         client = self.create_client()
+        assert isinstance(client._client, httpx.Client)  # Has httpx sub client
+        assert client._client is not None
 
-        # Kind of a hack, but the test is necessary to test the internal client is None
-        assert client._Client__client is None
+        new_url = "https://new-test.com"
+        new_api_key = "new_super_secret_api_key"
+        new_client = client.extend(base_url=new_url, api_key=new_api_key)
+        assert isinstance(new_client, Client)
+        assert new_client is not client
+        assert new_client._client is client._client
 
-        # Create an httpx client by calling the attribute
-        assert isinstance(client._client, httpx.Client)
+    def test_client_params_extension(self):
+        # pylint: disable=protected-access
+        client = self.create_client(params=True)
 
-        # Now the internal client should exist
-        assert isinstance(client._Client__client, httpx.Client)
+        new_params = {"link_token": "link_token", "first_param": "new_first_value"}
+        new_client = client.extend(params=new_params)
+        assert len(new_client.params) == len(client.params) + 1
+        assert new_client.params["first_param"] != client.params["first_param"]
 
 
 class TestClientRequestFunctionality:
