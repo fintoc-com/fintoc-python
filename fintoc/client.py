@@ -6,6 +6,7 @@ from json.decoder import JSONDecodeError
 
 import httpx
 
+from fintoc.jws import JWSSignature
 from fintoc.paginator import paginate
 
 
@@ -14,16 +15,25 @@ class Client:
 
     _client = httpx.Client()
 
-    def __init__(self, base_url, api_key, api_version, user_agent, params={}):
+    def __init__(
+        self,
+        base_url,
+        api_key,
+        api_version,
+        user_agent,
+        jws_private_key=None,
+        params={},
+    ):
         self.base_url = base_url
         self.api_key = api_key
         self.user_agent = user_agent
         self.params = params
         self.api_version = api_version
+        self.headers = self._get_static_headers()
+        self.__jws = JWSSignature(jws_private_key) if jws_private_key else None
 
-    @property
-    def headers(self):
-        """Return the appropriate headers for every request."""
+    def _get_static_headers(self):
+        """Return the headers that do not change per request."""
         headers = {
             "Authorization": self.api_key,
             "User-Agent": self.user_agent,
@@ -34,16 +44,27 @@ class Client:
 
         return headers
 
+    def _get_headers(self, method, json=None):
+        headers = dict(self.headers)
+        if self.__jws and json and method.lower() in ["post", "put", "patch"]:
+            jws_header = self.__jws.generate_header(json)
+            headers["Fintoc-JWS-Signature"] = jws_header
+
+        return headers
+
     def request(self, path, paginated=False, method="get", params=None, json=None):
         """
         Uses the internal httpx client to make a simple or paginated request.
         """
         url = f"{self.base_url}/{path.lstrip('/')}"
         all_params = {**self.params, **params} if params else self.params
+        headers = self._get_headers(method, json=json)
+
         if paginated:
-            return paginate(self._client, url, headers=self.headers, params=all_params)
+            return paginate(self._client, url, headers=headers, params=all_params)
+
         response = self._client.request(
-            method, url, headers=self.headers, params=all_params, json=json
+            method, url, headers=headers, params=all_params, json=json
         )
         response.raise_for_status()
         try:

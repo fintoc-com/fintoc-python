@@ -21,4 +21,7 @@ from .tax_return import TaxReturn
 from .taxpayer import Taxpayer
 from .tobacco_taxes import TobaccoTaxes
 from .transfer_account import TransferAccount
+from .v2.account import Account as AccountV2
+from .v2.account_number import AccountNumber
+from .v2.transfer import Transfer
 from .webhook_endpoint import WebhookEndpoint

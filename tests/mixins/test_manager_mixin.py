@@ -133,6 +133,10 @@ class TestManagerMixinMethods:
         object_ = self.manager.create()
         assert isinstance(object_, ResourceMixin)
         assert object_.method == "post"
+        assert object_.url == self.path.lstrip("/")
+
+        object_ = self.manager.create(path_="/resources/custom_path")
+        assert object_.url == "resources/custom_path"
 
     def test_update_method(self):
         object_ = self.manager.update("my_id")

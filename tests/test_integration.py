@@ -483,6 +483,153 @@ class TestFintocIntegration:
 
         assert result == webhook_endpoint_id
 
+    def test_v2_accounts_all(self):
+        """Test getting all accounts using v2 API."""
+        accounts = list(self.fintoc.v2.accounts.all())
+
+        assert len(accounts) > 0
+        for account in accounts:
+            assert account.method == "get"
+            assert account.url == "v2/accounts"
+
+    def test_v2_account_get(self):
+        """Test getting a specific account using v2 API."""
+        account_id = "test_account_id"
+
+        account = self.fintoc.v2.accounts.get(account_id)
+
+        assert account.method == "get"
+        assert account.url == f"v2/accounts/{account_id}"
+
+    def test_v2_account_create(self):
+        """Test creating an account using v2 API."""
+        account_data = {"description": "New test account"}
+
+        account = self.fintoc.v2.accounts.create(**account_data)
+
+        assert account.method == "post"
+        assert account.url == "v2/accounts"
+        assert account.json.description == account_data["description"]
+
+    def test_v2_account_numbers_all(self):
+        """Test getting all account numbers using v2 API."""
+        account_id = "test_account_id"
+        account_numbers = list(
+            self.fintoc.v2.account_numbers.all(account_id=account_id)
+        )
+
+        assert len(account_numbers) > 0
+        for account_number in account_numbers:
+            assert account_number.method == "get"
+            assert account_number.url == "v2/account_numbers"
+            assert account_number.params.account_id == account_id
+
+    def test_v2_account_number_get(self):
+        """Test getting a specific account number using v2 API."""
+        account_number_id = "test_account_number_id"
+
+        account_number = self.fintoc.v2.account_numbers.get(account_number_id)
+
+        assert account_number.method == "get"
+        assert account_number.url == f"v2/account_numbers/{account_number_id}"
+
+    def test_v2_account_number_create(self):
+        """Test creating an account number using v2 API."""
+        account_id = "test_account_id"
+
+        description = "Test account number"
+        metadata = {"test_key": "test_value"}
+
+        account_number = self.fintoc.v2.account_numbers.create(
+            account_id=account_id, description=description, metadata=metadata
+        )
+
+        assert account_number.method == "post"
+        assert account_number.url == "v2/account_numbers"
+        assert account_number.json.description == description
+        assert account_number.json.metadata.test_key == metadata["test_key"]
+        assert account_number.json.account_id == account_id
+
+    def test_v2_account_number_update(self):
+        """Test updating an account number using v2 API."""
+        account_number_id = "test_account_number_id"
+        metadata = {"test_key": "test_value"}
+
+        account_number = self.fintoc.v2.account_numbers.update(
+            account_number_id, metadata=metadata
+        )
+
+        assert account_number.method == "patch"
+        assert account_number.url == f"v2/account_numbers/{account_number_id}"
+        assert account_number.json.metadata.test_key == metadata["test_key"]
+
+    def test_v2_account_number_delete(self):
+        """Test deleting an account number using v2 API."""
+        account_number_id = "test_account_number_id"
+
+        result = self.fintoc.v2.account_numbers.delete(account_number_id)
+
+        assert result == account_number_id
+
+    def test_v2_transfers_all(self):
+        """Test getting all transfers using v2 API."""
+        account_id = "test_account_id"
+        transfers = list(self.fintoc.v2.transfers.all(account_id=account_id))
+
+        assert len(transfers) > 0
+        for transfer in transfers:
+            assert transfer.method == "get"
+            assert transfer.url == "v2/transfers"
+            assert transfer.params.account_id == account_id
+
+    def test_v2_transfer_get(self):
+        """Test getting a specific transfer using v2 API."""
+        transfer_id = "test_transfer_id"
+
+        transfer = self.fintoc.v2.transfers.get(transfer_id)
+
+        assert transfer.method == "get"
+        assert transfer.url == f"v2/transfers/{transfer_id}"
+
+    def test_v2_transfer_create(self):
+        """Test creating a transfer using v2 API."""
+        account_id = "test_account_id"
+        amount = 10000
+        currency = "MXN"
+        description = "Test transfer"
+        metadata = {"test_key": "test_value"}
+
+        transfer = self.fintoc.v2.transfers.create(
+            account_id=account_id,
+            amount=amount,
+            currency=currency,
+            description=description,
+            metadata=metadata,
+        )
+
+        assert transfer.method == "post"
+        assert transfer.url == "v2/transfers"
+        assert transfer.json.amount == amount
+        assert transfer.json.currency == currency
+        assert transfer.json.description == description
+        assert transfer.json.metadata.test_key == metadata["test_key"]
+
+    def test_v2_simulate_receive_transfer(self):
+        """Test simulating receiving a transfer using v2 API."""
+        account_number_id = "test_account_number_id"
+        amount = 10000
+        currency = "MXN"
+
+        transfer = self.fintoc.v2.simulate.receive_transfer(
+            account_number_id=account_number_id, amount=amount, currency=currency
+        )
+
+        assert transfer.method == "post"
+        assert transfer.url == "v2/simulate/receive_transfer"
+        assert transfer.json.amount == amount
+        assert transfer.json.currency == currency
+        assert transfer.json.account_number_id == account_number_id
+
 
 if __name__ == "__main__":
     pytest.main()
