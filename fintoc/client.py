@@ -2,6 +2,7 @@
 Module to house the Client object of the Fintoc Python SDK.
 """
 
+import uuid
 from json.decoder import JSONDecodeError
 
 import httpx
@@ -44,21 +45,32 @@ class Client:
 
         return headers
 
-    def _get_headers(self, method, json=None):
+    def _get_headers(self, method, json=None, idempotency_key=None):
         headers = dict(self.headers)
         if self.__jws and json and method.lower() in ["post", "put", "patch"]:
             jws_header = self.__jws.generate_header(json)
             headers["Fintoc-JWS-Signature"] = jws_header
 
+        if method.lower() == "post":
+            headers["Idempotency-Key"] = idempotency_key or str(uuid.uuid4())
+
         return headers
 
-    def request(self, path, paginated=False, method="get", params=None, json=None):
+    def request(
+        self,
+        path,
+        paginated=False,
+        method="get",
+        params=None,
+        json=None,
+        idempotency_key=None,
+    ):
         """
         Uses the internal httpx client to make a simple or paginated request.
         """
         url = f"{self.base_url}/{path.lstrip('/')}"
         all_params = {**self.params, **params} if params else self.params
-        headers = self._get_headers(method, json=json)
+        headers = self._get_headers(method, json=json, idempotency_key=idempotency_key)
 
         if paginated:
             return paginate(self._client, url, headers=headers, params=all_params)

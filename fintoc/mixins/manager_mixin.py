@@ -86,7 +86,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_get_handler(object_, identifier, **kwargs)
 
     @can_raise_fintoc_error
-    def _create(self, path_=None, **kwargs):
+    def _create(self, idempotency_key=None, path_=None, **kwargs):
         """
         Create an instance of the resource being handled by the manager.
         Data is passed using :kwargs:, as specified by the API.
@@ -100,6 +100,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
             handlers=self._handlers,
             methods=self.__class__.methods,
             params=kwargs,
+            idempotency_key=idempotency_key,
         )
         return self.post_create_handler(object_, **kwargs)
 

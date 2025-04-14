@@ -116,3 +116,19 @@ class TestClientRequestFunctionality:
         data = self.client.request("/movements/3", method="delete")
         assert isinstance(data, dict)
         assert len(data.keys()) == 0
+
+    def test_post_request(self):
+        data = self.client.request("/v2/transfers", method="post")
+        assert isinstance(data, dict)
+
+        idempotency_key = data["headers"]["Idempotency-Key"]
+        assert idempotency_key is not None and idempotency_key != ""
+
+    def test_post_request_with_custom_idempotency_key(self):
+        data = self.client.request(
+            "/v2/transfers", method="post", idempotency_key="1234"
+        )
+        assert isinstance(data, dict)
+
+        idempotency_key = data["headers"]["Idempotency-Key"]
+        assert idempotency_key == "1234"

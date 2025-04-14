@@ -614,6 +614,21 @@ class TestFintocIntegration:
         assert transfer.json.description == description
         assert transfer.json.metadata.test_key == metadata["test_key"]
 
+        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        assert idempotency_key_header is not None and idempotency_key_header != ""
+
+        idempotency_key = "123456"
+        transfer = self.fintoc.v2.transfers.create(
+            account_id=account_id,
+            amount=amount,
+            currency=currency,
+            description=description,
+            metadata=metadata,
+            idempotency_key=idempotency_key,
+        )
+        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        assert idempotency_key_header == "123456"
+
     def test_v2_simulate_receive_transfer(self):
         """Test simulating receiving a transfer using v2 API."""
         account_number_id = "test_account_number_id"
