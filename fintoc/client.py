@@ -12,23 +12,14 @@ from fintoc.paginator import paginate
 class Client:
     """Encapsulates the client behaviour and methods."""
 
+    _client = httpx.Client()
+
     def __init__(self, base_url, api_key, api_version, user_agent, params={}):
         self.base_url = base_url
         self.api_key = api_key
         self.user_agent = user_agent
         self.params = params
-        self.__client = None
         self.api_version = api_version
-
-    @property
-    def _client(self):
-        if self.__client is None:
-            self.__client = httpx.Client(
-                base_url=self.base_url,
-                headers=self.headers,
-                params=self.params,
-            )
-        return self.__client
 
     @property
     def headers(self):
@@ -47,9 +38,13 @@ class Client:
         """
         Uses the internal httpx client to make a simple or paginated request.
         """
+        url = f"{self.base_url}/{path.lstrip('/')}"
+        all_params = {**self.params, **params} if params else self.params
         if paginated:
-            return paginate(self._client, path, params=params)
-        response = self._client.request(method, path, params=params, json=json)
+            return paginate(self._client, url, headers=self.headers, params=all_params)
+        response = self._client.request(
+            method, url, headers=self.headers, params=all_params, json=json
+        )
         response.raise_for_status()
         try:
             return response.json()

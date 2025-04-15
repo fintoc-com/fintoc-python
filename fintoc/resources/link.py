@@ -2,9 +2,10 @@
 
 from fintoc.managers import (
     AccountsManager,
+    InvoicesManager,
     RefreshIntentsManager,
     SubscriptionsManager,
-    TaxRetunsManager,
+    TaxReturnsManager,
 )
 from fintoc.mixins import ResourceMixin
 
@@ -36,6 +37,8 @@ class Link(ResourceMixin):
 
     @property
     def subscriptions(self):
+        # TODO: this method should be deprecated as it's no longer allowed
+        # in our API
         """Proxies the subscriptions manager."""
         if self.__subscriptions_manager is None:
             self.__subscriptions_manager = SubscriptionsManager(
@@ -51,7 +54,7 @@ class Link(ResourceMixin):
     def tax_returns(self):
         """Proxies the tax_returns manager."""
         if self.__tax_returns_manager is None:
-            self.__tax_returns_manager = TaxRetunsManager("/tax_returns", self._client)
+            self.__tax_returns_manager = TaxReturnsManager("/tax_returns", self._client)
         return self.__tax_returns_manager
 
     @tax_returns.setter
@@ -62,7 +65,7 @@ class Link(ResourceMixin):
     def invoices(self):
         """Proxies the invoices manager."""
         if self.__invoices_manager is None:
-            self.__invoices_manager = TaxRetunsManager("/invoices", self._client)
+            self.__invoices_manager = InvoicesManager("/invoices", self._client)
         return self.__invoices_manager
 
     @invoices.setter

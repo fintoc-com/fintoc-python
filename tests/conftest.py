@@ -54,7 +54,7 @@ def patch_http_client(monkeypatch):
         def headers(self):
             if self._page is not None and self._page < 10:
                 params = "&".join([*self.formatted_params, f"page={self._page + 1}"])
-                url = f"/{self._url}" if not self._url.startswith("/") else self._url
+                url = self._url.lstrip("/")
                 return {"link": (f"<{self._base_url}/{url}?{params}>; " 'rel="next"')}
             return {}
 
@@ -100,3 +100,8 @@ def patch_http_client(monkeypatch):
             )
 
     monkeypatch.setattr(httpx, "Client", MockClient)
+
+    from fintoc.client import Client
+
+    mock_client = MockClient()
+    monkeypatch.setattr(Client, "_client", mock_client)

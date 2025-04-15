@@ -12,7 +12,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
 
     def __init__(self, path, client):
         self._path = path
-        self._client = client.extend()
+        self._client = client
         self._handlers = {
             "update": self.post_update_handler,
             "delete": self.post_delete_handler,
