@@ -2,7 +2,13 @@
 
 from abc import ABCMeta, abstractmethod
 
-from fintoc.resource_handlers import resource_all, resource_create, resource_get
+from fintoc.resource_handlers import (
+    resource_all,
+    resource_create,
+    resource_delete,
+    resource_get,
+    resource_update,
+)
 from fintoc.utils import can_raise_fintoc_error, get_resource_class
 
 
@@ -53,7 +59,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         klass = get_resource_class(self.__class__.resource)
         objects = resource_all(
             client=self._client,
-            path=self._path,
+            path=self._build_path(**kwargs),
             klass=klass,
             handlers=self._handlers,
             methods=self.__class__.methods,
@@ -70,7 +76,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         klass = get_resource_class(self.__class__.resource)
         object_ = resource_get(
             client=self._client,
-            path=self._path,
+            path=self._build_path(**kwargs),
             id_=identifier,
             klass=klass,
             handlers=self._handlers,
@@ -88,7 +94,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         klass = get_resource_class(self.__class__.resource)
         object_ = resource_create(
             client=self._client,
-            path=self._path,
+            path=self._build_path(**kwargs),
             klass=klass,
             handlers=self._handlers,
             methods=self.__class__.methods,
@@ -103,8 +109,17 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         identified by :identifier:. Data is passed using :kwargs:, as
         specified by the API.
         """
-        object_ = self._get(identifier)
-        return object_.update(**kwargs)
+        klass = get_resource_class(self.__class__.resource)
+        object_ = resource_update(
+            client=self._client,
+            path=self._build_path(**kwargs),
+            id_=identifier,
+            klass=klass,
+            handlers=self._handlers,
+            methods=self.__class__.methods,
+            params=kwargs,
+        )
+        return self.post_update_handler(object_, identifier, **kwargs)
 
     @can_raise_fintoc_error
     def _delete(self, identifier, **kwargs):
@@ -112,8 +127,23 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         Delete an instance of the resource being handled by the manager,
         identified by :identifier:.
         """
-        object_ = self._get(identifier)
-        return object_.delete(**kwargs)
+        resource_delete(
+            client=self._client,
+            path=self._build_path(**kwargs),
+            id_=identifier,
+            params=kwargs,
+        )
+        return self.post_delete_handler(identifier, **kwargs)
+
+    def _build_path(self, **kwargs):
+        """
+        Replaces placeholders in the path template with the corresponding
+        values.
+        """
+        path = self._path
+        for key, value in kwargs.items():
+            path = path.replace("{" + key + "}", str(value))
+        return path
 
     def post_all_handler(self, objects, **kwargs):
         """
