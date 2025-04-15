@@ -115,7 +115,9 @@ class TestFintocIntegration:
         # Test using directly the manager
         assert_movements(
             list(
-                self.fintoc.movements.all(account_id=account_id, link_token=link_token)
+                self.fintoc.accounts.movements.all(
+                    account_id=account_id, link_token=link_token
+                )
             )
         )
 
@@ -138,7 +140,7 @@ class TestFintocIntegration:
         assert_movement(movement)
 
         # Test using directly the manager
-        movement = self.fintoc.movements.get(
+        movement = self.fintoc.accounts.movements.get(
             movement_id, account_id=account_id, link_token=link_token
         )
         assert_movement(movement)

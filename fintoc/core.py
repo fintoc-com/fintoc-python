@@ -9,7 +9,6 @@ from fintoc.managers import (
     ChargesManager,
     InvoicesManager,
     LinksManager,
-    MovementsManager,
     PaymentIntentsManager,
     RefreshIntentsManager,
     SubscriptionIntentsManager,
@@ -46,6 +45,3 @@ class Fintoc:
         self.refresh_intents = RefreshIntentsManager("/refresh_intents", self._client)
         self.tax_returns = TaxReturnsManager("/tax_returns", self._client)
         self.invoices = InvoicesManager("/invoices", self._client)
-        self.movements = MovementsManager(
-            "/accounts/{account_id}/movements", self._client
-        )
