@@ -37,6 +37,7 @@
     - [V2 Endpoints](#v2-endpoints)
     - [Nested actions or resources](#nested-actions-or-resources)
   - [Webhook Signature Validation](#webhook-signature-validation)
+  - [Idempotency Keys](#idempotency-keys)
   - [Generate the JWS Signature](#gnerate-the-jws-signature)
   - [Serialization](#serialization)
 - [Acknowledgements](#acknowledgements)
@@ -154,17 +155,12 @@ To call v2 API endpoints, like the [Transfers API](https://docs.fintoc.com/refer
 
 ```python
 transfer = client.v2.transfers.create(
-        amount=49523,
-        currency="mxn",
-        account_id="acc_123545",
-        counterparty={
-                "account_number": "014180655091438298"
-            },
-        metadata={
-                "factura": '14814'
-            }
-        )
-
+    amount=49523,
+    currency="mxn",
+    account_id="acc_123545",
+    counterparty={"account_number": "014180655091438298"},
+    metadata={"factura": "14814"},
+)
 ```
 
 #### Nested actions or resources
@@ -173,10 +169,10 @@ To call nested actions just call the method as it appears in the API. For exampl
 
 ```python
 transfer = client.v2.simulate.receive_transfer(
-        amount=9912400,
-        currency="mxn",
-        account_number_id="acno_2vF18OHZdXXxPJTLJ5qghpo1pdU",
-        )
+    amount=9912400,
+    currency="mxn",
+    account_number_id="acno_2vF18OHZdXXxPJTLJ5qghpo1pdU",
+)
 ```
 
 ### Webhook Signature Validation
@@ -200,6 +196,21 @@ The `verify_header` method takes the following parameters:
 If the signature is invalid or the timestamp is outside the tolerance window, a `WebhookSignatureError` will be raised with a descriptive message.
 
 For a complete example of handling webhooks, see [examples/webhook.py](examples/webhook.py).
+
+### Idempotency Keys
+
+You can provide an [Idempotency Key](https://docs.fintoc.com/reference/idempotent-requests) using the `idempotency_key` argument. For example:
+
+```python
+transfer = client.v2.transfers.create(
+    idempotency_key="12345678910"
+    amount=49523,
+    currency="mxn",
+    account_id="acc_123545",
+    counterparty={"account_number": "014180655091438298"},
+    metadata={"factura": "14814"},
+)
+```
 
 ### Generate the JWS Signature
 
