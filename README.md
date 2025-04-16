@@ -206,15 +206,17 @@ For a complete example of handling webhooks, see [examples/webhook.py](examples/
 Some endpoints need a [JWS Signature](https://docs.fintoc.com/docs/setting-up-jws-keys), in addition to your API Key, to verify the integrity and authenticity of API requests. To generate the signature, initialize the Fintoc client with the `jws_private_key` argument, and the SDK will handle the rest:
 
 ```python
+import os
+
 from fintoc import Fintoc
 
-# Use a path to the PEM file
+# Provide a path to your PEM file
 client = Fintoc("your_api_key", jws_private_key="private_key.pem")
 
-# Pass a string containing the PEM file
+# Or pass the PEM key directly as a string
 client = Fintoc("your_api_key", jws_private_key=os.environ.get('JWS_PRIVATE_KEY'))
 
-# Now you can create transfers
+# You can now create transfers securely
 ```
 
 
