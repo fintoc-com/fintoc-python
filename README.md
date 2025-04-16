@@ -34,7 +34,10 @@
     - [create](#create)
     - [update](#update)
     - [delete](#delete)
+    - [V2 Endpoints](#v2-endpoints)
+    - [Nested actions or resources](#nested-actions-or-resources)
   - [Webhook Signature Validation](#webhook-signature-validation)
+  - [Generate the JWS Signature](#gnerate-the-jws-signature)
   - [Serialization](#serialization)
 - [Acknowledgements](#acknowledgements)
 
@@ -145,6 +148,37 @@ deleted_identifier = client.webhook_endpoints.delete("we_8anqVLlBC8ROodem")
 
 The `delete` method deletes an existing instance of the resource using its identifier to find it and returns the identifier.
 
+#### v2 Endpoints
+
+To call v2 API endpoints, like the [Transfers API](https://docs.fintoc.com/reference/transfers), you need to prepend the resource name with the `v2` namespace, the same as the API does it:
+
+```python
+transfer = client.v2.transfers.create(
+        amount=49523,
+        currency="mxn",
+        account_id="acc_123545",
+        counterparty={
+                "account_number": "014180655091438298"
+            },
+        metadata={
+                "factura": '14814'
+            }
+        )
+
+```
+
+#### Nested actions or resources
+
+To call nested actions just call the method as it appears in the API. For example to [simulate receiving a transfer for the Transfers](https://docs.fintoc.com/reference/receive-an-inbound-transfer) product you can do:
+
+```python
+transfer = client.v2.simulate.receive_transfer(
+        amount=9912400,
+        currency="mxn",
+        account_number_id="acno_2vF18OHZdXXxPJTLJ5qghpo1pdU",
+        )
+```
+
 ### Webhook Signature Validation
 
 To ensure the authenticity of incoming webhooks from Fintoc, you should always validate the signature. The SDK provides a `WebhookSignature` class to verify the `Fintoc-Signature` header
@@ -166,6 +200,23 @@ The `verify_header` method takes the following parameters:
 If the signature is invalid or the timestamp is outside the tolerance window, a `WebhookSignatureError` will be raised with a descriptive message.
 
 For a complete example of handling webhooks, see [examples/webhook.py](examples/webhook.py).
+
+### Generate the JWS Signature
+
+Some endpoints need a [JWS Signature](https://docs.fintoc.com/docs/setting-up-jws-keys), in addition to your API Key, to verify the integrity and authenticity of API requests. To generate the signature, initialize the Fintoc client with the `jws_private_key` argument, and the SDK will handle the rest:
+
+```python
+from fintoc import Fintoc
+
+# Use a path to the PEM file
+client = Fintoc("your_api_key", jws_private_key="private_key.pem")
+
+# Pass a string containing the PEM file
+client = Fintoc("your_api_key", jws_private_key=os.environ.get('JWS_PRIVATE_KEY'))
+
+# Now you can create transfers
+```
+
 
 ### Serialization
 
