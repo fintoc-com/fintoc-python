@@ -43,7 +43,7 @@ def parse_link_headers(link_header):
     Receive the 'link' header and return a dictionary with
     every key: value instance present on the header.
     """
-    if link_header is None:
+    if not link_header:
         return None
     return reduce(parse_link, link_header.split(","), {})
 
