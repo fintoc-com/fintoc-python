@@ -3,13 +3,13 @@
 from abc import ABCMeta, abstractmethod
 
 from fintoc.resource_handlers import (
-    resource_all,
     resource_create,
     resource_delete,
     resource_get,
+    resource_list,
     resource_update,
 )
-from fintoc.utils import can_raise_fintoc_error, get_resource_class
+from fintoc.utils import can_raise_fintoc_error, deprecate, get_resource_class
 
 
 class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
@@ -26,6 +26,8 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
 
     def __getattr__(self, attr):
         if attr not in self.__class__.methods:
+            if attr == "all" and "list" in self.__class__.methods:
+                return getattr(self, "_all")
             raise AttributeError(
                 f"{self.__class__.__name__} has no attribute '{attr.lstrip('_')}'"
             )
@@ -51,13 +53,13 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         """
 
     @can_raise_fintoc_error
-    def _all(self, **kwargs):
+    def _list(self, **kwargs):
         """
-        Return all instances of the resource being handled by the manager.
+        List all instances of the resource being handled by the manager.
         :kwargs: can be used to filter the results, using the API parameters.
         """
         klass = get_resource_class(self.__class__.resource)
-        objects = resource_all(
+        objects = resource_list(
             client=self._client,
             path=self._build_path(**kwargs),
             klass=klass,
@@ -65,7 +67,18 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
             methods=self.__class__.methods,
             params=kwargs,
         )
-        return self.post_all_handler(objects, **kwargs)
+        return self.post_list_handler(objects, **kwargs)
+
+    @deprecate(
+        "all() is deprecated and will be removed in a future version. Use "
+        "list() instead"
+    )
+    def _all(self, **kwargs):
+        """
+        Return all instances of the resource being handled by the manager.
+        :kwargs: can be used to filter the results, using the API parameters.
+        """
+        return self._list(**kwargs)
 
     @can_raise_fintoc_error
     def _get(self, identifier, **kwargs):
@@ -147,9 +160,9 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
             path = path.replace("{" + key + "}", str(value))
         return path
 
-    def post_all_handler(self, objects, **kwargs):
+    def post_list_handler(self, objects, **kwargs):
         """
-        Hook that runs after the :all: method. Receives the objects fetched
+        Hook that runs after the :list: method. Receives the objects fetched
         and **must** return them (either modified or as they came).
         """
         return objects

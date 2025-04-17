@@ -8,4 +8,4 @@ class ChargesManager(ManagerMixin):
     """Represents a charges manager."""
 
     resource = "charge"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

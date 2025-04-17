@@ -8,4 +8,4 @@ class RefreshIntentsManager(ManagerMixin):
     """Represents a refresh_intents manager."""
 
     resource = "refresh_intent"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

@@ -7,4 +7,4 @@ class TransfersManager(ManagerMixin):
     """Represents a transfers manager."""
 
     resource = "transfer"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

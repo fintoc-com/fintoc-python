@@ -8,4 +8,4 @@ class MovementsManager(ManagerMixin):
     """Represents a movements manager."""
 
     resource = "movement"
-    methods = ["all", "get"]
+    methods = ["list", "get"]

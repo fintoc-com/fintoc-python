@@ -7,4 +7,4 @@ class AccountsManager(ManagerMixin):
     """Represents an accounts manager."""
 
     resource = "account"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

@@ -3,8 +3,8 @@
 from fintoc.utils import objetize, objetize_generator
 
 
-def resource_all(client, path, klass, handlers, methods, params):
-    """Fetch all the instances of a resource."""
+def resource_list(client, path, klass, handlers, methods, params):
+    """List all the instances of a resource."""
     lazy = params.pop("lazy", True)
     data = client.request(path, paginated=True, params=params)
     if lazy:
