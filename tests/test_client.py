@@ -61,31 +61,18 @@ class TestClientCreationFunctionality:
         assert client.headers["Authorization"] == self.api_key
         assert client.headers["User-Agent"] == self.user_agent
 
-    def test_client_http_subclient_lazy_initialization(self):
-        # pylint: disable=protected-access
-        client = self.create_client()
-
-        # Kind of a hack, but the test is necessary to test the internal client is None
-        assert client._Client__client is None
-
-        # Create an httpx client by calling the attribute
-        assert isinstance(client._client, httpx.Client)
-
-        # Now the internal client should exist
-        assert isinstance(client._Client__client, httpx.Client)
-
     def test_client_extension(self):
         # pylint: disable=protected-access
         client = self.create_client()
-        assert isinstance(client._client, httpx.Client)  # Create httpx sub client
-        assert client._Client__client is not None
+        assert isinstance(client._client, httpx.Client)  # Has httpx sub client
+        assert client._client is not None
 
         new_url = "https://new-test.com"
         new_api_key = "new_super_secret_api_key"
         new_client = client.extend(base_url=new_url, api_key=new_api_key)
         assert isinstance(new_client, Client)
         assert new_client is not client
-        assert new_client._Client__client is None
+        assert new_client._client is client._client
 
     def test_client_params_extension(self):
         # pylint: disable=protected-access
@@ -129,3 +116,19 @@ class TestClientRequestFunctionality:
         data = self.client.request("/movements/3", method="delete")
         assert isinstance(data, dict)
         assert len(data.keys()) == 0
+
+    def test_post_request(self):
+        data = self.client.request("/v2/transfers", method="post")
+        assert isinstance(data, dict)
+
+        idempotency_key = data["headers"]["Idempotency-Key"]
+        assert idempotency_key is not None and idempotency_key != ""
+
+    def test_post_request_with_custom_idempotency_key(self):
+        data = self.client.request(
+            "/v2/transfers", method="post", idempotency_key="1234"
+        )
+        assert isinstance(data, dict)
+
+        idempotency_key = data["headers"]["Idempotency-Key"]
+        assert idempotency_key == "1234"

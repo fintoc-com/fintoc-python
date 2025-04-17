@@ -8,4 +8,4 @@ class SubscriptionIntentsManager(ManagerMixin):
     """Represents a subscription_intents manager."""
 
     resource = "subscription_intent"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

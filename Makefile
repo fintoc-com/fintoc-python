@@ -1,4 +1,4 @@
-POETRY_VERSION = 1.2.1
+POETRY_VERSION = 2.1.2
 
 # Env stuff
 .PHONY: get-poetry

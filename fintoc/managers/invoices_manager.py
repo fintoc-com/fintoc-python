@@ -8,4 +8,4 @@ class InvoicesManager(ManagerMixin):
     """Represents an invoices manager."""
 
     resource = "invoice"
-    methods = ["all"]
+    methods = ["list"]

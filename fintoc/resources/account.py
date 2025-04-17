@@ -17,7 +17,7 @@ class Account(ResourceMixin):
         """Proxies the movements manager."""
         if self.__movements_manager is None:
             self.__movements_manager = MovementsManager(
-                f"/accounts/{self.id}/movements", self._client
+                f"/v1/accounts/{self.id}/movements", self._client
             )
         return self.__movements_manager
 

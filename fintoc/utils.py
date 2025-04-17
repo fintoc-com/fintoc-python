@@ -1,6 +1,8 @@
 """Module to hold every generalized utility on the SDK."""
 
 import datetime
+import functools
+import warnings
 from importlib import import_module
 
 import httpx
@@ -112,3 +114,23 @@ def objetize_generator(generator, klass, client, handlers={}, methods=[], path=N
     """
     for element in generator:
         yield objetize(klass, client, element, handlers, methods, path)
+
+
+def deprecate(message=None):
+    """
+    Decorator to mark functions or methods as deprecated.
+    """
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            warning_message = message or (
+                f"{func.__name__} is deprecated and will be removed in a"
+                " future version."
+            )
+            warnings.warn(warning_message, category=DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

@@ -8,7 +8,7 @@ class LinksManager(ManagerMixin):
     """Represents a links manager."""
 
     resource = "link"
-    methods = ["all", "get", "update", "delete"]
+    methods = ["list", "get", "update", "delete"]
 
     def post_get_handler(self, object_, identifier, **kwargs):
         # pylint: disable=protected-access

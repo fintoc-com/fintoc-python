@@ -11,7 +11,7 @@ class InvalidMethodsMockManager(ManagerMixin):
 
 
 class InvalidResourceMockManager(ManagerMixin):
-    methods = ["all", "get", "create", "update", "delete"]
+    methods = ["list", "get", "create", "update", "delete"]
 
 
 class IncompleteMockManager(ManagerMixin):
@@ -21,15 +21,15 @@ class IncompleteMockManager(ManagerMixin):
 
 class EmptyMockManager(ManagerMixin):
     resource = "this_resource_does_not_exist"
-    methods = ["all", "get", "create", "update", "delete"]
+    methods = ["list", "get", "create", "update", "delete"]
 
 
 class ComplexMockManager(ManagerMixin):
     resource = "this_resource_does_not_exist"
-    methods = ["all", "get", "create", "update", "delete"]
+    methods = ["list", "get", "create", "update", "delete"]
 
-    def post_all_handler(self, objects, **kwargs):
-        print("Executing the 'post all' handler")
+    def post_list_handler(self, objects, **kwargs):
+        print("Executing the 'post list' handler")
         return objects
 
     def post_get_handler(self, object_, identifier, **kwargs):
@@ -110,13 +110,24 @@ class TestManagerMixinMethods:
         self.path = "/resources"
         self.manager = EmptyMockManager(self.path, self.client)
 
-    def test_all_lazy_method(self):
+    def test_list_lazy_method(self):
+        objects = self.manager.list()
+        assert isinstance(objects, GeneratorType)
+        for object_ in objects:
+            assert isinstance(object_, ResourceMixin)
+
+    def test_list_not_lazy_method(self):
+        objects = self.manager.list(lazy=False)
+        assert isinstance(objects, list)
+        for object_ in objects:
+            assert isinstance(object_, ResourceMixin)
+
+    def test_all_still_works_for_backwards_compatibility(self):
         objects = self.manager.all()
         assert isinstance(objects, GeneratorType)
         for object_ in objects:
             assert isinstance(object_, ResourceMixin)
 
-    def test_all_not_lazy_method(self):
         objects = self.manager.all(lazy=False)
         assert isinstance(objects, list)
         for object_ in objects:
@@ -133,6 +144,10 @@ class TestManagerMixinMethods:
         object_ = self.manager.create()
         assert isinstance(object_, ResourceMixin)
         assert object_.method == "post"
+        assert object_.url == self.path.lstrip("/")
+
+        object_ = self.manager.create(path_="/resources/custom_path")
+        assert object_.url == "resources/custom_path"
 
     def test_update_method(self):
         object_ = self.manager.update("my_id")
@@ -165,10 +180,10 @@ class TestManagerMixinHandlers:
         self.path = "/resources"
         self.manager = ComplexMockManager(self.path, self.client)
 
-    def test_all_handler(self, capsys):
-        self.manager.all()
+    def test_list_handler(self, capsys):
+        self.manager.list()
         captured = capsys.readouterr().out
-        assert "all" in captured
+        assert "list" in captured
 
     def test_get_handler(self, capsys):
         self.manager.get("my_id")

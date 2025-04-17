@@ -2,9 +2,10 @@
 
 from fintoc.managers import (
     AccountsManager,
+    InvoicesManager,
     RefreshIntentsManager,
     SubscriptionsManager,
-    TaxRetunsManager,
+    TaxReturnsManager,
 )
 from fintoc.mixins import ResourceMixin
 
@@ -27,7 +28,7 @@ class Link(ResourceMixin):
     def accounts(self):
         """Proxies the accounts manager."""
         if self.__accounts_manager is None:
-            self.__accounts_manager = AccountsManager("/accounts", self._client)
+            self.__accounts_manager = AccountsManager("/v1/accounts", self._client)
         return self.__accounts_manager
 
     @accounts.setter
@@ -36,10 +37,12 @@ class Link(ResourceMixin):
 
     @property
     def subscriptions(self):
+        # TODO: this method should be deprecated as it's no longer allowed
+        # in our API
         """Proxies the subscriptions manager."""
         if self.__subscriptions_manager is None:
             self.__subscriptions_manager = SubscriptionsManager(
-                "/subscriptions", self._client
+                "/v1/subscriptions", self._client
             )
         return self.__subscriptions_manager
 
@@ -51,7 +54,9 @@ class Link(ResourceMixin):
     def tax_returns(self):
         """Proxies the tax_returns manager."""
         if self.__tax_returns_manager is None:
-            self.__tax_returns_manager = TaxRetunsManager("/tax_returns", self._client)
+            self.__tax_returns_manager = TaxReturnsManager(
+                "/v1/tax_returns", self._client
+            )
         return self.__tax_returns_manager
 
     @tax_returns.setter
@@ -62,7 +67,7 @@ class Link(ResourceMixin):
     def invoices(self):
         """Proxies the invoices manager."""
         if self.__invoices_manager is None:
-            self.__invoices_manager = TaxRetunsManager("/invoices", self._client)
+            self.__invoices_manager = InvoicesManager("/v1/invoices", self._client)
         return self.__invoices_manager
 
     @invoices.setter
@@ -74,7 +79,7 @@ class Link(ResourceMixin):
         """Proxies the refresh_intents manager."""
         if self.__refresh_intents_manager is None:
             self.__refresh_intents_manager = RefreshIntentsManager(
-                "/refresh_intents", self._client
+                "/v1/refresh_intents", self._client
             )
         return self.__refresh_intents_manager
 
