@@ -8,4 +8,4 @@ class PaymentIntentsManager(ManagerMixin):
     """Represents a payment_intents manager."""
 
     resource = "payment_intent"
-    methods = ["all", "get", "create"]
+    methods = ["list", "get", "create"]

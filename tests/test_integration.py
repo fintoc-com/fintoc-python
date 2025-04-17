@@ -18,9 +18,9 @@ class TestFintocIntegration:
         self.api_key = "test_api_key"
         self.fintoc = Fintoc(self.api_key)
 
-    def test_links_all(self):
-        """Test that fintoc.links.all() calls the correct URL."""
-        links = list(self.fintoc.links.all())
+    def test_links_list(self):
+        """Test that fintoc.links.list() calls the correct URL."""
+        links = list(self.fintoc.links.list())
 
         assert len(links) > 0
         for link in links:
@@ -55,7 +55,7 @@ class TestFintocIntegration:
 
         assert result == link_id
 
-    def test_link_accounts_all(self):
+    def test_link_accounts_list(self):
         """Test getting accounts from a link."""
 
         def assert_accounts(accounts):
@@ -69,10 +69,10 @@ class TestFintocIntegration:
 
         # Test using the resource
         link = self.fintoc.links.get(link_token)
-        assert_accounts(list(link.accounts.all()))
+        assert_accounts(list(link.accounts.list()))
 
         # Test using directly the manager
-        assert_accounts(list(self.fintoc.accounts.all(link_token=link_token)))
+        assert_accounts(list(self.fintoc.accounts.list(link_token=link_token)))
 
     def test_link_account_get(self):
         """Test getting a specific account from a link."""
@@ -94,7 +94,7 @@ class TestFintocIntegration:
         account = self.fintoc.accounts.get(account_id, link_token=link_token)
         assert_account(account)
 
-    def test_account_movements_all(self):
+    def test_account_movements_list(self):
         """Test getting movements from an account."""
 
         def assert_movements(movements):
@@ -110,12 +110,12 @@ class TestFintocIntegration:
         # Test using the resource
         link = self.fintoc.links.get(link_token)
         account = link.accounts.get(account_id)
-        assert_movements(list(account.movements.all()))
+        assert_movements(list(account.movements.list()))
 
         # Test using directly the manager
         assert_movements(
             list(
-                self.fintoc.accounts.movements.all(
+                self.fintoc.accounts.movements.list(
                     account_id=account_id, link_token=link_token
                 )
             )
@@ -145,7 +145,7 @@ class TestFintocIntegration:
         )
         assert_movement(movement)
 
-    def test_link_subscriptions_all(self):
+    def test_link_subscriptions_list(self):
         """Test getting all subscriptions from a link."""
 
         def assert_subscriptions(subscriptions):
@@ -159,10 +159,10 @@ class TestFintocIntegration:
         # Test using the resource. This actually should be removed, because
         # subscriptions do not depend on a link.
         link = self.fintoc.links.get(link_token)
-        assert_subscriptions(list(link.subscriptions.all()))
+        assert_subscriptions(list(link.subscriptions.list()))
 
         # Test using directly the manager
-        assert_subscriptions(list(self.fintoc.subscriptions.all()))
+        assert_subscriptions(list(self.fintoc.subscriptions.list()))
 
     def test_link_subscription_get(self):
         """Test getting a specific subscription from a link."""
@@ -185,7 +185,7 @@ class TestFintocIntegration:
         )
         assert_subscription(subscription)
 
-    def test_link_tax_returns_all(self):
+    def test_link_tax_returns_list(self):
         """Test getting all tax returns from a link."""
 
         def assert_tax_returns(tax_returns):
@@ -199,10 +199,10 @@ class TestFintocIntegration:
 
         # Test using the resource
         link = self.fintoc.links.get(link_token)
-        assert_tax_returns(list(link.tax_returns.all()))
+        assert_tax_returns(list(link.tax_returns.list()))
 
         # Test using directly the manager
-        assert_tax_returns(list(self.fintoc.tax_returns.all(link_token=link_token)))
+        assert_tax_returns(list(self.fintoc.tax_returns.list(link_token=link_token)))
 
     def test_link_tax_return_get(self):
         """Test getting a specific tax return from a link."""
@@ -224,7 +224,7 @@ class TestFintocIntegration:
         tax_return = self.fintoc.tax_returns.get(tax_return_id, link_token=link_token)
         assert_tax_return(tax_return)
 
-    def test_link_invoices_all(self):
+    def test_link_invoices_list(self):
         """Test getting all invoices from a link."""
 
         def assert_invoices(invoices):
@@ -238,12 +238,12 @@ class TestFintocIntegration:
 
         # Test using the resource
         link = self.fintoc.links.get(link_token)
-        assert_invoices(list(link.invoices.all()))
+        assert_invoices(list(link.invoices.list()))
 
         # Test using directly the manager
-        assert_invoices(list(self.fintoc.invoices.all(link_token=link_token)))
+        assert_invoices(list(self.fintoc.invoices.list(link_token=link_token)))
 
-    def test_link_refresh_intents_all(self):
+    def test_link_refresh_intents_list(self):
         """Test getting all refresh intents from a link."""
 
         def assert_refresh_intents(refresh_intents):
@@ -257,11 +257,11 @@ class TestFintocIntegration:
 
         # Test using the resource
         link = self.fintoc.links.get(link_token)
-        assert_refresh_intents(list(link.refresh_intents.all()))
+        assert_refresh_intents(list(link.refresh_intents.list()))
 
         # Test using directly the manager
         assert_refresh_intents(
-            list(self.fintoc.refresh_intents.all(link_token=link_token))
+            list(self.fintoc.refresh_intents.list(link_token=link_token))
         )
 
     def test_link_refresh_intent_get(self):
@@ -315,9 +315,9 @@ class TestFintocIntegration:
         )
         assert_refresh_intent(refresh_intent)
 
-    def test_charges_all(self):
+    def test_charges_list(self):
         """Test getting all charges."""
-        charges = list(self.fintoc.charges.all())
+        charges = list(self.fintoc.charges.list())
 
         assert len(charges) > 0
         for charge in charges:
@@ -349,9 +349,9 @@ class TestFintocIntegration:
         assert charge.json.currency == charge_data["currency"]
         assert charge.json.payment_method == charge_data["payment_method"]
 
-    def test_payment_intents_all(self):
+    def test_payment_intents_list(self):
         """Test getting all payment intents."""
-        payment_intents = list(self.fintoc.payment_intents.all())
+        payment_intents = list(self.fintoc.payment_intents.list())
 
         assert len(payment_intents) > 0
         for payment_intent in payment_intents:
@@ -385,9 +385,9 @@ class TestFintocIntegration:
             payment_intent.json.payment_method == payment_intent_data["payment_method"]
         )
 
-    def test_subscription_intents_all(self):
+    def test_subscription_intents_list(self):
         """Test getting all subscription intents."""
-        subscription_intents = list(self.fintoc.subscription_intents.all())
+        subscription_intents = list(self.fintoc.subscription_intents.list())
 
         assert len(subscription_intents) > 0
         for subscription_intent in subscription_intents:
@@ -421,9 +421,9 @@ class TestFintocIntegration:
         assert subscription_intent.json.amount == subscription_intent_data["amount"]
         assert subscription_intent.json.currency == subscription_intent_data["currency"]
 
-    def test_webhook_endpoints_all(self):
+    def test_webhook_endpoints_list(self):
         """Test getting all webhook endpoints."""
-        webhook_endpoints = list(self.fintoc.webhook_endpoints.all())
+        webhook_endpoints = list(self.fintoc.webhook_endpoints.list())
 
         assert len(webhook_endpoints) > 0
         for webhook_endpoint in webhook_endpoints:
@@ -483,9 +483,9 @@ class TestFintocIntegration:
 
         assert result == webhook_endpoint_id
 
-    def test_v2_accounts_all(self):
+    def test_v2_accounts_list(self):
         """Test getting all accounts using v2 API."""
-        accounts = list(self.fintoc.v2.accounts.all())
+        accounts = list(self.fintoc.v2.accounts.list())
 
         assert len(accounts) > 0
         for account in accounts:
@@ -511,11 +511,11 @@ class TestFintocIntegration:
         assert account.url == "v2/accounts"
         assert account.json.description == account_data["description"]
 
-    def test_v2_account_numbers_all(self):
+    def test_v2_account_numbers_list(self):
         """Test getting all account numbers using v2 API."""
         account_id = "test_account_id"
         account_numbers = list(
-            self.fintoc.v2.account_numbers.all(account_id=account_id)
+            self.fintoc.v2.account_numbers.list(account_id=account_id)
         )
 
         assert len(account_numbers) > 0
@@ -571,10 +571,10 @@ class TestFintocIntegration:
 
         assert result == account_number_id
 
-    def test_v2_transfers_all(self):
+    def test_v2_transfers_list(self):
         """Test getting all transfers using v2 API."""
         account_id = "test_account_id"
-        transfers = list(self.fintoc.v2.transfers.all(account_id=account_id))
+        transfers = list(self.fintoc.v2.transfers.list(account_id=account_id))
 
         assert len(transfers) > 0
         for transfer in transfers:

@@ -8,4 +8,4 @@ class TaxReturnsManager(ManagerMixin):
     """Represents a tax_returns manager."""
 
     resource = "tax_return"
-    methods = ["all", "get"]
+    methods = ["list", "get"]

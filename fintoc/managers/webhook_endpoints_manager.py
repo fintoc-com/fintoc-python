@@ -8,4 +8,4 @@ class WebhookEndpointsManager(ManagerMixin):
     """Represents a webhook_endpoints manager."""
 
     resource = "webhook_endpoint"
-    methods = ["all", "get", "create", "update", "delete"]
+    methods = ["list", "get", "create", "update", "delete"]
