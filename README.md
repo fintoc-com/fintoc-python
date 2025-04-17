@@ -29,7 +29,7 @@
 - [Usage](#usage)
   - [Quickstart](#quickstart)
   - [Calling endpoints](#calling-endpoints)
-    - [all](#all)
+    - [list](#list)
     - [get](#get)
     - [create](#create)
     - [update](#update)
@@ -66,7 +66,7 @@ from fintoc import Fintoc
 client = Fintoc("your_api_key")
 
 # list all succeeded payment intents since the beginning of 2025
-payment_intents = client.payment_intents.all(since="2025-01-01", status="succeeded")
+payment_intents = client.payment_intents.list(since="2025-01-01", status="succeeded")
 for pi in payment_intents:
     print(pi.created_at, pi.amount, pi.customer_email)
 
@@ -81,24 +81,24 @@ The SDK provides direct access to Fintoc API resources following the API structu
 
 Notice that **not every resource has all of the methods**, as they correspond to the API capabilities.
 
-#### `all`
+#### `list`
 
-You can use the `all` method to list all the instances of the resource:
+You can use the `list` method to list all the instances of the resource:
 
 ```python
-webhook_endpoints = client.webhook_endpoints.all()
+webhook_endpoints = client.webhook_endpoints.list()
 ```
 
-The `all` method returns **a generator** with all the instances of the resource. This method can also receive the arguments that the API receives for that specific resource. For example, the `PaymentIntent` resource can be filtered using `since` and `until`, so if you wanted to get a range of `payment intents`, all you need to do is to pass the parameters to the method:
+The `list` method returns **a generator** with all the instances of the resource. This method can also receive the arguments that the API receives for that specific resource. For example, the `PaymentIntent` resource can be filtered using `since` and `until`, so if you wanted to get a range of `payment intents`, all you need to do is to pass the parameters to the method:
 
 ```python
-payment_intents = client.payment_intents.all(since="2025-01-01", until="2025-02-01")
+payment_intents = client.payment_intents.list(since="2025-01-01", until="2025-02-01")
 ```
 
 You can also pass the `lazy=False` parameter to the method to force the SDK to return a list of all the instances of the resource instead of the generator. **Beware**: this could take **very long**, depending on the amount of instances that exist of said resource:
 
 ```python
-payment_intents = client.payment_intents.all(since="2025-01-01", until="2025-02-01", lazy=False)
+payment_intents = client.payment_intents.list(since="2025-01-01", until="2025-02-01", lazy=False)
 
 isinstance(payment_intents, list)  # True
 ```
@@ -236,7 +236,7 @@ client = Fintoc("your_api_key", jws_private_key=os.environ.get('JWS_PRIVATE_KEY'
 Any resource of the SDK can be serialized! To get the serialized resource, just call the `serialize` method!
 
 ```python
-payment_intent = client.payment_intents.all(lazy=False)[0]
+payment_intent = client.payment_intents.list(lazy=False)[0]
 
 serialization = payment_intent.serialize()
 ```
