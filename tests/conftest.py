@@ -34,7 +34,7 @@ def patch_http_error(monkeypatch):
 @pytest.fixture
 def patch_http_client(monkeypatch):
     class MockResponse:
-        def __init__(self, method, base_url, url, params, json):
+        def __init__(self, method, base_url, url, params, json, headers):
             self._base_url = base_url
             self._params = params
             page = None
@@ -44,6 +44,7 @@ def patch_http_client(monkeypatch):
             self._method = method
             self._url = url
             self._json = json
+            self._headers = headers
 
             # Extract the ID from the URL if it's a specific resource request
             self._id = None
@@ -52,11 +53,14 @@ def patch_http_client(monkeypatch):
 
         @property
         def headers(self):
+            resp_headers = dict(self._headers)
             if self._page is not None and self._page < 10:
                 params = "&".join([*self.formatted_params, f"page={self._page + 1}"])
                 url = self._url.lstrip("/")
-                return {"link": (f"<{self._base_url}/{url}?{params}>; " 'rel="next"')}
-            return {}
+                resp_headers["link"] = (
+                    f"<{self._base_url}/{url}?{params}>; " 'rel="next"'
+                )
+            return resp_headers
 
         @property
         def formatted_params(self):
@@ -77,6 +81,7 @@ def patch_http_client(monkeypatch):
                         "params": self._params,
                         "json": self._json,
                         "page": self._page,
+                        "headers": self.headers,
                     }
                     for _ in range(10)
                 ]
@@ -87,16 +92,17 @@ def patch_http_client(monkeypatch):
                 "url": self._url,
                 "params": self._params,
                 "json": self._json,
+                "headers": self.headers,
             }
 
     class MockClient(httpx.Client):
-        def request(self, method, url, params=None, json=None, **kwargs):
+        def request(self, method, url, params=None, json=None, headers=None, **kwargs):
             query = url.split("?")[-1].split("&") if "?" in url else []
             inner_params = {y[0]: y[1] for y in (x.split("=") for x in query)}
             complete_params = {**inner_params, **({} if params is None else params)}
             usable_url = url.split("//")[-1].split("/", 1)[-1].split("?")[0]
             return MockResponse(
-                method, self.base_url, usable_url, complete_params, json
+                method, self.base_url, usable_url, complete_params, json, headers
             )
 
     monkeypatch.setattr(httpx, "Client", MockClient)
