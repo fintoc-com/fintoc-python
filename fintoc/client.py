@@ -2,8 +2,8 @@
 Module to house the Client object of the Fintoc Python SDK.
 """
 
-import uuid
 import urllib
+import uuid
 from json.decoder import JSONDecodeError
 
 import httpx
@@ -87,7 +87,8 @@ class Client:
         Uses the internal httpx client to make a simple or paginated request.
         """
         url = (
-            path if urllib.parse.urlparse(path).scheme
+            path
+            if urllib.parse.urlparse(path).scheme
             else f"{self.base_url}/{path.lstrip('/')}"
         )
 

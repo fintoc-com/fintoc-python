@@ -103,7 +103,7 @@ def patch_http_client(monkeypatch):
             inner_params = {y[0]: y[1] for y in (x.split("=") for x in query)}
             complete_params = {
                 **inner_params,
-                **({} if request.url.params is None else request.url.params)
+                **({} if request.url.params is None else request.url.params),
             }
             usable_url = request.url.path
             raw_body = request.content.decode("utf-8")

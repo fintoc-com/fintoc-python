@@ -78,9 +78,7 @@ class TestRequest:
 
     def test_request_params_get_passed_to_next_url(self):
         client = httpx.Client(base_url="https://test.com")
-        data = request(
-            client, "/movements", params={"link_token": "sample_link_token"}
-        )
+        data = request(client, "/movements", params={"link_token": "sample_link_token"})
         assert "next" in data
         assert "link_token=sample_link_token" in data["next"]
 
