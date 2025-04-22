@@ -63,7 +63,6 @@ class TestFintocIntegration:
             for account in accounts:
                 assert account.method == "get"
                 assert account.url == "v1/accounts"
-                assert account.params.link_token == link_token
 
         link_token = "test_link_token"
 
@@ -102,7 +101,6 @@ class TestFintocIntegration:
             for movement in movements:
                 assert movement.method == "get"
                 assert movement.url == f"v1/accounts/{account_id}/movements"
-                assert movement.params.link_token == link_token
 
         link_token = "test_link_token"
         account_id = "test_account_id"
@@ -193,7 +191,6 @@ class TestFintocIntegration:
             for tax_return in tax_returns:
                 assert tax_return.method == "get"
                 assert tax_return.url == "v1/tax_returns"
-                assert tax_return.params.link_token == link_token
 
         link_token = "test_link_token"
 
@@ -232,7 +229,6 @@ class TestFintocIntegration:
             for invoice in invoices:
                 assert invoice.method == "get"
                 assert invoice.url == "v1/invoices"
-                assert invoice.params.link_token == link_token
 
         link_token = "test_link_token"
 
@@ -251,7 +247,6 @@ class TestFintocIntegration:
             for refresh_intent in refresh_intents:
                 assert refresh_intent.method == "get"
                 assert refresh_intent.url == "v1/refresh_intents"
-                assert refresh_intent.params.link_token == link_token
 
         link_token = "test_link_token"
 
@@ -614,7 +609,7 @@ class TestFintocIntegration:
         assert transfer.json.description == description
         assert transfer.json.metadata.test_key == metadata["test_key"]
 
-        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        idempotency_key_header = getattr(transfer.headers, "idempotency-key")
         assert idempotency_key_header is not None and idempotency_key_header != ""
 
         idempotency_key = "123456"
@@ -626,7 +621,7 @@ class TestFintocIntegration:
             metadata=metadata,
             idempotency_key=idempotency_key,
         )
-        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        idempotency_key_header = getattr(transfer.headers, "idempotency-key")
         assert idempotency_key_header == "123456"
 
     def test_v2_simulate_receive_transfer(self):

@@ -6,28 +6,28 @@ from functools import reduce
 from fintoc.constants import LINK_HEADER_PATTERN
 
 
-def paginate(client, path, headers, params):
+def paginate(client, url, params):
     """
     Fetch a paginated resource and return a generator with all of
     its instances.
     """
-    response = request(client, path, headers=headers, params=params)
+    response = request(client, url, params=params)
     elements = response["elements"]
     for element in elements:
         yield element
     while response.get("next"):
-        response = request(client, response.get("next"), headers=headers)
+        response = request(client, response.get("next"))
         elements = response["elements"]
         for element in elements:
             yield element
 
 
-def request(client, path, headers={}, params={}):
+def request(client, url, params={}):
     """
     Fetch a page of a resource and return its elements and the next
     page of the resource.
     """
-    response = client.request("get", path, headers=headers, params=params)
+    response = client.request("get", url, params=params)
     response.raise_for_status()
     headers = parse_link_headers(response.headers.get("link"))
     next_ = headers and headers.get("next")

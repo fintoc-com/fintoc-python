@@ -79,7 +79,7 @@ class TestRequest:
     def test_request_params_get_passed_to_next_url(self):
         client = httpx.Client(base_url="https://test.com")
         data = request(
-            client, "/movements", headers={}, params={"link_token": "sample_link_token"}
+            client, "/movements", params={"link_token": "sample_link_token"}
         )
         assert "next" in data
         assert "link_token=sample_link_token" in data["next"]
@@ -92,7 +92,7 @@ class TestPaginate:
 
     def test_pagination(self):
         client = httpx.Client(base_url="https://test.com")
-        data = paginate(client, "/movements", {}, {})
+        data = paginate(client, "/movements", {})
         assert isinstance(data, GeneratorType)
 
         elements = list(data)

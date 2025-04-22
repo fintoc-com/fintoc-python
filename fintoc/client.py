@@ -3,6 +3,7 @@ Module to house the Client object of the Fintoc Python SDK.
 """
 
 import uuid
+import urllib
 from json.decoder import JSONDecodeError
 
 import httpx
@@ -45,16 +46,33 @@ class Client:
 
         return headers
 
-    def _get_headers(self, method, json=None, idempotency_key=None):
+    def _get_base_headers(self, method, idempotency_key=None):
         headers = dict(self.headers)
-        if self.__jws and json and method.lower() in ["post", "put", "patch"]:
-            jws_header = self.__jws.generate_header(json)
-            headers["Fintoc-JWS-Signature"] = jws_header
 
         if method.lower() == "post":
             headers["Idempotency-Key"] = idempotency_key or str(uuid.uuid4())
 
         return headers
+
+    def _build_jws_header(self, method, raw_body=None):
+        if self.__jws and raw_body and method.lower() in ["post", "put", "patch"]:
+            jws_header = self.__jws.generate_header(raw_body)
+            return {"Fintoc-JWS-Signature": jws_header}
+
+        return {}
+
+    def _build_request(self, method, url, params, json=None, idempotency_key=None):
+        all_params = {**self.params, **params} if params else self.params
+        headers = self._get_base_headers(method, idempotency_key=idempotency_key)
+
+        request = httpx.Request(
+            method, url, headers=headers, params=all_params, json=json
+        )
+
+        request.headers.update(
+            self._build_jws_header(method, request.content.decode("utf-8"))
+        )
+        return request
 
     def request(
         self,
@@ -68,16 +86,16 @@ class Client:
         """
         Uses the internal httpx client to make a simple or paginated request.
         """
-        url = f"{self.base_url}/{path.lstrip('/')}"
-        all_params = {**self.params, **params} if params else self.params
-        headers = self._get_headers(method, json=json, idempotency_key=idempotency_key)
+        url = (
+            path if urllib.parse.urlparse(path).scheme
+            else f"{self.base_url}/{path.lstrip('/')}"
+        )
 
         if paginated:
-            return paginate(self._client, url, headers=headers, params=all_params)
+            return paginate(self._client, url, params=params)
 
-        response = self._client.request(
-            method, url, headers=headers, params=all_params, json=json
-        )
+        _request = self._build_request(method, url, params, json, idempotency_key)
+        response = self._client.send(_request)
         response.raise_for_status()
         try:
             return response.json()
