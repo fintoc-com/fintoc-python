@@ -121,7 +121,7 @@ class TestClientRequestFunctionality:
         data = self.client.request("/v2/transfers", method="post")
         assert isinstance(data, dict)
 
-        idempotency_key = data["headers"]["Idempotency-Key"]
+        idempotency_key = data["headers"]["idempotency-key"]
         assert idempotency_key is not None and idempotency_key != ""
 
     def test_post_request_with_custom_idempotency_key(self):
@@ -130,5 +130,5 @@ class TestClientRequestFunctionality:
         )
         assert isinstance(data, dict)
 
-        idempotency_key = data["headers"]["Idempotency-Key"]
+        idempotency_key = data["headers"]["idempotency-key"]
         assert idempotency_key == "1234"
