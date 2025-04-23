@@ -3,6 +3,7 @@ Module to hold all the fixtures and stuff that needs to get auto-imported
 by PyTest.
 """
 
+import json
 from json.decoder import JSONDecodeError
 
 import httpx
@@ -96,13 +97,23 @@ def patch_http_client(monkeypatch):
             }
 
     class MockClient(httpx.Client):
-        def request(self, method, url, params=None, json=None, headers=None, **kwargs):
-            query = url.split("?")[-1].split("&") if "?" in url else []
+        def send(self, request: httpx.Request, **_kwargs):
+            query_string = request.url.query.decode("utf-8")
+            query = query_string.split("&") if query_string else []
             inner_params = {y[0]: y[1] for y in (x.split("=") for x in query)}
-            complete_params = {**inner_params, **({} if params is None else params)}
-            usable_url = url.split("//")[-1].split("/", 1)[-1].split("?")[0]
+            complete_params = {
+                **inner_params,
+                **({} if request.url.params is None else request.url.params),
+            }
+            usable_url = request.url.path
+            raw_body = request.content.decode("utf-8")
             return MockResponse(
-                method, self.base_url, usable_url, complete_params, json, headers
+                request.method.lower(),
+                self.base_url,
+                usable_url.lstrip("/"),
+                complete_params,
+                json.loads(raw_body) if raw_body else None,
+                request.headers,
             )
 
     monkeypatch.setattr(httpx, "Client", MockClient)

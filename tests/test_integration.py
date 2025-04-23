@@ -614,7 +614,7 @@ class TestFintocIntegration:
         assert transfer.json.description == description
         assert transfer.json.metadata.test_key == metadata["test_key"]
 
-        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        idempotency_key_header = getattr(transfer.headers, "idempotency-key")
         assert idempotency_key_header is not None and idempotency_key_header != ""
 
         idempotency_key = "123456"
@@ -626,7 +626,7 @@ class TestFintocIntegration:
             metadata=metadata,
             idempotency_key=idempotency_key,
         )
-        idempotency_key_header = transfer.serialize()["headers"]["Idempotency-Key"]
+        idempotency_key_header = getattr(transfer.headers, "idempotency-key")
         assert idempotency_key_header == "123456"
 
     def test_v2_simulate_receive_transfer(self):
