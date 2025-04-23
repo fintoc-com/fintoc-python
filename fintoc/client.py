@@ -61,13 +61,8 @@ class Client:
 
         return {}
 
-    def _build_request(self, method, url, params, json=None, idempotency_key=None):
-        all_params = {**self.params, **params} if params else self.params
-        headers = self._get_base_headers(method, idempotency_key=idempotency_key)
-
-        request = httpx.Request(
-            method, url, headers=headers, params=all_params, json=json
-        )
+    def _build_request(self, method, url, params, headers, json=None):
+        request = httpx.Request(method, url, headers=headers, params=params, json=json)
 
         request.headers.update(
             self._build_jws_header(method, request.content.decode("utf-8"))
@@ -91,11 +86,18 @@ class Client:
             if urllib.parse.urlparse(path).scheme
             else f"{self.base_url}/{path.lstrip('/')}"
         )
+        headers = self._get_base_headers(method, idempotency_key=idempotency_key)
+        all_params = {**self.params, **params} if params else self.params
 
         if paginated:
-            return paginate(self._client, url, params=params)
+            return paginate(
+                self._client,
+                url,
+                params=all_params,
+                headers=headers,
+            )
 
-        _request = self._build_request(method, url, params, json, idempotency_key)
+        _request = self._build_request(method, url, all_params, headers, json)
         response = self._client.send(_request)
         response.raise_for_status()
         try:

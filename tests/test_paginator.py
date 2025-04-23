@@ -90,7 +90,7 @@ class TestPaginate:
 
     def test_pagination(self):
         client = httpx.Client(base_url="https://test.com")
-        data = paginate(client, "/movements", {})
+        data = paginate(client, "/movements", {}, {})
         assert isinstance(data, GeneratorType)
 
         elements = list(data)
