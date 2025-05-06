@@ -2,5 +2,6 @@
 
 from .account_numbers_manager import AccountNumbersManager
 from .accounts_manager import AccountsManager
+from .entities_manager import EntitiesManager
 from .simulate_manager import SimulateManager
 from .transfers_manager import TransfersManager
