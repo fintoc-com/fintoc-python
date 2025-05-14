@@ -2,4 +2,5 @@
 
 from .account import Account
 from .account_number import AccountNumber
+from .entity import Entity
 from .transfer import Transfer

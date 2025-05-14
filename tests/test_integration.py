@@ -563,13 +563,23 @@ class TestFintocIntegration:
         assert account_number.url == f"v2/account_numbers/{account_number_id}"
         assert account_number.json.metadata.test_key == metadata["test_key"]
 
-    def test_v2_account_number_delete(self):
-        """Test deleting an account number using v2 API."""
-        account_number_id = "test_account_number_id"
+    def test_v2_entities_list(self):
+        """Test getting all entities using v2 API."""
+        entities = list(self.fintoc.v2.entities.list())
 
-        result = self.fintoc.v2.account_numbers.delete(account_number_id)
+        assert len(entities) > 0
+        for entity in entities:
+            assert entity.method == "get"
+            assert entity.url == "v2/entities"
 
-        assert result == account_number_id
+    def test_v2_entity_get(self):
+        """Test getting a specific entity using v2 API."""
+        entity_id = "test_entity_id"
+
+        entity = self.fintoc.v2.entities.get(entity_id)
+
+        assert entity.method == "get"
+        assert entity.url == f"v2/entities/{entity_id}"
 
     def test_v2_transfers_list(self):
         """Test getting all transfers using v2 API."""
