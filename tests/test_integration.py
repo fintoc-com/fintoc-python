@@ -563,6 +563,41 @@ class TestFintocIntegration:
         assert account_number.url == f"v2/account_numbers/{account_number_id}"
         assert account_number.json.metadata.test_key == metadata["test_key"]
 
+    def test_v2_account_verification_list(self):
+        """Test getting all account verifications using v2 API."""
+        account_verifications = list(self.fintoc.v2.account_verifications.list())
+
+        assert len(account_verifications) > 0
+        for account_verification in account_verifications:
+            assert account_verification.method == "get"
+            assert account_verification.url == "v2/account_verifications"
+
+    def test_v2_account_verification_get(self):
+        """Test getting a specific account number using v2 API."""
+        account_verification_id = "test_account_verification_id"
+
+        account_verification = self.fintoc.v2.account_verifications.get(
+            account_verification_id
+        )
+
+        assert account_verification.method == "get"
+        assert (
+            account_verification.url
+            == f"v2/account_verifications/{account_verification_id}"
+        )
+
+    def test_v2_account_verification_create(self):
+        """Test creating an account number using v2 API."""
+        account_number = "123456789"
+
+        account_verification = self.fintoc.v2.account_verifications.create(
+            account_number=account_number
+        )
+
+        assert account_verification.method == "post"
+        assert account_verification.url == "v2/account_verifications"
+        assert account_verification.json.account_number == account_number
+
     def test_v2_entities_list(self):
         """Test getting all entities using v2 API."""
         entities = list(self.fintoc.v2.entities.list())
