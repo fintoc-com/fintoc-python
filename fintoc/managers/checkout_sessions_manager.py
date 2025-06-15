@@ -11,5 +11,5 @@ class CheckoutSessionsManager(ManagerMixin):
 
     def _expire(self, identifier, **kwargs):
         """Expire a checkout session."""
-        path = f"{self._build_path(identifier=identifier, **kwargs)}/expire"
+        path = f"{self._build_path(**kwargs)}/{identifier}/expire"
         return self._create(path_=path, **kwargs)
