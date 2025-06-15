@@ -2,6 +2,7 @@
 
 from .accounts_manager import AccountsManager
 from .charges_manager import ChargesManager
+from .checkout_sessions_manager import CheckoutSessionsManager
 from .invoices_manager import InvoicesManager
 from .links_manager import LinksManager
 from .movements_manager import MovementsManager
