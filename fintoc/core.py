@@ -7,6 +7,7 @@ from fintoc.constants import API_BASE_URL
 from fintoc.managers import (
     AccountsManager,
     ChargesManager,
+    CheckoutSessionsManager,
     InvoicesManager,
     LinksManager,
     PaymentIntentsManager,
@@ -41,6 +42,9 @@ class Fintoc:
             jws_private_key=jws_private_key,
         )
         self.charges = ChargesManager("/v1/charges", self._client)
+        self.checkout_sessions = CheckoutSessionsManager(
+            "/v1/checkout_sessions", self._client
+        )
         self.links = LinksManager("/v1/links", self._client)
         self.payment_intents = PaymentIntentsManager(
             "/v1/payment_intents", self._client
