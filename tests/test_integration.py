@@ -690,6 +690,42 @@ class TestFintocIntegration:
         assert transfer.json.currency == currency
         assert transfer.json.account_number_id == account_number_id
 
+    def test_checkout_session_create(self):
+        """Test creating a checkout session."""
+        checkout_session_data = {
+            "amount": 5000,
+            "currency": "CLP",
+            "success_url": "https://example.com/success",
+            "cancel_url": "https://example.com/cancel",
+        }
+
+        checkout_session = self.fintoc.checkout_sessions.create(**checkout_session_data)
+
+        assert checkout_session.method == "post"
+        assert checkout_session.url == "v1/checkout_sessions"
+        assert checkout_session.json.amount == checkout_session_data["amount"]
+        assert checkout_session.json.currency == checkout_session_data["currency"]
+        assert checkout_session.json.success_url == checkout_session_data["success_url"]
+        assert checkout_session.json.cancel_url == checkout_session_data["cancel_url"]
+
+    def test_checkout_session_get(self):
+        """Test getting a specific checkout session."""
+        checkout_session_id = "test_checkout_session_id"
+
+        checkout_session = self.fintoc.checkout_sessions.get(checkout_session_id)
+
+        assert checkout_session.method == "get"
+        assert checkout_session.url == f"v1/checkout_sessions/{checkout_session_id}"
+
+    def test_checkout_session_expire(self):
+        """Test expiring a checkout session."""
+        checkout_session_id = "test_checkout_session_id"
+
+        result = self.fintoc.checkout_sessions.expire(checkout_session_id)
+
+        assert result.method == "post"
+        assert result.url == f"v1/checkout_sessions/{checkout_session_id}/expire"
+
 
 if __name__ == "__main__":
     pytest.main()
