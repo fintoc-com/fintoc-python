@@ -726,6 +726,16 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/checkout_sessions/{checkout_session_id}/expire"
 
+    def test_v2_transfer_return(self):
+        """Test returning a transfer using v2 API."""
+        transfer_id = "test_transfer_id"
+
+        result = self.fintoc.v2.transfers.return_(transfer_id=transfer_id)
+
+        assert result.method == "post"
+        assert result.url == "v2/transfers/return"
+        assert result.json.transfer_id == transfer_id
+
 
 if __name__ == "__main__":
     pytest.main()
