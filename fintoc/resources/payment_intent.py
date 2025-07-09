@@ -11,3 +11,7 @@ class PaymentIntent(ResourceMixin):
         "recipient_account": "transfer_account",
         "sender_account": "transfer_account",
     }
+
+    param_mappings = {
+        "payment_method": "payment_type",
+    }
