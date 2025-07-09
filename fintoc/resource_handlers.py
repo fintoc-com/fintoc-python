@@ -46,12 +46,6 @@ def resource_create(
     client, path, klass, handlers, methods, params, idempotency_key=None
 ):
     """Create a new instance of a resource."""
-    if hasattr(klass, "param_mappings"):
-        transformed_params = {}
-        for key, value in params.items():
-            mapped_key = klass.param_mappings.get(key, key)
-            transformed_params[mapped_key] = value
-        params = transformed_params
     data = client.request(
         path, method="post", json=params, idempotency_key=idempotency_key
     )
