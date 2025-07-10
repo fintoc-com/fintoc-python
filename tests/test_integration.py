@@ -383,6 +383,15 @@ class TestFintocIntegration:
         assert payment_intent.json.currency == payment_intent_data["currency"]
         assert payment_intent.json.payment_type == payment_intent_data["payment_type"]
 
+    def test_payment_intent_expire(self):
+        """Test expiring a payment intent."""
+        payment_intent_id = "test_payment_intent_id"
+
+        result = self.fintoc.payment_intents.expire(payment_intent_id)
+
+        assert result.method == "post"
+        assert result.url == f"v1/payment_intents/{payment_intent_id}/expire"
+
     def test_subscription_intents_list(self):
         """Test getting all subscription intents."""
         subscription_intents = list(self.fintoc.subscription_intents.list())
