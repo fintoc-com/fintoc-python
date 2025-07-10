@@ -372,7 +372,7 @@ class TestFintocIntegration:
         payment_intent_data = {
             "amount": 1000,
             "currency": "CLP",
-            "payment_method": "bank_transfer",
+            "payment_type": "bank_transfer",
         }
 
         payment_intent = self.fintoc.payment_intents.create(**payment_intent_data)
@@ -381,9 +381,7 @@ class TestFintocIntegration:
         assert payment_intent.url == "v1/payment_intents"
         assert payment_intent.json.amount == payment_intent_data["amount"]
         assert payment_intent.json.currency == payment_intent_data["currency"]
-        assert (
-            payment_intent.json.payment_method == payment_intent_data["payment_method"]
-        )
+        assert payment_intent.json.payment_type == payment_intent_data["payment_type"]
 
     def test_subscription_intents_list(self):
         """Test getting all subscription intents."""
