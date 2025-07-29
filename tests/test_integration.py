@@ -743,6 +743,28 @@ class TestFintocIntegration:
         assert result.url == "v2/transfers/return"
         assert result.json.transfer_id == transfer_id
 
+    def test_v2_account_movements_list(self):
+        """Test getting movements from an account using v2 API."""
+        account_id = "test_account_id"
+        movements = list(self.fintoc.v2.accounts.movements.list(account_id=account_id))
+
+        assert len(movements) > 0
+        for movement in movements:
+            assert movement.method == "get"
+            assert movement.url == f"v2/accounts/{account_id}/movements"
+
+    def test_v2_account_movement_get(self):
+        """Test getting a specific movement from an account using v2 API."""
+        account_id = "test_account_id"
+        movement_id = "test_movement_id"
+
+        movement = self.fintoc.v2.accounts.movements.get(
+            movement_id, account_id=account_id
+        )
+
+        assert movement.method == "get"
+        assert movement.url == f"v2/accounts/{account_id}/movements/{movement_id}"
+
 
 if __name__ == "__main__":
     pytest.main()
