@@ -12,6 +12,7 @@ from fintoc.managers import (
     LinksManager,
     PaymentIntentsManager,
     RefreshIntentsManager,
+    RefundsManager,
     SubscriptionIntentsManager,
     SubscriptionsManager,
     TaxReturnsManager,
@@ -49,6 +50,7 @@ class Fintoc:
         self.payment_intents = PaymentIntentsManager(
             "/v1/payment_intents", self._client
         )
+        self.refunds = RefundsManager("/v1/refunds", self._client)
         self.subscriptions = SubscriptionsManager("/v1/subscriptions", self._client)
         self.subscription_intents = SubscriptionIntentsManager(
             "/v1/subscription_intents", self._client
