@@ -392,6 +392,49 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/payment_intents/{payment_intent_id}/expire"
 
+    def test_refund_list(self):
+        """Test getting all refunds."""
+        refunds = list(self.fintoc.refunds.list())
+
+        assert len(refunds) > 0
+        for refund in refunds:
+            assert refund.method == "get"
+            assert refund.url == "v1/refunds"
+
+    def test_refund_get(self):
+        """Test getting a specific refund."""
+        refund_id = "test_refund_id"
+
+        refund = self.fintoc.refunds.get(refund_id)
+
+        assert refund.method == "get"
+        assert refund.url == f"v1/refunds/{refund_id}"
+
+    def test_refund_create(self):
+        """Test creating a refund."""
+        refund_data = {
+            "resource_type": "payment_intent",
+            "resource_id": "pi_30yWq311fOLrAAKkSH1bvODVLGa",
+            "amount": 1000,
+        }
+
+        refund = self.fintoc.refunds.create(**refund_data)
+
+        assert refund.method == "post"
+        assert refund.url == "v1/refunds"
+        assert refund.json.resource_type == refund_data["resource_type"]
+        assert refund.json.resource_id == refund_data["resource_id"]
+        assert refund.json.amount == refund_data["amount"]
+
+    def test_refund_cancel(self):
+        """Test canceling a refund."""
+        refund_id = "ref_QmbpWzP1HOngN3X7"
+
+        refund = self.fintoc.refunds.cancel(refund_id)
+
+        assert refund.method == "post"
+        assert refund.url == f"v1/refunds/{refund_id}/cancel"
+
     def test_subscription_intents_list(self):
         """Test getting all subscription intents."""
         subscription_intents = list(self.fintoc.subscription_intents.list())
