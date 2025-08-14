@@ -561,6 +561,17 @@ class TestFintocIntegration:
         assert account.url == "v2/accounts"
         assert account.json.description == account_data["description"]
 
+    def test_v2_account_update(self):
+        """Test updating an account using v2 API."""
+        account_id = "test_account_id"
+        update_data = {"description": "Updated test account"}
+
+        account = self.fintoc.v2.accounts.update(account_id, **update_data)
+
+        assert account.method == "patch"
+        assert account.url == f"v2/accounts/{account_id}"
+        assert account.json.description == update_data["description"]
+
     def test_v2_account_numbers_list(self):
         """Test getting all account numbers using v2 API."""
         account_id = "test_account_id"
