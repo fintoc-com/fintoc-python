@@ -9,7 +9,7 @@ class AccountsManager(ManagerMixin):
     """Represents an accounts manager."""
 
     resource = "account"
-    methods = ["list", "get", "create"]
+    methods = ["list", "get", "create", "update"]
 
     def __init__(self, path, client):
         super().__init__(path, client)
