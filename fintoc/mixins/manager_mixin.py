@@ -118,13 +118,14 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_create_handler(object_, **kwargs)
 
     @can_raise_fintoc_error
-    def _update(self, identifier, **kwargs):
+    def _update(self, identifier, path_=None, **kwargs):
         """
         Update an instance of the resource being handled by the manager,
         identified by :identifier:. Data is passed using :kwargs:, as
         specified by the API.
         """
         klass = get_resource_class(self.__class__.resource)
+        custom_path = path_ if path_ else None
         object_ = resource_update(
             client=self._client,
             path=self._build_path(**kwargs),
@@ -133,6 +134,7 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
             handlers=self._handlers,
             methods=self.__class__.methods,
             params=kwargs,
+            custom_path=custom_path,
         )
         return self.post_update_handler(object_, identifier, **kwargs)
 
