@@ -13,4 +13,4 @@ class PaymentLinksManager(ManagerMixin):
     def _cancel(self, identifier, **kwargs):
         """Cancel a payment link."""
         path = f"{self._build_path(**kwargs)}/{identifier}/cancel"
-        return self._update(path_=path, **kwargs)
+        return self._update(identifier, path_=path, **kwargs)
