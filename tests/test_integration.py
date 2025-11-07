@@ -392,6 +392,18 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/payment_intents/{payment_intent_id}/expire"
 
+    def test_payment_intent_check_eligibility(self):
+        """Test checking eligibility for a payment intent."""
+        eligibility_data = {
+            "amount": 1000,
+            "currency": "CLP",
+        }
+
+        result = self.fintoc.payment_intents.check_eligibility(**eligibility_data)
+
+        assert result.method == "post"
+        assert result.url == "v1/payment_intents/check_eligibility"
+
     def test_payment_links_list(self):
         """Test getting all payment links."""
         payment_links = list(self.fintoc.payment_links.list())
