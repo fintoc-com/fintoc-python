@@ -14,6 +14,7 @@ from .link import Link
 from .movement import Movement
 from .other_taxes import OtherTaxes
 from .payment_intent import PaymentIntent
+from .payment_link import PaymentLink
 from .refresh_intent import RefreshIntent
 from .services_invoice import ServicesInvoice
 from .subscription import Subscription

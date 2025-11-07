@@ -7,6 +7,7 @@ from .invoices_manager import InvoicesManager
 from .links_manager import LinksManager
 from .movements_manager import MovementsManager
 from .payment_intents_manager import PaymentIntentsManager
+from .payment_links_manager import PaymentLinksManager
 from .refresh_intents_manager import RefreshIntentsManager
 from .refunds_manager import RefundsManager
 from .subscription_intents_manager import SubscriptionIntentsManager
