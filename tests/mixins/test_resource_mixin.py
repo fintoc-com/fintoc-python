@@ -267,3 +267,20 @@ class TestMixinUpdateAndDeleteMethods:
 
         assert data["id"] not in resource.url
         assert data["identifier"] in resource.url
+
+    def test_resource_update_with_custom_path(self, capsys):
+        methods = ["update"]
+        data = {
+            "id": "id0",
+            "identifier": "identifier0",
+        }
+        resource = EmptyMockResource(
+            self.client, self.handlers, methods, self.path, **data
+        )
+
+        custom_path = f"{self.path}/id0/cancel"
+        resource.update(path_=custom_path)
+
+        captured = capsys.readouterr().out
+        assert "update" in captured
+        assert resource.url == custom_path.lstrip("/")
