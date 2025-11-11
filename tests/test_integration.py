@@ -392,6 +392,61 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/payment_intents/{payment_intent_id}/expire"
 
+    def test_payment_intent_check_eligibility(self):
+        """Test checking eligibility for a payment intent."""
+        eligibility_data = {
+            "amount": 1000,
+            "currency": "CLP",
+        }
+
+        result = self.fintoc.payment_intents.check_eligibility(**eligibility_data)
+
+        assert result.method == "post"
+        assert result.url == "v1/payment_intents/check_eligibility"
+
+    def test_payment_links_list(self):
+        """Test getting all payment links."""
+        payment_links = list(self.fintoc.payment_links.list())
+
+        assert len(payment_links) > 0
+        for payment_link in payment_links:
+            assert payment_link.method == "get"
+            assert payment_link.url == "v1/payment_links"
+
+    def test_payment_link_get(self):
+        """Test getting a specific payment link."""
+        payment_link_id = "test_payment_link_id"
+
+        payment_link = self.fintoc.payment_links.get(payment_link_id)
+
+        assert payment_link.method == "get"
+        assert payment_link.url == f"v1/payment_links/{payment_link_id}"
+
+    def test_payment_link_create(self):
+        """Test creating a payment link."""
+        payment_link_data = {
+            "amount": 1000,
+            "currency": "CLP",
+            "description": "Test payment link",
+        }
+
+        payment_link = self.fintoc.payment_links.create(**payment_link_data)
+
+        assert payment_link.method == "post"
+        assert payment_link.url == "v1/payment_links"
+        assert payment_link.json.amount == payment_link_data["amount"]
+        assert payment_link.json.currency == payment_link_data["currency"]
+        assert payment_link.json.description == payment_link_data["description"]
+
+    def test_payment_link_cancel(self):
+        """Test canceling a payment link."""
+        payment_link_id = "test_payment_link_id"
+
+        result = self.fintoc.payment_links.cancel(payment_link_id)
+
+        assert result.method == "patch"
+        assert result.url == f"v1/payment_links/{payment_link_id}/cancel"
+
     def test_refund_list(self):
         """Test getting all refunds."""
         refunds = list(self.fintoc.refunds.list())

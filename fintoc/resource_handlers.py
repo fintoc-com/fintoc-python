@@ -59,9 +59,12 @@ def resource_create(
     )
 
 
-def resource_update(client, path, id_, klass, handlers, methods, params):
+def resource_update(
+    client, path, id_, klass, handlers, methods, params, custom_path=None
+):
     """Update a specific instance of a resource."""
-    data = client.request(f"{path}/{id_}", method="patch", json=params)
+    update_path = custom_path if custom_path else f"{path}/{id_}"
+    data = client.request(update_path, method="patch", json=params)
     return objetize(
         klass,
         client,

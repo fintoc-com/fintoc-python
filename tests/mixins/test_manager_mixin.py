@@ -154,6 +154,12 @@ class TestManagerMixinMethods:
         assert isinstance(object_, ResourceMixin)
         assert object_.method == "patch"
 
+    def test_update_update_method_with_custom_path(self):
+        object_ = self.manager.update("my_id", path_="/resources/my_id/cancel")
+        assert isinstance(object_, ResourceMixin)
+        assert object_.method == "patch"
+        assert object_.url == "resources/my_id/cancel"
+
     def test_delete_method(self):
         id_ = self.manager.delete("my_id")
         isinstance(id_, str)

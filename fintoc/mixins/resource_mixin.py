@@ -61,8 +61,10 @@ class ResourceMixin(metaclass=ABCMeta):
         return serialized
 
     @can_raise_fintoc_error
-    def _update(self, **kwargs):
+    def _update(self, path_=None, **kwargs):
+        """Update the resource."""
         id_ = getattr(self, self.__class__.resource_identifier)
+        custom_path = path_ if path_ else None
         object_ = resource_update(
             client=self._client,
             path=self._path,
@@ -71,6 +73,7 @@ class ResourceMixin(metaclass=ABCMeta):
             handlers=self._handlers,
             methods=self._methods,
             params=kwargs,
+            custom_path=custom_path,
         )
         object_ = self._handlers.get("update")(object_, id_, **kwargs)
         self.__dict__.update(object_.__dict__)
