@@ -714,6 +714,38 @@ class TestFintocIntegration:
         assert account_verification.url == "v2/account_verifications"
         assert account_verification.json.account_number == account_number
 
+    def test_v2_customers_list(self):
+        """Test getting all customers using v2 API."""
+        customers = list(self.fintoc.v2.customers.list())
+
+        assert len(customers) > 0
+        for customer in customers:
+            assert customer.method == "get"
+            assert customer.url == "v2/customers"
+
+    def test_v2_customer_get(self):
+        """Test getting a specific customer using v2 API."""
+        customer_id = "test_customer_id"
+
+        customer = self.fintoc.v2.customers.get(customer_id)
+
+        assert customer.method == "get"
+        assert customer.url == f"v2/customers/{customer_id}"
+
+    def test_v2_customer_create(self):
+        """Test creating a customer using v2 API."""
+        customer_data = {
+            "name": "Test Customer",
+            "email": "test@example.com",
+        }
+
+        customer = self.fintoc.v2.customers.create(**customer_data)
+
+        assert customer.method == "post"
+        assert customer.url == "v2/customers"
+        assert customer.json.name == customer_data["name"]
+        assert customer.json.email == customer_data["email"]
+
     def test_v2_entities_list(self):
         """Test getting all entities using v2 API."""
         entities = list(self.fintoc.v2.entities.list())
