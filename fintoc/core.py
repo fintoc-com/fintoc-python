@@ -23,6 +23,7 @@ from fintoc.managers.v2 import AccountNumbersManager
 from fintoc.managers.v2 import AccountsManager as AccountsManagerV2
 from fintoc.managers.v2 import (
     AccountVerificationsManager,
+    CustomersManager,
     EntitiesManager,
     SimulateManager,
     TransfersManager,
@@ -78,5 +79,6 @@ class _FintocV2:
         self.account_verifications = AccountVerificationsManager(
             "/v2/account_verifications", client
         )
+        self.customers = CustomersManager("/v2/customers", client)
         self.entities = EntitiesManager("/v2/entities", client)
         self.simulate = SimulateManager("/v2/simulate", client)
