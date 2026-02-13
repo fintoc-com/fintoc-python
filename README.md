@@ -95,6 +95,13 @@ The `list` method returns **a generator** with all the instances of the resource
 payment_intents = client.payment_intents.list(since="2025-01-01", until="2025-02-01")
 ```
 
+The same applies to other resources. For instance, you can filter `refunds` by `since`, `until`, and `status`:
+
+```python
+# Get all succeeded refunds from the last month
+refunds = client.refunds.list(since="2025-01-01", until="2025-02-01", status="succeeded")
+```
+
 You can also pass the `lazy=False` parameter to the method to force the SDK to return a list of all the instances of the resource instead of the generator. **Beware**: this could take **very long**, depending on the amount of instances that exist of said resource:
 
 ```python
