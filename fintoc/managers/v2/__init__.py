@@ -3,6 +3,7 @@
 from .account_numbers_manager import AccountNumbersManager
 from .account_verifications_manager import AccountVerificationsManager
 from .accounts_manager import AccountsManager
+from .checkout_sessions_manager import CheckoutSessionsManager
 from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
 from .movements_manager import MovementsManager

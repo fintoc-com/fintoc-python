@@ -906,6 +906,53 @@ class TestFintocIntegration:
         assert movement.method == "get"
         assert movement.url == f"v2/accounts/{account_id}/movements/{movement_id}"
 
+    def test_v2_checkout_session_list(self):
+        """Test getting all checkout sessions using v2 API."""
+        checkout_sessions = list(self.fintoc.v2.checkout_sessions.list())
+
+        assert len(checkout_sessions) > 0
+        for checkout_session in checkout_sessions:
+            assert checkout_session.method == "get"
+            assert checkout_session.url == "v2/checkout_sessions"
+
+    def test_v2_checkout_session_create(self):
+        """Test creating a checkout session using v2 API."""
+        checkout_session_data = {
+            "amount": 5000,
+            "currency": "CLP",
+            "success_url": "https://example.com/success",
+            "cancel_url": "https://example.com/cancel",
+        }
+
+        checkout_session = self.fintoc.v2.checkout_sessions.create(
+            **checkout_session_data
+        )
+
+        assert checkout_session.method == "post"
+        assert checkout_session.url == "v2/checkout_sessions"
+        assert checkout_session.json.amount == checkout_session_data["amount"]
+        assert checkout_session.json.currency == checkout_session_data["currency"]
+        assert checkout_session.json.success_url == checkout_session_data["success_url"]
+        assert checkout_session.json.cancel_url == checkout_session_data["cancel_url"]
+
+    def test_v2_checkout_session_get(self):
+        """Test getting a specific checkout session using v2 API."""
+        checkout_session_id = "test_checkout_session_id"
+
+        checkout_session = self.fintoc.v2.checkout_sessions.get(checkout_session_id)
+
+        assert checkout_session.method == "get"
+        assert checkout_session.url == f"v2/checkout_sessions/{checkout_session_id}"
+
+    def test_v2_checkout_session_expire(self):
+        """Test expiring a checkout session using v2 API."""
+        checkout_session_id = "test_checkout_session_id"
+
+        result = self.fintoc.v2.checkout_sessions.expire(checkout_session_id)
+
+        assert result.method == "post"
+        assert result.url == f"v2/checkout_sessions/{checkout_session_id}/expire"
+
 
 if __name__ == "__main__":
     pytest.main()
