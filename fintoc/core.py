@@ -23,12 +23,9 @@ from fintoc.managers.v2 import AccountNumbersManager
 from fintoc.managers.v2 import AccountsManager as AccountsManagerV2
 from fintoc.managers.v2 import AccountVerificationsManager
 from fintoc.managers.v2 import CheckoutSessionsManager as CheckoutSessionsManagerV2
-from fintoc.managers.v2 import (
-    CustomersManager,
-    EntitiesManager,
-    SimulateManager,
-    TransfersManager,
-)
+from fintoc.managers.v2 import CustomersManager, EntitiesManager
+from fintoc.managers.v2 import PaymentIntentsManager as PaymentIntentsManagerV2
+from fintoc.managers.v2 import SimulateManager, TransfersManager
 from fintoc.version import __version__
 
 
@@ -86,3 +83,4 @@ class _FintocV2:
         self.checkout_sessions = CheckoutSessionsManagerV2(
             "/v2/checkout_sessions", client
         )
+        self.payment_intents = PaymentIntentsManagerV2("/v2/payment_intents", client)
