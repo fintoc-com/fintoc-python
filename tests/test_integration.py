@@ -953,6 +953,42 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v2/checkout_sessions/{checkout_session_id}/expire"
 
+    def test_v2_payment_intent_list(self):
+        """Test getting all payment intents using v2 API."""
+        payment_intents = list(self.fintoc.v2.payment_intents.list())
+
+        assert len(payment_intents) > 0
+        for payment_intent in payment_intents:
+            assert payment_intent.method == "get"
+            assert payment_intent.url == "v2/payment_intents"
+
+    def test_v2_payment_intent_get(self):
+        """Test getting a specific payment intent using v2 API."""
+        payment_intent_id = "test_payment_intent_id"
+
+        payment_intent = self.fintoc.v2.payment_intents.get(payment_intent_id)
+
+        assert payment_intent.method == "get"
+        assert payment_intent.url == f"v2/payment_intents/{payment_intent_id}"
+
+    def test_v2_payment_intent_create(self):
+        """Test creating a payment intent using v2 API."""
+        payment_intent_data = {
+            "amount": 5000,
+            "currency": "CLP",
+            "success_url": "https://example.com/success",
+            "cancel_url": "https://example.com/cancel",
+        }
+
+        payment_intent = self.fintoc.v2.payment_intents.create(**payment_intent_data)
+
+        assert payment_intent.method == "post"
+        assert payment_intent.url == "v2/payment_intents"
+        assert payment_intent.json.amount == payment_intent_data["amount"]
+        assert payment_intent.json.currency == payment_intent_data["currency"]
+        assert payment_intent.json.success_url == payment_intent_data["success_url"]
+        assert payment_intent.json.cancel_url == payment_intent_data["cancel_url"]
+
 
 if __name__ == "__main__":
     pytest.main()
