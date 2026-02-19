@@ -1,4 +1,4 @@
 """Module to hold the version utilities."""
 
-version_info = (2, 16, 0)
+version_info = (2, 17, 0)
 __version__ = ".".join([str(x) for x in version_info])
