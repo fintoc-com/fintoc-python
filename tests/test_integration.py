@@ -1034,6 +1034,24 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
 
+    def test_v2_invoices_list(self):
+        """Test getting all invoices using v2 API."""
+        invoices = list(self.fintoc.v2.invoices.list())
+
+        assert len(invoices) > 0
+        for invoice in invoices:
+            assert invoice.method == "get"
+            assert invoice.url == "v2/invoices"
+
+    def test_v2_invoice_get(self):
+        """Test getting a specific invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+
+        invoice = self.fintoc.v2.invoices.get(invoice_id)
+
+        assert invoice.method == "get"
+        assert invoice.url == f"v2/invoices/{invoice_id}"
+
 
 if __name__ == "__main__":
     pytest.main()

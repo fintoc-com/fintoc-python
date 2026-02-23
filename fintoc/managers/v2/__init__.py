@@ -6,6 +6,7 @@ from .accounts_manager import AccountsManager
 from .checkout_sessions_manager import CheckoutSessionsManager
 from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
+from .invoices_manager import InvoicesManager
 from .movements_manager import MovementsManager
 from .payment_intents_manager import PaymentIntentsManager
 from .payment_methods_manager import PaymentMethodsManager
