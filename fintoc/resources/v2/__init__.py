@@ -6,4 +6,5 @@ from .account_verification import AccountVerification
 from .entity import Entity
 from .movement import Movement
 from .payment_method import PaymentMethod
+from .subscription import Subscription
 from .transfer import Transfer

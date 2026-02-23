@@ -1007,6 +1007,33 @@ class TestFintocIntegration:
         assert payment_method.method == "get"
         assert payment_method.url == f"v2/payment_methods/{payment_method_id}"
 
+    def test_v2_subscriptions_list(self):
+        """Test getting all subscriptions using v2 API."""
+        subscriptions = list(self.fintoc.v2.subscriptions.list())
+
+        assert len(subscriptions) > 0
+        for subscription in subscriptions:
+            assert subscription.method == "get"
+            assert subscription.url == "v2/subscriptions"
+
+    def test_v2_subscription_get(self):
+        """Test getting a specific subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        subscription = self.fintoc.v2.subscriptions.get(subscription_id)
+
+        assert subscription.method == "get"
+        assert subscription.url == f"v2/subscriptions/{subscription_id}"
+
+    def test_v2_subscription_cancel(self):
+        """Test canceling a subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        result = self.fintoc.v2.subscriptions.cancel(subscription_id)
+
+        assert result.method == "post"
+        assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
+
 
 if __name__ == "__main__":
     pytest.main()
