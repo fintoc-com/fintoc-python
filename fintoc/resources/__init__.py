@@ -28,5 +28,8 @@ from .v2.account_number import AccountNumber
 from .v2.account_verification import AccountVerification
 from .v2.customer import Customer
 from .v2.entity import Entity
+from .v2.invoice import Invoice as InvoiceV2
+from .v2.payment_method import PaymentMethod
+from .v2.subscription import Subscription as SubscriptionV2
 from .v2.transfer import Transfer
 from .webhook_endpoint import WebhookEndpoint
