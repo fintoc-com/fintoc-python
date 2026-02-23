@@ -989,6 +989,69 @@ class TestFintocIntegration:
         assert payment_intent.json.success_url == payment_intent_data["success_url"]
         assert payment_intent.json.cancel_url == payment_intent_data["cancel_url"]
 
+    def test_v2_payment_methods_list(self):
+        """Test getting all payment methods using v2 API."""
+        payment_methods = list(self.fintoc.v2.payment_methods.list())
+
+        assert len(payment_methods) > 0
+        for payment_method in payment_methods:
+            assert payment_method.method == "get"
+            assert payment_method.url == "v2/payment_methods"
+
+    def test_v2_payment_method_get(self):
+        """Test getting a specific payment method using v2 API."""
+        payment_method_id = "test_payment_method_id"
+
+        payment_method = self.fintoc.v2.payment_methods.get(payment_method_id)
+
+        assert payment_method.method == "get"
+        assert payment_method.url == f"v2/payment_methods/{payment_method_id}"
+
+    def test_v2_subscriptions_list(self):
+        """Test getting all subscriptions using v2 API."""
+        subscriptions = list(self.fintoc.v2.subscriptions.list())
+
+        assert len(subscriptions) > 0
+        for subscription in subscriptions:
+            assert subscription.method == "get"
+            assert subscription.url == "v2/subscriptions"
+
+    def test_v2_subscription_get(self):
+        """Test getting a specific subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        subscription = self.fintoc.v2.subscriptions.get(subscription_id)
+
+        assert subscription.method == "get"
+        assert subscription.url == f"v2/subscriptions/{subscription_id}"
+
+    def test_v2_subscription_cancel(self):
+        """Test canceling a subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        result = self.fintoc.v2.subscriptions.cancel(subscription_id)
+
+        assert result.method == "post"
+        assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
+
+    def test_v2_invoices_list(self):
+        """Test getting all invoices using v2 API."""
+        invoices = list(self.fintoc.v2.invoices.list())
+
+        assert len(invoices) > 0
+        for invoice in invoices:
+            assert invoice.method == "get"
+            assert invoice.url == "v2/invoices"
+
+    def test_v2_invoice_get(self):
+        """Test getting a specific invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+
+        invoice = self.fintoc.v2.invoices.get(invoice_id)
+
+        assert invoice.method == "get"
+        assert invoice.url == f"v2/invoices/{invoice_id}"
+
 
 if __name__ == "__main__":
     pytest.main()
