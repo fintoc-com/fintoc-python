@@ -989,6 +989,24 @@ class TestFintocIntegration:
         assert payment_intent.json.success_url == payment_intent_data["success_url"]
         assert payment_intent.json.cancel_url == payment_intent_data["cancel_url"]
 
+    def test_v2_payment_methods_list(self):
+        """Test getting all payment methods using v2 API."""
+        payment_methods = list(self.fintoc.v2.payment_methods.list())
+
+        assert len(payment_methods) > 0
+        for payment_method in payment_methods:
+            assert payment_method.method == "get"
+            assert payment_method.url == "v2/payment_methods"
+
+    def test_v2_payment_method_get(self):
+        """Test getting a specific payment method using v2 API."""
+        payment_method_id = "test_payment_method_id"
+
+        payment_method = self.fintoc.v2.payment_methods.get(payment_method_id)
+
+        assert payment_method.method == "get"
+        assert payment_method.url == f"v2/payment_methods/{payment_method_id}"
+
 
 if __name__ == "__main__":
     pytest.main()

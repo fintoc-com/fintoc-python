@@ -8,5 +8,6 @@ from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
 from .movements_manager import MovementsManager
 from .payment_intents_manager import PaymentIntentsManager
+from .payment_methods_manager import PaymentMethodsManager
 from .simulate_manager import SimulateManager
 from .transfers_manager import TransfersManager
