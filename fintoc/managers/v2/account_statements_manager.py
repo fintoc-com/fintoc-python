@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Module to hold the account statements manager."""
 
 from fintoc.mixins import ManagerMixin

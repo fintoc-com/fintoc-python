@@ -28,7 +28,7 @@ class AccountsManager(ManagerMixin):
         return self.__account_statements_manager
 
     @account_statements.setter
-    def account_statements(self, new_value):
+    def account_statements(self, new_value):  # pylint: disable=no-self-use
         raise NameError("Attribute name corresponds to a manager")
 
     @property
