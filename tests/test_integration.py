@@ -681,7 +681,7 @@ class TestFintocIntegration:
 
     def test_v2_account_number_delete(self):
         """Test deleting an account number using v2 API."""
-        account_number_id = "test_account_number_id"
+        account_number_id = "acno_Kasf91034gj1AD"
 
         result = self.fintoc.v2.account_numbers.delete(account_number_id)
 
