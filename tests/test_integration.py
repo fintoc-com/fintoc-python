@@ -679,6 +679,14 @@ class TestFintocIntegration:
         assert account_number.url == f"v2/account_numbers/{account_number_id}"
         assert account_number.json.metadata.test_key == metadata["test_key"]
 
+    def test_v2_account_number_delete(self):
+        """Test deleting an account number using v2 API."""
+        account_number_id = "acno_Kasf91034gj1AD"
+
+        result = self.fintoc.v2.account_numbers.delete(account_number_id)
+
+        assert result == account_number_id
+
     def test_v2_account_verification_list(self):
         """Test getting all account verifications using v2 API."""
         account_verifications = list(self.fintoc.v2.account_verifications.list())
