@@ -1060,6 +1060,20 @@ class TestFintocIntegration:
         assert invoice.method == "get"
         assert invoice.url == f"v2/invoices/{invoice_id}"
 
+    def test_v2_account_statements_list(self):
+        """Test getting account statements from an account using v2 API."""
+        account_id = "acc_12345"
+        account_statements = list(
+            self.fintoc.v2.accounts.account_statements.list(account_id=account_id)
+        )
+
+        assert len(account_statements) > 0
+        for account_statement in account_statements:
+            assert account_statement.method == "get"
+            assert (
+                account_statement.url == f"v2/accounts/{account_id}/account_statements"
+            )
+
 
 if __name__ == "__main__":
     pytest.main()
