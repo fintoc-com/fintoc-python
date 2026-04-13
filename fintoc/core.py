@@ -26,7 +26,7 @@ from fintoc.managers.v2 import CheckoutSessionsManager as CheckoutSessionsManage
 from fintoc.managers.v2 import CustomersManager, EntitiesManager
 from fintoc.managers.v2 import InvoicesManager as InvoicesManagerV2
 from fintoc.managers.v2 import PaymentIntentsManager as PaymentIntentsManagerV2
-from fintoc.managers.v2 import PaymentMethodsManager, SimulateManager
+from fintoc.managers.v2 import PaymentMethodsManager, ProductsManager, SimulateManager
 from fintoc.managers.v2 import SubscriptionsManager as SubscriptionsManagerV2
 from fintoc.managers.v2 import TransfersManager
 from fintoc.version import __version__
@@ -89,4 +89,5 @@ class _FintocV2:
         self.invoices = InvoicesManagerV2("/v2/invoices", client)
         self.payment_intents = PaymentIntentsManagerV2("/v2/payment_intents", client)
         self.payment_methods = PaymentMethodsManager("/v2/payment_methods", client)
+        self.products = ProductsManager("/v2/products", client)
         self.subscriptions = SubscriptionsManagerV2("/v2/subscriptions", client)
