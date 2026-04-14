@@ -1042,6 +1042,40 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
 
+    def test_v2_products_list(self):
+        """Test getting all products using v2 API."""
+        products = list(self.fintoc.v2.products.list())
+
+        assert len(products) > 0
+        for product in products:
+            assert product.method == "get"
+            assert product.url == "v2/products"
+
+    def test_v2_product_get(self):
+        """Test getting a specific product using v2 API."""
+        product_id = "test_product_id"
+
+        product = self.fintoc.v2.products.get(product_id)
+
+        assert product.method == "get"
+        assert product.url == f"v2/products/{product_id}"
+
+    def test_v2_product_create(self):
+        """Test creating a product using v2 API."""
+        product_data = {
+            "name": "Test Product",
+            "amount": 10000,
+            "currency": "CLP",
+        }
+
+        product = self.fintoc.v2.products.create(**product_data)
+
+        assert product.method == "post"
+        assert product.url == "v2/products"
+        assert product.json.name == product_data["name"]
+        assert product.json.amount == product_data["amount"]
+        assert product.json.currency == product_data["currency"]
+
     def test_v2_invoices_list(self):
         """Test getting all invoices using v2 API."""
         invoices = list(self.fintoc.v2.invoices.list())

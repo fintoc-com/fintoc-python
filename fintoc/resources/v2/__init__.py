@@ -8,5 +8,6 @@ from .entity import Entity
 from .invoice import Invoice
 from .movement import Movement
 from .payment_method import PaymentMethod
+from .product import Product
 from .subscription import Subscription
 from .transfer import Transfer
