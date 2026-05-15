@@ -1,13 +1,25 @@
 name: release
 
 on:
-  push:
-    branches:
-      - stable
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Tipo de bump'
+        type: choice
+        required: true
+        default: minor
+        options: [patch, minor, major]
+      release-notes:
+        description: 'Release notes (markdown, opcional)'
+        type: string
+        required: false
 
 jobs:
-  pypi-release:
+  release:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
@@ -32,6 +44,15 @@ jobs:
       - name: Install dependencies
         if: steps.poetry-cache.outputs.cache-hit != 'true'
         run: poetry install
+
+      - uses: fintoc-com/release-action/prepare@main
+        id: prep
+        with:
+          bump: ${{ inputs.bump }}
+          version-format: py
+          tag-prefix: v
+          app-id: ${{ vars.FIN_RELEASES_APP_ID }}
+          app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
 
       - name: Build the package
         run: poetry build
@@ -42,53 +63,9 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
 
-  github-release:
-    needs: pypi-release
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout to commit code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: fintoc-com/release-action/finalize@main
         with:
-          python-version: "3.10.6"
-
-      - name: Install Poetry
-        run: |
-          make get-poetry
-          echo $HOME/.poetry/bin >> $GITHUB_PATH
-
-      - name: Set up environment cache
-        uses: actions/cache@v3
-        id: environment-cache
-        with:
-          key: environment-cache-v1-${{ hashFiles('**/poetry.lock') }}
-          path: .venv
-
-      - name: Install dependencies
-        if: steps.poetry-cache.outputs.cache-hit != 'true'
-        run: poetry install
-
-      - name: Get version
-        id: version
-        run: echo ::set-output name=version::$(poetry version | rev | cut -d' ' -f1 | rev)
-
-      - name: Get Pull Request data
-        uses: jwalton/gh-find-current-pr@v1
-        id: find-pr
-        with:
-          state: all
-
-      - name: Tag and Release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: ${{ steps.version.outputs.version }}
-          body: |
-            ${{ steps.find-pr.outputs.body }}
-          draft: false
-          prerelease: false
+          tag: ${{ steps.prep.outputs.tag }}
+          release-notes: ${{ inputs.release-notes }}
+          app-id: ${{ vars.FIN_RELEASES_APP_ID }}
+          app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
