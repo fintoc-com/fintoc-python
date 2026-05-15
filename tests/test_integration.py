@@ -588,6 +588,17 @@ class TestFintocIntegration:
 
         assert result == webhook_endpoint_id
 
+    def test_webhook_endpoint_test(self):
+        """Test sending a test event to a webhook endpoint."""
+        webhook_endpoint_id = "test_webhook_endpoint_id"
+        test_data = {"type": "link.credentials_changed"}
+
+        result = self.fintoc.webhook_endpoints.test(webhook_endpoint_id, **test_data)
+
+        assert result.method == "post"
+        assert result.url == f"v1/webhook_endpoints/{webhook_endpoint_id}/test"
+        assert result.json.type == test_data["type"]
+
     def test_v2_accounts_list(self):
         """Test getting all accounts using v2 API."""
         accounts = list(self.fintoc.v2.accounts.list())
