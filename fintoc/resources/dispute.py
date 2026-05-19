@@ -4,7 +4,6 @@ from fintoc.mixins import ResourceMixin
 
 
 class Dispute(ResourceMixin):
-
     """Represents a Fintoc Dispute."""
 
     mappings = {

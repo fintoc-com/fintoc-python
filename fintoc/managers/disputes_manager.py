@@ -6,7 +6,6 @@ from fintoc.mixins import ManagerMixin
 
 # pylint: disable=duplicate-code
 class DisputesManager(ManagerMixin):
-
     """Represents a disputes manager."""
 
     resource = "dispute"
