@@ -8,6 +8,7 @@ from fintoc.managers import (
     AccountsManager,
     ChargesManager,
     CheckoutSessionsManager,
+    DisputesManager,
     InvoicesManager,
     LinksManager,
     PaymentIntentsManager,
@@ -68,6 +69,7 @@ class Fintoc:
         )
         self.tax_returns = TaxReturnsManager("/v1/tax_returns", self._client)
         self.invoices = InvoicesManager("/v1/invoices", self._client)
+        self.disputes = DisputesManager("/v1/disputes", self._client)
 
         self.v2 = _FintocV2(self._client)
 

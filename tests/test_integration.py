@@ -882,6 +882,42 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/checkout_sessions/{checkout_session_id}/expire"
 
+    def test_disputes_list(self):
+        """Test getting all disputes."""
+        disputes = list(self.fintoc.disputes.list())
+
+        assert len(disputes) > 0
+        for dispute in disputes:
+            assert dispute.method == "get"
+            assert dispute.url == "v1/disputes"
+
+    def test_dispute_get(self):
+        """Test getting a specific dispute."""
+        dispute_id = "test_dispute_id"
+
+        dispute = self.fintoc.disputes.get(dispute_id)
+
+        assert dispute.method == "get"
+        assert dispute.url == f"v1/disputes/{dispute_id}"
+
+    def test_dispute_submit_for_review(self):
+        """Test submitting a dispute for review."""
+        dispute_id = "test_dispute_id"
+
+        result = self.fintoc.disputes.submit_for_review(dispute_id)
+
+        assert result.method == "post"
+        assert result.url == f"v1/disputes/{dispute_id}/submit_for_review"
+
+    def test_dispute_document_create(self):
+        """Test creating a document for a dispute."""
+        dispute_id = "test_dispute_id"
+
+        document = self.fintoc.disputes.documents.create(dispute_id=dispute_id)
+
+        assert document.method == "post"
+        assert document.url == f"v1/disputes/{dispute_id}/documents"
+
     def test_v2_transfer_return(self):
         """Test returning a transfer using v2 API."""
         transfer_id = "test_transfer_id"

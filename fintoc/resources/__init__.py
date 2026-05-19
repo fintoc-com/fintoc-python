@@ -4,6 +4,8 @@ from .account import Account
 from .balance import Balance
 from .charge import Charge
 from .checkout_session import CheckoutSession
+from .dispute import Dispute
+from .dispute_document import DisputeDocument
 from .generic_fintoc_resource import GenericFintocResource
 from .income import Income
 from .institution import Institution
