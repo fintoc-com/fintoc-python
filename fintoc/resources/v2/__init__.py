@@ -7,6 +7,9 @@ from .account_verification import AccountVerification
 from .entity import Entity
 from .invoice import Invoice
 from .movement import Movement
+from .onboarding import Onboarding
+from .onboarding_document import OnboardingDocument
+from .onboarding_shareholder import OnboardingShareholder
 from .payment_method import PaymentMethod
 from .product import Product
 from .subscription import Subscription

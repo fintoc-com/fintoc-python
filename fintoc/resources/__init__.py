@@ -31,6 +31,9 @@ from .v2.account_verification import AccountVerification
 from .v2.customer import Customer
 from .v2.entity import Entity
 from .v2.invoice import Invoice as InvoiceV2
+from .v2.onboarding import Onboarding
+from .v2.onboarding_document import OnboardingDocument
+from .v2.onboarding_shareholder import OnboardingShareholder
 from .v2.payment_method import PaymentMethod
 from .v2.subscription import Subscription as SubscriptionV2
 from .v2.transfer import Transfer
