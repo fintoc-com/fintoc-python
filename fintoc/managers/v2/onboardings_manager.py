@@ -4,8 +4,6 @@ import mimetypes
 import os
 
 from fintoc.mixins import ManagerMixin
-from fintoc.resource_handlers import resource_upload
-from fintoc.utils import can_raise_fintoc_error, get_resource_class
 
 
 class OnboardingsManager(ManagerMixin):
@@ -29,7 +27,7 @@ class OnboardingsManager(ManagerMixin):
     def _upload_document(self, identifier, slot_key, file, **kwargs):
         """Upload a document to a slot, identified by :slot_key:."""
         path = f"{self._build_path(**kwargs)}/{identifier}/documents/{slot_key}"
-        return self._upload(path, file)
+        return self._upload(path, {"file": self._build_file_payload(file)})
 
     def _upload_shareholder_document(self, identifier, shareholder_id, file, **kwargs):
         """Upload a document for a shareholder of an onboarding."""
@@ -37,16 +35,7 @@ class OnboardingsManager(ManagerMixin):
             f"{self._build_path(**kwargs)}/{identifier}"
             f"/shareholders/{shareholder_id}/document"
         )
-        return self._upload(path, file)
-
-    @can_raise_fintoc_error
-    def _upload(self, path, file):
-        """Perform a multipart ``PUT`` upload of :file: and objetize the result."""
-        klass = get_resource_class(self.__class__.resource)
-        files = {"file": self._build_file_payload(file)}
-        return resource_upload(
-            self._client, path, klass, self._handlers, self.__class__.methods, files
-        )
+        return self._upload(path, {"file": self._build_file_payload(file)})
 
     @staticmethod
     def _build_file_payload(file):
