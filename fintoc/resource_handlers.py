@@ -59,6 +59,19 @@ def resource_create(
     )
 
 
+def resource_upload(client, path, klass, handlers, methods, files):
+    """Upload files to a resource endpoint through a multipart PUT request."""
+    data = client.request(path, method="put", files=files)
+    return objetize(
+        klass,
+        client,
+        data,
+        handlers=handlers,
+        methods=methods,
+        path=path,
+    )
+
+
 def resource_update(
     client, path, id_, klass, handlers, methods, params, custom_path=None
 ):
