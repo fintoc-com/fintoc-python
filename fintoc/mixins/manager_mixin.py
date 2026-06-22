@@ -8,6 +8,7 @@ from fintoc.resource_handlers import (
     resource_get,
     resource_list,
     resource_update,
+    resource_upload,
 )
 from fintoc.utils import can_raise_fintoc_error, deprecate, get_resource_class
 
@@ -116,6 +117,17 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
             idempotency_key=idempotency_key,
         )
         return self.post_create_handler(object_, **kwargs)
+
+    @can_raise_fintoc_error
+    def _upload(self, path, files):
+        """
+        Upload :files: to :path: through a multipart PUT and objetize the
+        result. :files: is a dict in the format expected by httpx.
+        """
+        klass = get_resource_class(self.__class__.resource)
+        return resource_upload(
+            self._client, path, klass, self._handlers, self.__class__.methods, files
+        )
 
     @can_raise_fintoc_error
     def _update(self, identifier, path_=None, **kwargs):
