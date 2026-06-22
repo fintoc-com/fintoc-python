@@ -61,7 +61,15 @@ class Client:
 
         return {}
 
-    def _build_request(self, method, url, params, headers, json=None):
+    def _build_request(self, method, url, params, headers, json=None, files=None):
+        if files is not None:
+            # Multipart uploads: let httpx set the multipart Content-Type and
+            # boundary automatically. Multipart bodies are not utf-8-safe, so
+            # JWS signing is skipped for these requests.
+            return httpx.Request(
+                method, url, headers=headers, params=params, files=files
+            )
+
         request = httpx.Request(method, url, headers=headers, params=params, json=json)
 
         request.headers.update(
@@ -76,6 +84,7 @@ class Client:
         method="get",
         params=None,
         json=None,
+        files=None,
         idempotency_key=None,
     ):
         """
@@ -97,7 +106,9 @@ class Client:
                 headers=headers,
             )
 
-        _request = self._build_request(method, url, all_params, headers, json)
+        _request = self._build_request(
+            method, url, all_params, headers, json, files=files
+        )
         response = self._client.send(_request)
         response.raise_for_status()
         try:

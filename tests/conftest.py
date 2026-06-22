@@ -106,13 +106,23 @@ def patch_http_client(monkeypatch):
                 **({} if request.url.params is None else request.url.params),
             }
             usable_url = request.url.path
-            raw_body = request.content.decode("utf-8")
+            # Materialize the (possibly streaming, e.g. multipart) request body,
+            # mirroring what the real httpx transport does before sending.
+            request.read()
+            content_type = request.headers.get("content-type", "")
+            if content_type.startswith("multipart/form-data"):
+                # Multipart bodies are not utf-8/JSON-parseable; surface the raw
+                # body length so tests can assert the upload was sent.
+                body = {"multipart": True, "content_length": len(request.content)}
+            else:
+                raw_body = request.content.decode("utf-8")
+                body = json.loads(raw_body) if raw_body else None
             return MockResponse(
                 request.method.lower(),
                 self.base_url,
                 usable_url.lstrip("/"),
                 complete_params,
-                json.loads(raw_body) if raw_body else None,
+                body,
                 request.headers,
             )
 
