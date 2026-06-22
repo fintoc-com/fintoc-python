@@ -9,6 +9,7 @@ from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
 from .invoices_manager import InvoicesManager
 from .movements_manager import MovementsManager
+from .onboardings_manager import OnboardingsManager
 from .payment_intents_manager import PaymentIntentsManager
 from .payment_methods_manager import PaymentMethodsManager
 from .products_manager import ProductsManager

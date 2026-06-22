@@ -783,6 +783,20 @@ class TestFintocIntegration:
         assert entity.method == "get"
         assert entity.url == f"v2/entities/{entity_id}"
 
+    def test_v2_entity_create(self):
+        """Test creating an entity using v2 API."""
+        entity_data = {
+            "holder_name": "Test Holder",
+            "holder_id": "12345678-9",
+        }
+
+        entity = self.fintoc.v2.entities.create(**entity_data)
+
+        assert entity.method == "post"
+        assert entity.url == "v2/entities"
+        assert entity.json.holder_name == entity_data["holder_name"]
+        assert entity.json.holder_id == entity_data["holder_id"]
+
     def test_v2_transfers_list(self):
         """Test getting all transfers using v2 API."""
         account_id = "test_account_id"
@@ -1154,6 +1168,190 @@ class TestFintocIntegration:
             assert (
                 account_statement.url == f"v2/accounts/{account_id}/account_statements"
             )
+
+    def test_v2_entity_onboardings_list(self):
+        """Test getting onboardings from an entity using v2 API."""
+        entity_id = "ent_12345"
+        onboardings = list(
+            self.fintoc.v2.entities.onboardings.list(entity_id=entity_id)
+        )
+
+        assert len(onboardings) > 0
+        for onboarding in onboardings:
+            assert onboarding.method == "get"
+            assert onboarding.url == f"v2/entities/{entity_id}/onboardings"
+
+    def test_v2_entity_onboarding_get(self):
+        """Test getting a specific onboarding from an entity using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+
+        onboarding = self.fintoc.v2.entities.onboardings.get(
+            onboarding_id, entity_id=entity_id
+        )
+
+        assert onboarding.method == "get"
+        assert onboarding.url == f"v2/entities/{entity_id}/onboardings/{onboarding_id}"
+
+    def test_v2_entity_onboarding_create(self):
+        """Test creating an onboarding for an entity using v2 API."""
+        entity_id = "ent_12345"
+        company_information = {"legal_name": "Acme SpA"}
+        legal_representative = {"first_name": "Ada", "last_name": "Lovelace"}
+        transactional_profile = {"monthly_amount_range": "0-1000"}
+        shareholders = [
+            {
+                "type": "natural_person",
+                "name": "Ada",
+                "last_name": "Lovelace",
+                "holder_id": "1-9",
+                "nationality": "CL",
+                "percentage": 100,
+            }
+        ]
+
+        onboarding = self.fintoc.v2.entities.onboardings.create(
+            entity_id=entity_id,
+            company_information=company_information,
+            legal_representative=legal_representative,
+            transactional_profile=transactional_profile,
+            shareholders=shareholders,
+        )
+
+        assert onboarding.method == "post"
+        assert onboarding.url == f"v2/entities/{entity_id}/onboardings"
+        assert (
+            onboarding.json.company_information.legal_name
+            == company_information["legal_name"]
+        )
+        assert (
+            onboarding.json.legal_representative.first_name
+            == legal_representative["first_name"]
+        )
+        assert (
+            onboarding.json.transactional_profile.monthly_amount_range
+            == transactional_profile["monthly_amount_range"]
+        )
+        assert onboarding.json.shareholders[0].name == shareholders[0]["name"]
+
+    def test_v2_entity_onboarding_submit(self):
+        """Test submitting an onboarding for an entity using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+
+        result = self.fintoc.v2.entities.onboardings.submit(
+            onboarding_id, entity_id=entity_id
+        )
+
+        assert result.method == "post"
+        assert (
+            result.url == f"v2/entities/{entity_id}/onboardings/{onboarding_id}/submit"
+        )
+
+    def test_v2_entity_onboarding_upload_document(self, tmp_path):
+        """Test uploading a step document for an onboarding using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        slot_key = "company_constitution"
+        file_path = tmp_path / "document.pdf"
+        file_path.write_bytes(b"%PDF-1.4 test file")
+
+        result = self.fintoc.v2.entities.onboardings.upload_document(
+            onboarding_id, slot_key, str(file_path), entity_id=entity_id
+        )
+
+        assert result.method == "put"
+        assert result.url == (
+            f"v2/entities/{entity_id}/onboardings/{onboarding_id}"
+            f"/documents/{slot_key}"
+        )
+        assert getattr(result.headers, "content-type").startswith("multipart/form-data")
+        assert result.json.multipart is True
+
+    def test_v2_entity_onboarding_upload_document_file_like(self, tmp_path):
+        """Test uploading a step document from a file-like object."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        slot_key = "company_constitution"
+        file_path = tmp_path / "document.pdf"
+        file_path.write_bytes(b"%PDF-1.4 test file")
+
+        with open(file_path, "rb") as file_obj:
+            result = self.fintoc.v2.entities.onboardings.upload_document(
+                onboarding_id, slot_key, file_obj, entity_id=entity_id
+            )
+
+        assert result.method == "put"
+        assert getattr(result.headers, "content-type").startswith("multipart/form-data")
+
+    def test_v2_entity_onboarding_upload_shareholder_document(self, tmp_path):
+        """Test uploading a shareholder document for an onboarding using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        shareholder_id = "onbsh_12345"
+        file_path = tmp_path / "id.png"
+        file_path.write_bytes(b"\x89PNG test file")
+
+        result = self.fintoc.v2.entities.onboardings.upload_shareholder_document(
+            onboarding_id, shareholder_id, str(file_path), entity_id=entity_id
+        )
+
+        assert result.method == "put"
+        assert result.url == (
+            f"v2/entities/{entity_id}/onboardings/{onboarding_id}"
+            f"/shareholders/{shareholder_id}/document"
+        )
+        assert getattr(result.headers, "content-type").startswith("multipart/form-data")
+
+    def test_v2_onboarding_objetization(self):
+        """Test that a full onboarding payload is objetized with nested resources."""
+        from fintoc.resources.v2.onboarding import Onboarding
+        from fintoc.resources.v2.onboarding_document import OnboardingDocument
+        from fintoc.resources.v2.onboarding_shareholder import OnboardingShareholder
+        from fintoc.utils import objetize
+
+        payload = {
+            "id": "onbprc_12345",
+            "object": "onboarding",
+            "entity_id": "ent_12345",
+            "status": "in_progress",
+            "source": "api",
+            "submitted_at": None,
+            "reviewed_at": None,
+            "submittable": True,
+            "data": {"company_information": {"legal_name": "Acme SpA"}},
+            "shareholders": [
+                {
+                    "id": "onbsh_12345",
+                    "object": "onboarding_shareholder",
+                    "type": "natural_person",
+                    "name": "Ada",
+                    "last_name": "Lovelace",
+                    "percentage": 100,
+                    "holder_id": "1-9",
+                    "parent_id": None,
+                    "document": {
+                        "slot_key": "identity",
+                        "status": "uploaded",
+                        "filename": "id.png",
+                    },
+                }
+            ],
+            "documents": [{"slot_key": "company_constitution", "status": "missing"}],
+        }
+
+        onboarding = objetize(Onboarding, self.fintoc._client, payload)
+
+        assert isinstance(onboarding, Onboarding)
+        assert onboarding.object == "onboarding"
+        assert onboarding.status == "in_progress"
+        assert onboarding.submittable is True
+        assert isinstance(onboarding.shareholders[0], OnboardingShareholder)
+        assert onboarding.shareholders[0].name == "Ada"
+        assert isinstance(onboarding.shareholders[0].document, OnboardingDocument)
+        assert onboarding.shareholders[0].document.slot_key == "identity"
+        assert isinstance(onboarding.documents[0], OnboardingDocument)
+        assert onboarding.documents[0].status == "missing"
 
 
 if __name__ == "__main__":
