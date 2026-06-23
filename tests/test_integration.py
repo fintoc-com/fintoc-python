@@ -1173,6 +1173,16 @@ class TestFintocIntegration:
         assert invoice.method == "post"
         assert invoice.url == f"v2/invoices/{invoice_id}/add_lines"
 
+    def test_v2_invoice_remove_lines(self):
+        """Test removing line items from an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+        lines = ["il_test_line_id"]
+
+        invoice = self.fintoc.v2.invoices.remove_lines(invoice_id, lines=lines)
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/remove_lines"
+
     def test_v2_account_statements_list(self):
         """Test getting account statements from an account using v2 API."""
         account_id = "acc_12345"
