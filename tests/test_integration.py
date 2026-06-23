@@ -1103,6 +1103,66 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
 
+    def test_v2_subscription_create(self):
+        """Test creating a subscription using v2 API."""
+        subscription_data = {
+            "customer": "cus_test_id",
+            "items": [{"price": "price_test_id", "quantity": 1}],
+        }
+
+        subscription = self.fintoc.v2.subscriptions.create(**subscription_data)
+
+        assert subscription.method == "post"
+        assert subscription.url == "v2/subscriptions"
+        assert subscription.json.customer == subscription_data["customer"]
+
+    def test_v2_subscription_update(self):
+        """Test updating a subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        subscription = self.fintoc.v2.subscriptions.update(
+            subscription_id, trial_end="2024-12-31T00:00:00Z"
+        )
+
+        assert subscription.method == "patch"
+        assert subscription.url == f"v2/subscriptions/{subscription_id}"
+
+    def test_v2_subscription_item_create(self):
+        """Test creating a subscription item using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        item = self.fintoc.v2.subscriptions.items.create(
+            subscription_id=subscription_id,
+            price_data={"product": "prod_test_id", "amount": 10000, "currency": "CLP"},
+            quantity=1,
+        )
+
+        assert item.method == "post"
+        assert item.url == f"v2/subscriptions/{subscription_id}/items"
+
+    def test_v2_subscription_item_update(self):
+        """Test updating a subscription item using v2 API."""
+        subscription_id = "test_subscription_id"
+        item_id = "si_test_item_id"
+
+        item = self.fintoc.v2.subscriptions.items.update(
+            item_id, subscription_id=subscription_id, quantity=3
+        )
+
+        assert item.method == "patch"
+        assert item.url == f"v2/subscriptions/{subscription_id}/items/{item_id}"
+
+    def test_v2_subscription_item_delete(self):
+        """Test deleting a subscription item using v2 API."""
+        subscription_id = "test_subscription_id"
+        item_id = "si_test_item_id"
+
+        result = self.fintoc.v2.subscriptions.items.delete(
+            item_id, subscription_id=subscription_id
+        )
+
+        assert result == item_id
+
     def test_v2_products_list(self):
         """Test getting all products using v2 API."""
         products = list(self.fintoc.v2.products.list())
@@ -1154,6 +1214,46 @@ class TestFintocIntegration:
 
         assert invoice.method == "get"
         assert invoice.url == f"v2/invoices/{invoice_id}"
+
+    def test_v2_invoice_add_lines(self):
+        """Test adding line items to an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+        lines = [
+            {
+                "amount": 10000,
+                "currency": "CLP",
+                "period_end": "2024-02-01",
+                "period_start": "2024-01-01",
+                "quantity": 1,
+            }
+        ]
+
+        invoice = self.fintoc.v2.invoices.add_lines(invoice_id, lines=lines)
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/add_lines"
+
+    def test_v2_invoice_remove_lines(self):
+        """Test removing line items from an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+        lines = ["il_test_line_id"]
+
+        invoice = self.fintoc.v2.invoices.remove_lines(invoice_id, lines=lines)
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/remove_lines"
+
+    def test_v2_invoice_line_update(self):
+        """Test updating an invoice line item using v2 API."""
+        invoice_id = "test_invoice_id"
+        line_id = "il_test_line_id"
+
+        line = self.fintoc.v2.invoices.lines.update(
+            line_id, invoice_id=invoice_id, quantity=2
+        )
+
+        assert line.method == "patch"
+        assert line.url == f"v2/invoices/{invoice_id}/lines/{line_id}"
 
     def test_v2_account_statements_list(self):
         """Test getting account statements from an account using v2 API."""
