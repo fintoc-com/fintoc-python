@@ -1152,6 +1152,17 @@ class TestFintocIntegration:
         assert item.method == "patch"
         assert item.url == f"v2/subscriptions/{subscription_id}/items/{item_id}"
 
+    def test_v2_subscription_item_delete(self):
+        """Test deleting a subscription item using v2 API."""
+        subscription_id = "test_subscription_id"
+        item_id = "si_test_item_id"
+
+        result = self.fintoc.v2.subscriptions.items.delete(
+            item_id, subscription_id=subscription_id
+        )
+
+        assert result == item_id
+
     def test_v2_products_list(self):
         """Test getting all products using v2 API."""
         products = list(self.fintoc.v2.products.list())

@@ -7,4 +7,4 @@ class SubscriptionItemsManager(ManagerMixin):
     """Represents a subscription items manager."""
 
     resource = "subscription_item"
-    methods = ["create", "update"]
+    methods = ["create", "update", "delete"]
