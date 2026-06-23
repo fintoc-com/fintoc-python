@@ -1116,6 +1116,17 @@ class TestFintocIntegration:
         assert subscription.url == "v2/subscriptions"
         assert subscription.json.customer == subscription_data["customer"]
 
+    def test_v2_subscription_update(self):
+        """Test updating a subscription using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        subscription = self.fintoc.v2.subscriptions.update(
+            subscription_id, trial_end="2024-12-31T00:00:00Z"
+        )
+
+        assert subscription.method == "patch"
+        assert subscription.url == f"v2/subscriptions/{subscription_id}"
+
     def test_v2_products_list(self):
         """Test getting all products using v2 API."""
         products = list(self.fintoc.v2.products.list())

@@ -7,7 +7,7 @@ class SubscriptionsManager(ManagerMixin):
     """Represents a subscriptions manager."""
 
     resource = "subscription"
-    methods = ["list", "get", "create", "cancel"]
+    methods = ["list", "get", "create", "update", "cancel"]
 
     def _cancel(self, identifier, **kwargs):
         """Cancel a subscription."""
