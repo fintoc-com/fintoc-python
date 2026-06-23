@@ -7,4 +7,9 @@ class InvoicesManager(ManagerMixin):
     """Represents an invoices manager."""
 
     resource = "invoice"
-    methods = ["list", "get"]
+    methods = ["list", "get", "add_lines"]
+
+    def _add_lines(self, identifier, **kwargs):
+        """Add line items to an invoice."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/add_lines"
+        return self._create(path_=path, **kwargs)

@@ -1155,6 +1155,24 @@ class TestFintocIntegration:
         assert invoice.method == "get"
         assert invoice.url == f"v2/invoices/{invoice_id}"
 
+    def test_v2_invoice_add_lines(self):
+        """Test adding line items to an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+        lines = [
+            {
+                "amount": 10000,
+                "currency": "CLP",
+                "period_end": "2024-02-01",
+                "period_start": "2024-01-01",
+                "quantity": 1,
+            }
+        ]
+
+        invoice = self.fintoc.v2.invoices.add_lines(invoice_id, lines=lines)
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/add_lines"
+
     def test_v2_account_statements_list(self):
         """Test getting account statements from an account using v2 API."""
         account_id = "acc_12345"
