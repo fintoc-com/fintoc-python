@@ -1127,6 +1127,19 @@ class TestFintocIntegration:
         assert subscription.method == "patch"
         assert subscription.url == f"v2/subscriptions/{subscription_id}"
 
+    def test_v2_subscription_item_create(self):
+        """Test creating a subscription item using v2 API."""
+        subscription_id = "test_subscription_id"
+
+        item = self.fintoc.v2.subscriptions.items.create(
+            subscription_id=subscription_id,
+            price_data={"product": "prod_test_id", "amount": 10000, "currency": "CLP"},
+            quantity=1,
+        )
+
+        assert item.method == "post"
+        assert item.url == f"v2/subscriptions/{subscription_id}/items"
+
     def test_v2_products_list(self):
         """Test getting all products using v2 API."""
         products = list(self.fintoc.v2.products.list())
