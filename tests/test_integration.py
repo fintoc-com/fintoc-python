@@ -1183,6 +1183,18 @@ class TestFintocIntegration:
         assert invoice.method == "post"
         assert invoice.url == f"v2/invoices/{invoice_id}/remove_lines"
 
+    def test_v2_invoice_line_update(self):
+        """Test updating an invoice line item using v2 API."""
+        invoice_id = "test_invoice_id"
+        line_id = "il_test_line_id"
+
+        line = self.fintoc.v2.invoices.lines.update(
+            line_id, invoice_id=invoice_id, quantity=2
+        )
+
+        assert line.method == "patch"
+        assert line.url == f"v2/invoices/{invoice_id}/lines/{line_id}"
+
     def test_v2_account_statements_list(self):
         """Test getting account statements from an account using v2 API."""
         account_id = "acc_12345"

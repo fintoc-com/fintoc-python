@@ -6,6 +6,7 @@ from .account_statement import AccountStatement
 from .account_verification import AccountVerification
 from .entity import Entity
 from .invoice import Invoice
+from .line import Line
 from .movement import Movement
 from .onboarding import Onboarding
 from .onboarding_document import OnboardingDocument

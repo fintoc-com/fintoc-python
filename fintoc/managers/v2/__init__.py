@@ -8,6 +8,7 @@ from .checkout_sessions_manager import CheckoutSessionsManager
 from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
 from .invoices_manager import InvoicesManager
+from .lines_manager import LinesManager
 from .movements_manager import MovementsManager
 from .onboardings_manager import OnboardingsManager
 from .payment_intents_manager import PaymentIntentsManager
