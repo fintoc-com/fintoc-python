@@ -10,6 +10,7 @@ from .line import Line
 from .movement import Movement
 from .onboarding import Onboarding
 from .onboarding_document import OnboardingDocument
+from .onboarding_legal_representative import OnboardingLegalRepresentative
 from .onboarding_shareholder import OnboardingShareholder
 from .payment_method import PaymentMethod
 from .product import Product
