@@ -1297,7 +1297,7 @@ class TestFintocIntegration:
         """Test creating an onboarding for an entity using v2 API."""
         entity_id = "ent_12345"
         company_information = {"legal_name": "Acme SpA"}
-        legal_representative = {"first_name": "Ada", "last_name": "Lovelace"}
+        legal_representatives = [{"first_name": "Ada", "last_name": "Lovelace"}]
         transactional_profile = {"monthly_amount_range": "0-1000"}
         shareholders = [
             {
@@ -1313,7 +1313,7 @@ class TestFintocIntegration:
         onboarding = self.fintoc.v2.entities.onboardings.create(
             entity_id=entity_id,
             company_information=company_information,
-            legal_representative=legal_representative,
+            legal_representatives=legal_representatives,
             transactional_profile=transactional_profile,
             shareholders=shareholders,
         )
@@ -1325,8 +1325,8 @@ class TestFintocIntegration:
             == company_information["legal_name"]
         )
         assert (
-            onboarding.json.legal_representative.first_name
-            == legal_representative["first_name"]
+            onboarding.json.legal_representatives[0].first_name
+            == legal_representatives[0]["first_name"]
         )
         assert (
             onboarding.json.transactional_profile.monthly_amount_range
@@ -1403,10 +1403,39 @@ class TestFintocIntegration:
         )
         assert getattr(result.headers, "content-type").startswith("multipart/form-data")
 
+    def test_v2_entity_onboarding_upload_legal_representative_document(self, tmp_path):
+        """Test uploading a legal representative document using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        legal_representative_id = "onblr_12345"
+        slot_key = "identification"
+        file_path = tmp_path / "id.pdf"
+        file_path.write_bytes(b"%PDF-1.4 test file")
+
+        onboardings = self.fintoc.v2.entities.onboardings
+        result = onboardings.upload_legal_representative_document(
+            onboarding_id,
+            legal_representative_id,
+            slot_key,
+            str(file_path),
+            entity_id=entity_id,
+        )
+
+        assert result.method == "put"
+        assert result.url == (
+            f"v2/entities/{entity_id}/onboardings/{onboarding_id}"
+            f"/legal_representatives/{legal_representative_id}/documents/{slot_key}"
+        )
+        assert getattr(result.headers, "content-type").startswith("multipart/form-data")
+        assert result.json.multipart is True
+
     def test_v2_onboarding_objetization(self):
         """Test that a full onboarding payload is objetized with nested resources."""
         from fintoc.resources.v2.onboarding import Onboarding
         from fintoc.resources.v2.onboarding_document import OnboardingDocument
+        from fintoc.resources.v2.onboarding_legal_representative import (
+            OnboardingLegalRepresentative,
+        )
         from fintoc.resources.v2.onboarding_shareholder import OnboardingShareholder
         from fintoc.utils import objetize
 
@@ -1420,6 +1449,27 @@ class TestFintocIntegration:
             "reviewed_at": None,
             "submittable": True,
             "data": {"company_information": {"legal_name": "Acme SpA"}},
+            "legal_representatives": [
+                {
+                    "id": "onblr_12345",
+                    "object": "onboarding_legal_representative",
+                    "first_name": "Ada",
+                    "last_name": "Lovelace",
+                    "email": "rep@example.com",
+                    "nationality": "mx",
+                    "identification_number": "AAAA010101HDFAAA01",
+                    "position": "Director General",
+                    "documents": [
+                        {
+                            "slot_key": "identification",
+                            "status": "uploaded",
+                            "filename": "id.pdf",
+                            "uploaded_at": "2026-01-15T14:30:00Z",
+                        },
+                        {"slot_key": "power_of_attorney", "status": "missing"},
+                    ],
+                }
+            ],
             "shareholders": [
                 {
                     "id": "onbsh_12345",
@@ -1446,6 +1496,18 @@ class TestFintocIntegration:
         assert onboarding.object == "onboarding"
         assert onboarding.status == "in_progress"
         assert onboarding.submittable is True
+        assert isinstance(
+            onboarding.legal_representatives[0], OnboardingLegalRepresentative
+        )
+        assert onboarding.legal_representatives[0].first_name == "Ada"
+        assert isinstance(
+            onboarding.legal_representatives[0].documents[0], OnboardingDocument
+        )
+        assert (
+            onboarding.legal_representatives[0].documents[0].slot_key
+            == "identification"
+        )
+        assert onboarding.legal_representatives[0].documents[1].status == "missing"
         assert isinstance(onboarding.shareholders[0], OnboardingShareholder)
         assert onboarding.shareholders[0].name == "Ada"
         assert isinstance(onboarding.shareholders[0].document, OnboardingDocument)

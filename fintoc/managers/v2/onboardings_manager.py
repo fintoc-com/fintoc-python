@@ -17,6 +17,7 @@ class OnboardingsManager(ManagerMixin):
         "submit",
         "upload_document",
         "upload_shareholder_document",
+        "upload_legal_representative_document",
     ]
 
     def _submit(self, identifier, **kwargs):
@@ -34,6 +35,16 @@ class OnboardingsManager(ManagerMixin):
         path = (
             f"{self._build_path(**kwargs)}/{identifier}"
             f"/shareholders/{shareholder_id}/document"
+        )
+        return self._upload(path, {"file": self._build_file_payload(file)})
+
+    def _upload_legal_representative_document(
+        self, identifier, legal_representative_id, slot_key, file, **kwargs
+    ):
+        """Upload a document for a legal representative of an onboarding."""
+        path = (
+            f"{self._build_path(**kwargs)}/{identifier}"
+            f"/legal_representatives/{legal_representative_id}/documents/{slot_key}"
         )
         return self._upload(path, {"file": self._build_file_payload(file)})
 
