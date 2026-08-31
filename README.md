@@ -36,6 +36,7 @@
     - [delete](#delete)
     - [V2 Endpoints](#v2-endpoints)
     - [Nested actions or resources](#nested-actions-or-resources)
+    - [Entity onboardings](#entity-onboardings)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Generate the JWS Signature](#gnerate-the-jws-signature)
@@ -173,6 +174,92 @@ transfer = client.v2.simulate.receive_transfer(
     currency="mxn",
     account_number_id="acno_2vF18OHZdXXxPJTLJ5qghpo1pdU",
 )
+```
+
+#### Entity onboardings
+
+[Entity onboardings](https://docs.fintoc.com/reference/entity-onboardings) are nested
+under an entity, so every call takes the `entity_id` of the entity that owns them.
+
+```python
+onboardings = client.v2.entities.onboardings.list(entity_id="ent_8anBwgZktbZH6ydyHa6Tm0eM")
+onboarding = client.v2.entities.onboardings.get(
+    "onbprc_0ujsswThIGTUYm2K8FjOOfXtY1K", entity_id="ent_8anBwgZktbZH6ydyHa6Tm0eM"
+)
+```
+
+To create one, pass the `type` of onboarding to run (`account_holder` or
+`settlement_recipient`) and the onboarding `data`:
+
+```python
+onboarding = client.v2.entities.onboardings.create(
+    entity_id="ent_8anBwgZktbZH6ydyHa6Tm0eM",
+    type="account_holder",
+    data={
+        "company_information": {
+            "incorporation_date": "2020-01-15",
+            "business_activity": "Servicios financieros",
+            "fiscal_address": "Av. Reforma 123, CDMX",
+            "business_address": "Av. Insurgentes 456, CDMX",
+            "settlement_account": "646180357600000013",
+            "phone": "+521111111111",
+        },
+        "legal_representatives": [
+            {
+                "first_name": "Ada",
+                "last_name": "Lovelace",
+                "email": "ada@example.com",
+                "nationality": "mx",
+                "identification_number": "AAAA010101HDFAAA01",
+                "position": "Director General",
+            }
+        ],
+        "transactional_profile": {
+            "resource_origins": ["trusts", "investments"],
+            "monthly_amount_range": "1_500000",
+            "monthly_operations_range": "1_15000",
+        },
+        "shareholders": [
+            {
+                "type": "natural_person",
+                "name": "Ada",
+                "last_name": "Lovelace",
+                "nationality": "mx",
+                "percentage": 100,
+                "holder_id": "AAAA010101AAA",
+            }
+        ],
+    },
+)
+```
+
+Documents are uploaded one slot at a time. The file can be a path or a binary file-like
+object:
+
+```python
+entity_id = "ent_8anBwgZktbZH6ydyHa6Tm0eM"
+onboarding_id = "onbprc_0ujsswThIGTUYm2K8FjOOfXtY1K"
+
+client.v2.entities.onboardings.upload_document(
+    onboarding_id, "tax_registration_certificate", "csf.pdf", entity_id=entity_id
+)
+client.v2.entities.onboardings.upload_shareholder_document(
+    onboarding_id, "onbsh_0ujsswThIGTUYm2K8FjOOfXtY1K", "id.png", entity_id=entity_id
+)
+client.v2.entities.onboardings.upload_legal_representative_document(
+    onboarding_id,
+    "onblr_0ujsswThIGTUYm2K8FjOOfXtY1K",
+    "identification",
+    "id.png",
+    entity_id=entity_id,
+)
+```
+
+Once every required field and document is complete, `submittable` turns `True` and the
+onboarding can be sent for review:
+
+```python
+onboarding = client.v2.entities.onboardings.submit(onboarding_id, entity_id=entity_id)
 ```
 
 ### Webhook Signature Validation

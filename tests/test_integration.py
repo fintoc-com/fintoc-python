@@ -1296,43 +1296,46 @@ class TestFintocIntegration:
     def test_v2_entity_onboarding_create(self):
         """Test creating an onboarding for an entity using v2 API."""
         entity_id = "ent_12345"
-        company_information = {"legal_name": "Acme SpA"}
-        legal_representatives = [{"first_name": "Ada", "last_name": "Lovelace"}]
-        transactional_profile = {"monthly_amount_range": "0-1000"}
-        shareholders = [
-            {
-                "type": "natural_person",
-                "name": "Ada",
-                "last_name": "Lovelace",
-                "holder_id": "1-9",
-                "nationality": "CL",
-                "percentage": 100,
-            }
-        ]
+        data = {
+            "company_information": {"business_activity": "Servicios financieros"},
+            "legal_representatives": [{"first_name": "Ada", "last_name": "Lovelace"}],
+            "transactional_profile": {"monthly_amount_range": "1_500000"},
+            "shareholders": [
+                {
+                    "type": "natural_person",
+                    "name": "Ada",
+                    "last_name": "Lovelace",
+                    "holder_id": "AAAA010101AAA",
+                    "nationality": "mx",
+                    "percentage": 100,
+                }
+            ],
+        }
 
         onboarding = self.fintoc.v2.entities.onboardings.create(
             entity_id=entity_id,
-            company_information=company_information,
-            legal_representatives=legal_representatives,
-            transactional_profile=transactional_profile,
-            shareholders=shareholders,
+            type="account_holder",
+            data=data,
         )
 
         assert onboarding.method == "post"
         assert onboarding.url == f"v2/entities/{entity_id}/onboardings"
+        assert onboarding.json.type == "account_holder"
         assert (
-            onboarding.json.company_information.legal_name
-            == company_information["legal_name"]
+            onboarding.json.data.company_information.business_activity
+            == data["company_information"]["business_activity"]
         )
         assert (
-            onboarding.json.legal_representatives[0].first_name
-            == legal_representatives[0]["first_name"]
+            onboarding.json.data.legal_representatives[0].first_name
+            == data["legal_representatives"][0]["first_name"]
         )
         assert (
-            onboarding.json.transactional_profile.monthly_amount_range
-            == transactional_profile["monthly_amount_range"]
+            onboarding.json.data.transactional_profile.monthly_amount_range
+            == data["transactional_profile"]["monthly_amount_range"]
         )
-        assert onboarding.json.shareholders[0].name == shareholders[0]["name"]
+        assert (
+            onboarding.json.data.shareholders[0].name == data["shareholders"][0]["name"]
+        )
 
     def test_v2_entity_onboarding_submit(self):
         """Test submitting an onboarding for an entity using v2 API."""
@@ -1443,6 +1446,7 @@ class TestFintocIntegration:
             "id": "onbprc_12345",
             "object": "onboarding",
             "entity_id": "ent_12345",
+            "type": "account_holder",
             "status": "in_progress",
             "source": "api",
             "submitted_at": None,
@@ -1494,6 +1498,7 @@ class TestFintocIntegration:
 
         assert isinstance(onboarding, Onboarding)
         assert onboarding.object == "onboarding"
+        assert onboarding.type == "account_holder"
         assert onboarding.status == "in_progress"
         assert onboarding.submittable is True
         assert isinstance(
