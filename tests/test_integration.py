@@ -855,6 +855,25 @@ class TestFintocIntegration:
         idempotency_key_header = getattr(transfer.headers, "idempotency-key")
         assert idempotency_key_header == "123456"
 
+    def test_v2_transfer_batches_list(self):
+        """Test getting all transfer batches using v2 API."""
+        status = "succeeded"
+        since = "2026-01-01"
+        until = "2026-02-01"
+        transfer_batches = list(
+            self.fintoc.v2.transfer_batches.list(
+                status=status, since=since, until=until
+            )
+        )
+
+        assert len(transfer_batches) > 0
+        for transfer_batch in transfer_batches:
+            assert transfer_batch.method == "get"
+            assert transfer_batch.url == "v2/transfer_batches"
+            assert transfer_batch.params.status == status
+            assert transfer_batch.params.since == since
+            assert transfer_batch.params.until == until
+
     def test_v2_simulate_receive_transfer(self):
         """Test simulating receiving a transfer using v2 API."""
         account_number_id = "test_account_number_id"

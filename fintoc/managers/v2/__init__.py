@@ -17,4 +17,5 @@ from .products_manager import ProductsManager
 from .simulate_manager import SimulateManager
 from .subscription_items_manager import SubscriptionItemsManager
 from .subscriptions_manager import SubscriptionsManager
+from .transfer_batches_manager import TransferBatchesManager
 from .transfers_manager import TransfersManager

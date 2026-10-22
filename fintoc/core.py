@@ -29,7 +29,7 @@ from fintoc.managers.v2 import InvoicesManager as InvoicesManagerV2
 from fintoc.managers.v2 import PaymentIntentsManager as PaymentIntentsManagerV2
 from fintoc.managers.v2 import PaymentMethodsManager, ProductsManager, SimulateManager
 from fintoc.managers.v2 import SubscriptionsManager as SubscriptionsManagerV2
-from fintoc.managers.v2 import TransfersManager
+from fintoc.managers.v2 import TransferBatchesManager, TransfersManager
 from fintoc.version import __version__
 
 
@@ -77,6 +77,7 @@ class Fintoc:
 class _FintocV2:
     def __init__(self, client):
         self.transfers = TransfersManager("/v2/transfers", client)
+        self.transfer_batches = TransferBatchesManager("/v2/transfer_batches", client)
         self.accounts = AccountsManagerV2("/v2/accounts", client)
         self.account_numbers = AccountNumbersManager("/v2/account_numbers", client)
         self.account_verifications = AccountVerificationsManager(
