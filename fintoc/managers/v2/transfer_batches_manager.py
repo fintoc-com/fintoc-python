@@ -7,4 +7,4 @@ class TransferBatchesManager(ManagerMixin):
     """Represents a transfer batches manager."""
 
     resource = "transfer_batch"
-    methods = ["list", "get"]
+    methods = ["list", "get", "create"]

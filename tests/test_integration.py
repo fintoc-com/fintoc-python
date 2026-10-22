@@ -883,6 +883,44 @@ class TestFintocIntegration:
         assert transfer_batch.method == "get"
         assert transfer_batch.url == f"v2/transfer_batches/{transfer_batch_id}"
 
+    def test_v2_transfer_batch_create(self):
+        """Test creating a transfer batch using v2 API."""
+        description = "Test transfer batch"
+        currency = "MXN"
+        transfers = [
+            {
+                "account_id": "test_account_id",
+                "amount": 10000,
+                "counterparty": {"account_number": "014180655091438298"},
+                "comment": "Test transfer",
+                "metadata": {"test_key": "test_value"},
+            }
+        ]
+
+        transfer_batch = self.fintoc.v2.transfer_batches.create(
+            description=description, currency=currency, transfers=transfers
+        )
+
+        assert transfer_batch.method == "post"
+        assert transfer_batch.url == "v2/transfer_batches"
+        assert transfer_batch.json.description == description
+        assert transfer_batch.json.currency == currency
+        assert transfer_batch.json.transfers[0].amount == transfers[0]["amount"]
+        assert transfer_batch.json.transfers[0].account_id == transfers[0]["account_id"]
+
+        idempotency_key_header = getattr(transfer_batch.headers, "idempotency-key")
+        assert idempotency_key_header is not None and idempotency_key_header != ""
+
+        idempotency_key = "123456"
+        transfer_batch = self.fintoc.v2.transfer_batches.create(
+            description=description,
+            currency=currency,
+            transfers=transfers,
+            idempotency_key=idempotency_key,
+        )
+        idempotency_key_header = getattr(transfer_batch.headers, "idempotency-key")
+        assert idempotency_key_header == "123456"
+
     def test_v2_simulate_receive_transfer(self):
         """Test simulating receiving a transfer using v2 API."""
         account_number_id = "test_account_number_id"
