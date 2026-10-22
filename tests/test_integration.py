@@ -874,6 +874,15 @@ class TestFintocIntegration:
             assert transfer_batch.params.since == since
             assert transfer_batch.params.until == until
 
+    def test_v2_transfer_batch_get(self):
+        """Test getting a specific transfer batch using v2 API."""
+        transfer_batch_id = "test_transfer_batch_id"
+
+        transfer_batch = self.fintoc.v2.transfer_batches.get(transfer_batch_id)
+
+        assert transfer_batch.method == "get"
+        assert transfer_batch.url == f"v2/transfer_batches/{transfer_batch_id}"
+
     def test_v2_simulate_receive_transfer(self):
         """Test simulating receiving a transfer using v2 API."""
         account_number_id = "test_account_number_id"
