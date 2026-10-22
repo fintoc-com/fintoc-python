@@ -37,6 +37,7 @@
     - [V2 Endpoints](#v2-endpoints)
     - [Nested actions or resources](#nested-actions-or-resources)
     - [Entity onboardings](#entity-onboardings)
+    - [Transfer batches](#transfer-batches)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
   - [Generate the JWS Signature](#gnerate-the-jws-signature)
@@ -260,6 +261,35 @@ onboarding can be sent for review:
 
 ```python
 onboarding = client.v2.entities.onboardings.submit(onboarding_id, entity_id=entity_id)
+```
+
+#### Transfer batches
+
+Transfer batches let you send several transfers in a single request. Creating one
+requires the [JWS Signature](#generate-the-jws-signature):
+
+```python
+transfer_batch = client.v2.transfer_batches.create(
+    description="Payroll October",
+    currency="mxn",
+    transfers=[
+        {
+            "account_id": "acc_123545",
+            "amount": 49523,
+            "counterparty": {"account_number": "014180655091438298"},
+            "comment": "Salary",
+            "metadata": {"employee_id": "123"},
+        },
+    ],
+)
+```
+
+To list them, filtering by creation date:
+
+```python
+transfer_batches = client.v2.transfer_batches.list(
+    since="2026-01-01T00:00:00Z", until="2026-02-01T00:00:00Z"
+)
 ```
 
 ### Webhook Signature Validation
