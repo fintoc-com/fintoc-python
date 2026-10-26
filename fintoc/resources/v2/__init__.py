@@ -14,6 +14,7 @@ from .onboarding_legal_representative import OnboardingLegalRepresentative
 from .onboarding_shareholder import OnboardingShareholder
 from .payment_method import PaymentMethod
 from .product import Product
+from .recipient import Recipient
 from .subscription import Subscription
 from .subscription_item import SubscriptionItem
 from .transfer import Transfer
