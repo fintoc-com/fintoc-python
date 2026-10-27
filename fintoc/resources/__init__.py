@@ -37,6 +37,7 @@ from .v2.onboarding_document import OnboardingDocument
 from .v2.onboarding_legal_representative import OnboardingLegalRepresentative
 from .v2.onboarding_shareholder import OnboardingShareholder
 from .v2.payment_method import PaymentMethod
+from .v2.recipient import Recipient
 from .v2.subscription import Subscription as SubscriptionV2
 from .v2.subscription_item import SubscriptionItem
 from .v2.transfer import Transfer
