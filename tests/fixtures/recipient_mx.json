@@ -5,7 +5,7 @@
   "alias": "Test recipient",
   "created_at": "2026-03-01T12:00:00Z",
   "email": "recipient@example.com",
-  "holder_id": "111111111",
+  "holder_id": "XAXX010101000",
   "holder_name": "Test Customer 1",
   "holder_type": "person",
   "updated_at": "2026-03-01T12:00:00Z",
