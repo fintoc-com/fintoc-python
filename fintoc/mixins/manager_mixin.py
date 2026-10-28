@@ -7,6 +7,7 @@ from fintoc.resource_handlers import (
     resource_delete,
     resource_get,
     resource_list,
+    resource_request,
     resource_update,
     resource_upload,
 )
@@ -119,14 +120,39 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         return self.post_create_handler(object_, **kwargs)
 
     @can_raise_fintoc_error
-    def _upload(self, path, files):
-        """
-        Upload :files: to :path: through a multipart PUT and objetize the
-        result. :files: is a dict in the format expected by httpx.
-        """
+    def _upload(self, path, files, method="put", data=None, idempotency_key=None):
+        """Upload :files: to :path: as multipart and objetize the result."""
         klass = get_resource_class(self.__class__.resource)
         return resource_upload(
-            self._client, path, klass, self._handlers, self.__class__.methods, files
+            self._client,
+            path,
+            klass,
+            self._handlers,
+            self.__class__.methods,
+            files,
+            method=method,
+            data=data,
+            idempotency_key=idempotency_key,
+        )
+
+    @can_raise_fintoc_error
+    def _request_resource(
+        self, method, path, resource=None, idempotency_key=None, **kwargs
+    ):
+        """Make a request to :path: and objetize the result."""
+        klass = get_resource_class(resource or self.__class__.resource)
+        methods = self.__class__.methods if resource is None else []
+        handlers = self._handlers if resource is None else {}
+        return resource_request(
+            client=self._client,
+            path=path,
+            klass=klass,
+            handlers=handlers,
+            methods=methods,
+            method=method,
+            params=kwargs,
+            resource_path=self._build_path(**kwargs),
+            idempotency_key=idempotency_key,
         )
 
     @can_raise_fintoc_error

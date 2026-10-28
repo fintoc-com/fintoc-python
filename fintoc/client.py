@@ -61,13 +61,15 @@ class Client:
 
         return {}
 
-    def _build_request(self, method, url, params, headers, json=None, files=None):
+    def _build_request(
+        self, method, url, params, headers, json=None, files=None, data=None
+    ):  # pylint: disable=too-many-arguments
         if files is not None:
             # Multipart uploads: let httpx set the multipart Content-Type and
             # boundary automatically. Multipart bodies are not utf-8-safe, so
             # JWS signing is skipped for these requests.
             return httpx.Request(
-                method, url, headers=headers, params=params, files=files
+                method, url, headers=headers, params=params, files=files, data=data
             )
 
         request = httpx.Request(method, url, headers=headers, params=params, json=json)
@@ -85,8 +87,9 @@ class Client:
         params=None,
         json=None,
         files=None,
+        data=None,
         idempotency_key=None,
-    ):
+    ):  # pylint: disable=too-many-arguments
         """
         Uses the internal httpx client to make a simple or paginated request.
         """
@@ -107,7 +110,7 @@ class Client:
             )
 
         _request = self._build_request(
-            method, url, all_params, headers, json, files=files
+            method, url, all_params, headers, json, files=files, data=data
         )
         response = self._client.send(_request)
         response.raise_for_status()
