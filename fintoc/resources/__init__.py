@@ -37,6 +37,7 @@ from .v2.entity import Entity
 from .v2.event import Event
 from .v2.invoice import Invoice as InvoiceV2
 from .v2.line import Line
+from .v2.mandate_document import MandateDocument
 from .v2.onboarding import Onboarding
 from .v2.onboarding_document import OnboardingDocument
 from .v2.onboarding_legal_representative import OnboardingLegalRepresentative

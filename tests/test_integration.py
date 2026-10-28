@@ -1,5 +1,7 @@
 """Integration tests for the Fintoc core object."""
 
+import io
+
 import httpx
 import pytest
 
@@ -12,9 +14,11 @@ from fintoc.resources import (
     Invoice,
     Link,
     LinkIntent,
+    MandateDocument,
     Onboarding,
     PaymentEligibility,
     PaymentIntent,
+    PaymentMethod,
     Payout,
     Product,
     Refund,
@@ -1921,6 +1925,57 @@ class TestFintocIntegration:
         assert voucher_url.method == "get"
         assert voucher_url.url == f"v2/payment_intents/{payment_intent_id}/voucher_url"
 
+    def test_v2_payment_method_create(self, tmp_path):
+        """Test creating a payment method using v2 API."""
+        documents = {}
+        for name in ["contract", "selfie", "id_front", "id_back"]:
+            file_path = tmp_path / f"{name}.pdf"
+            file_path.write_bytes(b"%PDF-1.4 test file")
+            documents[name] = str(file_path)
+
+        payment_method = self.fintoc.v2.payment_methods.create(
+            type="mx_direct_debit",
+            customer="cus_12345",
+            mx_direct_debit={
+                "account_number": "000000000000000000",
+                "account_type": "clabe",
+                "interval": "month",
+                "max_amount": 100000,
+                "consent_documents": documents,
+            },
+        )
+
+        assert isinstance(payment_method, PaymentMethod)
+        assert payment_method.method == "post"
+        assert payment_method.url == "v2/payment_methods"
+        assert getattr(payment_method.headers, "content-type").startswith(
+            "multipart/form-data"
+        )
+        assert getattr(payment_method.headers, "idempotency-key")
+        assert payment_method.json.multipart is True
+
+    def test_v2_payment_method_cancel(self):
+        """Test canceling a payment method using v2 API."""
+        payment_method_id = "pm_12345"
+
+        payment_method = self.fintoc.v2.payment_methods.cancel(payment_method_id)
+
+        assert isinstance(payment_method, PaymentMethod)
+        assert payment_method.method == "post"
+        assert payment_method.url == f"v2/payment_methods/{payment_method_id}/cancel"
+
+    def test_v2_payment_method_mandate_document(self):
+        """Test getting the mandate document of a payment method using v2 API."""
+        payment_method_id = "pm_12345"
+
+        document = self.fintoc.v2.payment_methods.mandate_document(payment_method_id)
+
+        assert isinstance(document, MandateDocument)
+        assert document.method == "get"
+        assert document.url == (
+            f"v2/payment_methods/{payment_method_id}/mandate_document"
+        )
+
     def test_v2_product_update(self):
         """Test updating a product using v2 API."""
         product_id = "prod_12345"
@@ -1999,6 +2054,54 @@ class TestFintocCustomResponses:
         request = self.requests[-1]
         assert request.method == "PATCH"
         assert request.url.path == "/v1/links/link_12345_token_abc"
+
+    def test_v2_payment_method_create_multipart_fields(self):
+        """Test the multipart encoding of a payment method creation."""
+        self.response = {"id": "pm_12345", "object": "payment_method"}
+
+        payment_method = self.fintoc.v2.payment_methods.create(
+            type="mx_direct_debit",
+            customer="cus_12345",
+            mx_direct_debit={
+                "account_number": "000000000000000000",
+                "account_type": "clabe",
+                "interval": "month",
+                "max_amount": 100000,
+                "institution_id": None,
+                "account_holder": {"rfc": "AAA010101AAA"},
+                "consent_documents": {
+                    "contract": io.BytesIO(b"contract"),
+                    "selfie": io.BytesIO(b"selfie"),
+                    "id_front": io.BytesIO(b"id_front"),
+                    "id_back": io.BytesIO(b"id_back"),
+                },
+            },
+            idempotency_key="idem_12345",
+        )
+
+        request = self.requests[-1]
+        body = request.content.decode("latin-1")
+        assert request.method == "POST"
+        assert request.url.path == "/v2/payment_methods"
+        assert request.headers["idempotency-key"] == "idem_12345"
+        assert request.headers["content-type"].startswith("multipart/form-data")
+        fields = {
+            "type": "mx_direct_debit",
+            "customer": "cus_12345",
+            "mx_direct_debit[account_number]": "000000000000000000",
+            "mx_direct_debit[account_type]": "clabe",
+            "mx_direct_debit[interval]": "month",
+            "mx_direct_debit[max_amount]": "100000",
+            "mx_direct_debit[account_holder][rfc]": "AAA010101AAA",
+        }
+        for name, value in fields.items():
+            assert f'name="{name}"\r\n\r\n{value}\r\n' in body
+        assert "institution_id" not in body
+        for name in ["contract", "selfie", "id_front", "id_back"]:
+            assert f'name="mx_direct_debit[consent_documents][{name}]"' in body
+            assert f"\r\n\r\n{name}\r\n" in body
+        assert isinstance(payment_method, PaymentMethod)
+        assert payment_method.id == "pm_12345"
 
     def test_v2_entity_onboarding_delete_document(self):
         """Test deleting a document from an onboarding slot using v2 API."""

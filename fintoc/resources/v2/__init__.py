@@ -8,6 +8,7 @@ from .entity import Entity
 from .event import Event
 from .invoice import Invoice
 from .line import Line
+from .mandate_document import MandateDocument
 from .movement import Movement
 from .onboarding import Onboarding
 from .onboarding_document import OnboardingDocument
