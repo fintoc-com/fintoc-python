@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from fintoc.constants import DATE_TIME_PATTERN
-from fintoc.errors import ApiError, FintocError
+from fintoc.errors import ApiError, FintocError, InvalidRequestError
 from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
     build_file_payload,
@@ -286,6 +286,26 @@ class TestObjetizeGenerator:
 
         for object_ in objetized_generator:
             assert isinstance(object_, ExampleClass)
+
+    def test_http_status_error_while_iterating(self):
+        def failing_generator():
+            yield {"id": "obj_3nlaf830FBbfF83"}
+            raise httpx.HTTPStatusError(
+                message="HTTP Status Error",
+                response=httpx.Response(
+                    status_code=400,
+                    json={"error": {"type": "invalid_request_error"}},
+                ),
+                request=httpx.Request("GET", "/"),
+            )
+
+        objetized_generator = objetize_generator(
+            failing_generator(), ExampleClass, self.client
+        )
+        assert isinstance(next(objetized_generator), ExampleClass)
+
+        with pytest.raises(InvalidRequestError):
+            next(objetized_generator)
 
 
 class TestBuildFilePayload:

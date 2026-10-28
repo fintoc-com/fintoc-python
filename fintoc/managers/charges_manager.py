@@ -13,7 +13,4 @@ class ChargesManager(ManagerMixin):
     def _cancel(self, identifier, **kwargs):
         """Cancel a charge."""
         path = f"{self._build_path(**kwargs)}/{identifier}/cancel"
-        charge = self._create(path_=path, **kwargs)
-        # pylint: disable=protected-access
-        charge._path = self._build_path(**kwargs)
-        return charge
+        return self._create(path_=path, **kwargs)

@@ -614,7 +614,7 @@ class TestFintocIntegration:
         assert result == webhook_endpoint_id
 
     def test_webhook_endpoint_test(self):
-        """Test sending a test event to a webhook endpoint."""
+        """Test sending a test event to a webhook endpoint, and updating it."""
         webhook_endpoint_id = "test_webhook_endpoint_id"
         test_data = {"type": "link.credentials_changed"}
 
@@ -623,6 +623,10 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v1/webhook_endpoints/{webhook_endpoint_id}/test"
         assert result.json.type == test_data["type"]
+
+        result.update(disabled=True)
+        assert result.method == "patch"
+        assert result.url == f"v1/webhook_endpoints/{result.id}"
 
     def test_v2_accounts_list(self):
         """Test getting all accounts using v2 API."""
@@ -1186,13 +1190,17 @@ class TestFintocIntegration:
         assert subscription.url == f"v2/subscriptions/{subscription_id}"
 
     def test_v2_subscription_cancel(self):
-        """Test canceling a subscription using v2 API."""
+        """Test canceling a subscription, and updating the canceled subscription."""
         subscription_id = "test_subscription_id"
 
         result = self.fintoc.v2.subscriptions.cancel(subscription_id)
 
         assert result.method == "post"
         assert result.url == f"v2/subscriptions/{subscription_id}/cancel"
+
+        result.update(metadata={"key": "value"})
+        assert result.method == "patch"
+        assert result.url == f"v2/subscriptions/{result.id}"
 
     def test_v2_subscription_create(self):
         """Test creating a subscription using v2 API."""
@@ -1307,7 +1315,7 @@ class TestFintocIntegration:
         assert invoice.url == f"v2/invoices/{invoice_id}"
 
     def test_v2_invoice_add_lines(self):
-        """Test adding line items to an invoice using v2 API."""
+        """Test adding line items to an invoice, and updating the invoice."""
         invoice_id = "test_invoice_id"
         lines = [
             {
@@ -1324,8 +1332,12 @@ class TestFintocIntegration:
         assert invoice.method == "post"
         assert invoice.url == f"v2/invoices/{invoice_id}/add_lines"
 
+        invoice.update(metadata={"key": "value"})
+        assert invoice.method == "patch"
+        assert invoice.url == f"v2/invoices/{invoice.id}"
+
     def test_v2_invoice_remove_lines(self):
-        """Test removing line items from an invoice using v2 API."""
+        """Test removing line items from an invoice, and updating the invoice."""
         invoice_id = "test_invoice_id"
         lines = ["il_test_line_id"]
 
@@ -1333,6 +1345,10 @@ class TestFintocIntegration:
 
         assert invoice.method == "post"
         assert invoice.url == f"v2/invoices/{invoice_id}/remove_lines"
+
+        invoice.update(metadata={"key": "value"})
+        assert invoice.method == "patch"
+        assert invoice.url == f"v2/invoices/{invoice.id}"
 
     def test_v2_invoice_line_update(self):
         """Test updating an invoice line item using v2 API."""
@@ -1633,7 +1649,6 @@ class TestFintocIntegration:
         assert charge.method == "post"
         assert charge.url == f"v1/charges/{charge_id}/cancel"
 
-        # The resulting charge keeps the charges collection path
         charge.update(amount=3000)
         assert charge.method == "patch"
         assert charge.url == f"v1/charges/{charge.id}"
@@ -1874,7 +1889,6 @@ class TestFintocIntegration:
         assert invoice.method == "post"
         assert invoice.url == f"v2/invoices/{invoice_id}/{action}"
 
-        # The resulting invoice keeps the invoices collection path
         invoice.update(metadata={"key": "value"})
         assert invoice.method == "patch"
         assert invoice.url == f"v2/invoices/{invoice.id}"

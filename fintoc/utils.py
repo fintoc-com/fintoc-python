@@ -76,11 +76,16 @@ def can_raise_fintoc_error(function):
         try:
             return function(*args, **kwargs)
         except httpx.HTTPStatusError as exc:
-            error_data = exc.response.json()
-            error = get_error_class(error_data["error"]["type"])
-            raise error(error_data["error"]) from None
+            raise fintoc_error_from(exc) from None
 
     return wrapper
+
+
+def fintoc_error_from(http_error):
+    """Build the Fintoc error that corresponds to an HTTPStatusError."""
+    error_data = http_error.response.json()
+    error = get_error_class(error_data["error"]["type"])
+    return error(error_data["error"])
 
 
 def serialize(object_):
@@ -112,10 +117,14 @@ def objetize(klass, client, data, handlers={}, methods=[], path=None):
 def objetize_generator(generator, klass, client, handlers={}, methods=[], path=None):
     """
     Transform a generator of dictionaries into a generator of
-    objects with class :klass:.
+    objects with class :klass:. Pages are fetched while iterating, outside
+    the scope of :can_raise_fintoc_error:, so HTTP errors are converted here.
     """
-    for element in generator:
-        yield objetize(klass, client, element, handlers, methods, path)
+    try:
+        for element in generator:
+            yield objetize(klass, client, element, handlers, methods, path)
+    except httpx.HTTPStatusError as exc:
+        raise fintoc_error_from(exc) from None
 
 
 def deprecate(message=None):

@@ -67,7 +67,4 @@ class InvoicesManager(ManagerMixin):
 
     def _invoice_action(self, identifier, action, **kwargs):
         path = f"{self._build_path(**kwargs)}/{identifier}/{action}"
-        invoice = self._create(path_=path, **kwargs)
-        # pylint: disable=protected-access
-        invoice._path = self._build_path(**kwargs)
-        return invoice
+        return self._create(path_=path, **kwargs)

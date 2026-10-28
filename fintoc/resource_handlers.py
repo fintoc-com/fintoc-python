@@ -43,7 +43,14 @@ def resource_get(client, path, id_, klass, handlers, methods, params):
 
 
 def resource_create(
-    client, path, klass, handlers, methods, params, idempotency_key=None
+    client,
+    path,
+    klass,
+    handlers,
+    methods,
+    params,
+    idempotency_key=None,
+    resource_path=None,
 ):
     """Create a new instance of a resource."""
     data = client.request(
@@ -55,7 +62,7 @@ def resource_create(
         data,
         handlers=handlers,
         methods=methods,
-        path=path,
+        path=resource_path or path,
     )
 
 

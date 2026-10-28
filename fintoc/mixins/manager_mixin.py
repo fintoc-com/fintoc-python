@@ -107,15 +107,16 @@ class ManagerMixin(metaclass=ABCMeta):  # pylint: disable=no-self-use
         Data is passed using :kwargs:, as specified by the API.
         """
         klass = get_resource_class(self.__class__.resource)
-        path = path_ if path_ else self._build_path(**kwargs)
+        resource_path = self._build_path(**kwargs)
         object_ = resource_create(
             client=self._client,
-            path=path,
+            path=path_ or resource_path,
             klass=klass,
             handlers=self._handlers,
             methods=self.__class__.methods,
             params=kwargs,
             idempotency_key=idempotency_key,
+            resource_path=resource_path,
         )
         return self.post_create_handler(object_, **kwargs)
 
