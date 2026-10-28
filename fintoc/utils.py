@@ -138,17 +138,19 @@ def deprecate(message=None):
     return decorator
 
 
-def build_file_payload(file):
+def build_file_payload(file, default_filename="file"):
     """
-    Build the ``(filename, fileobj, content_type)`` tuple expected by httpx
-    from either a path (``str`` / ``os.PathLike``) or a binary file-like
-    object.
+    Build the httpx file tuple from a path or a binary file-like object.
+    Nameless file-like objects use :default_filename:, because servers only
+    treat multipart parts with a filename as uploaded files.
     """
     if isinstance(file, (str, os.PathLike)):
         filename = os.path.basename(os.fspath(file))
         content_type = mimetypes.guess_type(filename)[0]
         return (filename, open(file, "rb"), content_type)  # noqa: SIM115
 
-    filename = os.path.basename(getattr(file, "name", "") or "") or None
-    content_type = mimetypes.guess_type(filename)[0] if filename else None
+    name = getattr(file, "name", None)
+    filename = os.path.basename(name) if isinstance(name, str) else ""
+    filename = filename or default_filename
+    content_type = mimetypes.guess_type(filename)[0]
     return (filename, file, content_type)

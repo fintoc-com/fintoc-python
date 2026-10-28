@@ -56,6 +56,7 @@ class PaymentMethodsManager(ManagerMixin):
                     is_file=is_file or nested_key in self.file_parameters,
                 )
         elif is_file:
-            files.append((key, build_file_payload(value)))
+            filename = key.rsplit("[", 1)[-1].rstrip("]")
+            files.append((key, build_file_payload(value, default_filename=filename)))
         else:
             data.append((key, str(value)))

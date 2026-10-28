@@ -1,4 +1,5 @@
 import datetime
+import io
 from types import GeneratorType
 
 import httpx
@@ -8,6 +9,7 @@ from fintoc.constants import DATE_TIME_PATTERN
 from fintoc.errors import ApiError, FintocError
 from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
+    build_file_payload,
     can_raise_fintoc_error,
     get_error_class,
     get_resource_class,
@@ -284,3 +286,40 @@ class TestObjetizeGenerator:
 
         for object_ in objetized_generator:
             assert isinstance(object_, ExampleClass)
+
+
+class TestBuildFilePayload:
+    def test_path(self, tmp_path):
+        file_path = tmp_path / "document.pdf"
+        file_path.write_bytes(b"%PDF-1.4")
+
+        filename, file_obj, content_type = build_file_payload(str(file_path))
+        file_obj.close()
+
+        assert filename == "document.pdf"
+        assert content_type == "application/pdf"
+
+    def test_named_file_like(self, tmp_path):
+        file_path = tmp_path / "id.png"
+        file_path.write_bytes(b"\x89PNG")
+
+        with open(file_path, "rb") as file_obj:
+            payload = build_file_payload(file_obj)
+
+        assert payload == ("id.png", file_obj, "image/png")
+
+    def test_nameless_file_like_uses_default_filename(self):
+        file_obj = io.BytesIO(b"data")
+
+        assert build_file_payload(file_obj) == ("file", file_obj, None)
+        assert build_file_payload(file_obj, default_filename="contract.pdf") == (
+            "contract.pdf",
+            file_obj,
+            "application/pdf",
+        )
+
+    def test_non_string_name_uses_default_filename(self):
+        file_obj = io.BytesIO(b"data")
+        file_obj.name = 3
+
+        assert build_file_payload(file_obj)[0] == "file"

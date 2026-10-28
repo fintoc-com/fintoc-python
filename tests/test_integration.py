@@ -2098,10 +2098,33 @@ class TestFintocCustomResponses:
             assert f'name="{name}"\r\n\r\n{value}\r\n' in body
         assert "institution_id" not in body
         for name in ["contract", "selfie", "id_front", "id_back"]:
-            assert f'name="mx_direct_debit[consent_documents][{name}]"' in body
+            assert (
+                f'name="mx_direct_debit[consent_documents][{name}]"; '
+                f'filename="{name}"'
+            ) in body
             assert f"\r\n\r\n{name}\r\n" in body
         assert isinstance(payment_method, PaymentMethod)
         assert payment_method.id == "pm_12345"
+
+    @pytest.mark.parametrize(
+        "method,args",
+        [
+            ("upload_document", ("company_constitution",)),
+            ("append_document", ("incorporation_amendments",)),
+            ("upload_shareholder_document", ("onbsh_12345",)),
+            ("upload_legal_representative_document", ("onblr_12345", "identification")),
+        ],
+    )
+    def test_v2_entity_onboarding_upload_nameless_file_like(self, method, args):
+        """Test that nameless file-like uploads are sent with a filename."""
+        self.response = {"id": "onbprc_12345", "object": "onboarding"}
+
+        getattr(self.fintoc.v2.entities.onboardings, method)(
+            "onbprc_12345", *args, io.BytesIO(b"%PDF-1.4"), entity_id="ent_12345"
+        )
+
+        body = self.requests[-1].content.decode("latin-1")
+        assert 'name="file"; filename="file"' in body
 
     def test_v2_entity_onboarding_delete_document(self):
         """Test deleting a document from an onboarding slot using v2 API."""
