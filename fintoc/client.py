@@ -63,7 +63,7 @@ class Client:
 
     def _build_request(
         self, method, url, params, headers, json=None, files=None, data=None
-    ):  # pylint: disable=too-many-arguments
+    ):
         if files is not None:
             # Multipart uploads: let httpx set the multipart Content-Type and
             # boundary automatically. Multipart bodies are not utf-8-safe, so
@@ -89,7 +89,7 @@ class Client:
         files=None,
         data=None,
         idempotency_key=None,
-    ):  # pylint: disable=too-many-arguments
+    ):
         """
         Uses the internal httpx client to make a simple or paginated request.
         """

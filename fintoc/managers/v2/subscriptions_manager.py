@@ -1,4 +1,3 @@
-# pylint: disable=duplicate-code
 """Module to hold the subscriptions manager."""
 
 from fintoc.managers.v2.subscription_items_manager import SubscriptionItemsManager
@@ -9,14 +8,7 @@ class SubscriptionsManager(ManagerMixin):
     """Represents a subscriptions manager."""
 
     resource = "subscription"
-    methods = [
-        "list",
-        "get",
-        "create",
-        "update",
-        "cancel",
-        "detach_payment_method",
-    ]
+    methods = ["list", "get", "create", "update", "cancel", "detach_payment_method"]
 
     def __init__(self, path, client):
         super().__init__(path, client)

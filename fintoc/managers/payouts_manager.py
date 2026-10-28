@@ -4,7 +4,6 @@ from fintoc.managers.payout_resources_manager import PayoutResourcesManager
 from fintoc.mixins import ManagerMixin
 
 
-# pylint: disable=duplicate-code
 class PayoutsManager(ManagerMixin):
 
     """Represents a payouts manager."""

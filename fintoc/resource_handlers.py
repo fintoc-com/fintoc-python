@@ -69,7 +69,7 @@ def resource_upload(
     method="put",
     data=None,
     idempotency_key=None,
-):  # pylint: disable=too-many-arguments
+):
     """Upload files to a resource endpoint through a multipart request."""
     data = client.request(
         path,
@@ -98,7 +98,7 @@ def resource_request(
     params,
     resource_path=None,
     idempotency_key=None,
-):  # pylint: disable=too-many-arguments
+):
     """Make a request with an arbitrary :method: and objetize the response."""
     if method.lower() in ["get", "delete"]:
         data = client.request(path, method=method, params=params)
