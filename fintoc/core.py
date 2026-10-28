@@ -9,15 +9,19 @@ from fintoc.managers import (
     ChargesManager,
     CheckoutSessionsManager,
     DisputesManager,
+    InstitutionsManager,
     InvoicesManager,
+    LinkIntentsManager,
     LinksManager,
     PaymentIntentsManager,
     PaymentLinksManager,
+    PayoutsManager,
     RefreshIntentsManager,
     RefundsManager,
     SubscriptionIntentsManager,
     SubscriptionsManager,
     TaxReturnsManager,
+    TaxStatementsManager,
     WebhookEndpointsManager,
 )
 from fintoc.managers.v2 import AccountNumbersManager
@@ -75,6 +79,10 @@ class Fintoc:
         self.tax_returns = TaxReturnsManager("/v1/tax_returns", self._client)
         self.invoices = InvoicesManager("/v1/invoices", self._client)
         self.disputes = DisputesManager("/v1/disputes", self._client)
+        self.institutions = InstitutionsManager("/v1/institutions", self._client)
+        self.link_intents = LinkIntentsManager("/v1/link_intents", self._client)
+        self.payouts = PayoutsManager("/v1/payouts", self._client)
+        self.tax_statements = TaxStatementsManager("/v1/tax_statements", self._client)
 
         self.v2 = _FintocV2(self._client)
 

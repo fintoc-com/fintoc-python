@@ -13,15 +13,19 @@ from .institution_invoice import InstitutionInvoice
 from .institution_tax_return import InstitutionTaxReturn
 from .invoice import Invoice
 from .link import Link
+from .link_intent import LinkIntent
 from .movement import Movement
 from .other_taxes import OtherTaxes
 from .payment_intent import PaymentIntent
 from .payment_link import PaymentLink
+from .payout import Payout
 from .refresh_intent import RefreshIntent
+from .refund import Refund
 from .services_invoice import ServicesInvoice
 from .subscription import Subscription
 from .subscription_intent import SubscriptionIntent
 from .tax_return import TaxReturn
+from .tax_statement import TaxStatement
 from .taxpayer import Taxpayer
 from .tobacco_taxes import TobaccoTaxes
 from .transfer_account import TransferAccount
@@ -42,4 +46,5 @@ from .v2.subscription import Subscription as SubscriptionV2
 from .v2.subscription_item import SubscriptionItem
 from .v2.transfer import Transfer
 from .v2.transfer_batch import TransferBatch
+from .voucher_url import VoucherUrl
 from .webhook_endpoint import WebhookEndpoint

@@ -6,6 +6,7 @@ from fintoc.managers import (
     RefreshIntentsManager,
     SubscriptionsManager,
     TaxReturnsManager,
+    TaxStatementsManager,
 )
 from fintoc.mixins import ResourceMixin
 
@@ -23,6 +24,7 @@ class Link(ResourceMixin):
         self.__tax_returns_manager = None
         self.__invoices_manager = None
         self.__refresh_intents_manager = None
+        self.__tax_statements_manager = None
 
     @property
     def accounts(self):
@@ -85,4 +87,17 @@ class Link(ResourceMixin):
 
     @refresh_intents.setter
     def refresh_intents(self, new_value):  # pylint: disable=no-self-use
+        raise NameError("Attribute name corresponds to a manager")
+
+    @property
+    def tax_statements(self):
+        """Proxies the tax_statements manager."""
+        if self.__tax_statements_manager is None:
+            self.__tax_statements_manager = TaxStatementsManager(
+                "/v1/tax_statements", self._client
+            )
+        return self.__tax_statements_manager
+
+    @tax_statements.setter
+    def tax_statements(self, new_value):  # pylint: disable=no-self-use
         raise NameError("Attribute name corresponds to a manager")

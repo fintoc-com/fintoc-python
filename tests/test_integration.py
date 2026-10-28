@@ -1,8 +1,22 @@
 """Integration tests for the Fintoc core object."""
 
+import httpx
 import pytest
 
+from fintoc.client import Client
 from fintoc.core import Fintoc
+from fintoc.resources import (
+    Charge,
+    Institution,
+    Invoice,
+    Link,
+    LinkIntent,
+    PaymentIntent,
+    Payout,
+    Refund,
+    TaxStatement,
+    VoucherUrl,
+)
 
 
 class TestFintocIntegration:
@@ -1585,6 +1599,227 @@ class TestFintocIntegration:
         assert onboarding.shareholders[0].document.slot_key == "identity"
         assert isinstance(onboarding.documents[0], OnboardingDocument)
         assert onboarding.documents[0].status == "missing"
+
+    def test_charge_update(self):
+        """Test updating a charge."""
+        charge_id = "test_charge_id"
+
+        charge = self.fintoc.charges.update(charge_id, amount=2000, currency="CLP")
+
+        assert isinstance(charge, Charge)
+        assert charge.method == "patch"
+        assert charge.url == f"v1/charges/{charge_id}"
+        assert charge.json.amount == 2000
+        assert charge.json.currency == "CLP"
+
+    def test_charge_cancel(self):
+        """Test canceling a charge, and updating the canceled charge."""
+        charge_id = "test_charge_id"
+
+        charge = self.fintoc.charges.cancel(charge_id)
+
+        assert isinstance(charge, Charge)
+        assert charge.method == "post"
+        assert charge.url == f"v1/charges/{charge_id}/cancel"
+
+        # The resulting charge keeps the charges collection path
+        charge.update(amount=3000)
+        assert charge.method == "patch"
+        assert charge.url == f"v1/charges/{charge.id}"
+
+    def test_institutions_list(self):
+        """Test listing institutions."""
+        institutions = list(
+            self.fintoc.institutions.list(country="cl", product="movements")
+        )
+
+        assert len(institutions) > 0
+        for institution in institutions:
+            assert isinstance(institution, Institution)
+            assert institution.method == "get"
+            assert institution.url == "v1/institutions"
+            assert institution.params.country == "cl"
+            assert institution.params.product == "movements"
+
+    def test_link_invoice_get(self):
+        """Test getting a specific invoice from a link."""
+
+        def assert_invoice(invoice):
+            assert isinstance(invoice, Invoice)
+            assert invoice.method == "get"
+            assert invoice.url == f"v1/invoices/{invoice_id}"
+            assert invoice.params.link_token == link_token
+
+        link_token = "test_link_token"
+        invoice_id = "test_invoice_id"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        assert_invoice(link.invoices.get(invoice_id))
+
+        # Test using directly the manager
+        assert_invoice(self.fintoc.invoices.get(invoice_id, link_token=link_token))
+
+    def test_link_intent_create(self):
+        """Test creating a link intent."""
+        data = {"country": "cl", "holder_type": "business", "product": "movements"}
+
+        link_intent = self.fintoc.link_intents.create(**data)
+
+        assert isinstance(link_intent, LinkIntent)
+        assert link_intent.method == "post"
+        assert link_intent.url == "v1/link_intents"
+        assert link_intent.json.country == data["country"]
+        assert link_intent.json.holder_type == data["holder_type"]
+        assert link_intent.json.product == data["product"]
+
+    def test_payouts_list(self):
+        """Test listing payouts."""
+        payouts = list(self.fintoc.payouts.list(status="succeeded"))
+
+        assert len(payouts) > 0
+        for payout in payouts:
+            assert isinstance(payout, Payout)
+            assert payout.method == "get"
+            assert payout.url == "v1/payouts"
+            assert payout.params.status == "succeeded"
+
+    def test_payout_get(self):
+        """Test getting a specific payout."""
+        payout_id = "test_payout_id"
+
+        payout = self.fintoc.payouts.get(payout_id)
+
+        assert isinstance(payout, Payout)
+        assert payout.method == "get"
+        assert payout.url == f"v1/payouts/{payout_id}"
+
+    @pytest.mark.parametrize(
+        "resource_type,klass",
+        [
+            ("payment_intent", PaymentIntent),
+            ("charge", Charge),
+            ("refund", Refund),
+            ("refund_adjustment", Refund),
+        ],
+    )
+    def test_payout_resources_list(self, resource_type, klass):
+        """Test listing the resources of a payout, by resource type."""
+        payout_id = "test_payout_id"
+
+        resources = list(
+            self.fintoc.payouts.resources.list(
+                payout_id=payout_id, resource_type=resource_type
+            )
+        )
+
+        assert len(resources) > 0
+        for resource in resources:
+            assert isinstance(resource, klass)
+            assert resource.method == "get"
+            assert resource.url == f"v1/payouts/{payout_id}/resources"
+            assert resource.params.resource_type == resource_type
+
+    def test_refund_voucher_url(self):
+        """Test getting the voucher URL of a refund."""
+        refund_id = "test_refund_id"
+
+        voucher_url = self.fintoc.refunds.voucher_url(refund_id)
+
+        assert isinstance(voucher_url, VoucherUrl)
+        assert voucher_url.method == "get"
+        assert voucher_url.url == f"v1/refunds/{refund_id}/voucher_url"
+
+    def test_link_tax_statements_list(self):
+        """Test listing tax statements from a link."""
+
+        def assert_tax_statements(tax_statements):
+            assert len(tax_statements) > 0
+            for tax_statement in tax_statements:
+                assert isinstance(tax_statement, TaxStatement)
+                assert tax_statement.method == "get"
+                assert tax_statement.url == "v1/tax_statements"
+                assert tax_statement.params.link_token == link_token
+
+        link_token = "test_link_token"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        assert_tax_statements(list(link.tax_statements.list()))
+
+        # Test using directly the manager
+        assert_tax_statements(
+            list(self.fintoc.tax_statements.list(link_token=link_token))
+        )
+
+    def test_link_tax_statement_get(self):
+        """Test getting a specific tax statement from a link."""
+
+        def assert_tax_statement(tax_statement):
+            assert isinstance(tax_statement, TaxStatement)
+            assert tax_statement.method == "get"
+            assert tax_statement.url == f"v1/tax_statements/{tax_statement_id}"
+            assert tax_statement.params.link_token == link_token
+
+        link_token = "test_link_token"
+        tax_statement_id = "test_tax_statement_id"
+
+        # Test using the resource
+        link = self.fintoc.links.get(link_token)
+        assert_tax_statement(link.tax_statements.get(tax_statement_id))
+
+        # Test using directly the manager
+        assert_tax_statement(
+            self.fintoc.tax_statements.get(tax_statement_id, link_token=link_token)
+        )
+
+
+class TestFintocCustomResponses:
+    """Tests for operations whose responses the shared HTTP mock can't represent."""
+
+    @pytest.fixture(autouse=True)
+    def mock_transport(self, monkeypatch):
+        """Record the requests sent and answer them with :self.response:."""
+        self.requests = []
+        self.response = {}
+
+        def handler(request):
+            request.read()
+            self.requests.append(request)
+            return httpx.Response(200, json=self.response)
+
+        monkeypatch.setattr(
+            Client, "_client", httpx.Client(transport=httpx.MockTransport(handler))
+        )
+
+    def setup_method(self):
+        """Set up the test environment."""
+        self.fintoc = Fintoc("test_api_key")
+
+    def test_links_exchange(self):
+        """Test exchanging a link, and using its link token afterwards."""
+        self.response = {"id": "link_12345", "link_token": "link_12345_token_abc"}
+
+        link = self.fintoc.links.exchange("exchange_token_123")
+
+        request = self.requests[-1]
+        assert request.method == "GET"
+        assert request.url.path == "/v1/links/exchange"
+        assert request.url.params["exchange_token"] == "exchange_token_123"
+        assert isinstance(link, Link)
+        assert link.link_token == "link_12345_token_abc"
+
+        self.response = []
+        list(link.accounts.list())
+        request = self.requests[-1]
+        assert request.url.path == "/v1/accounts"
+        assert request.url.params["link_token"] == "link_12345_token_abc"
+
+        self.response = {"id": "link_12345"}
+        link.update(active=False)
+        request = self.requests[-1]
+        assert request.method == "PATCH"
+        assert request.url.path == "/v1/links/link_12345_token_abc"
 
 
 if __name__ == "__main__":
