@@ -1,9 +1,7 @@
 """Module to hold the onboardings manager."""
 
-import mimetypes
-import os
-
 from fintoc.mixins import ManagerMixin
+from fintoc.utils import build_file_payload
 
 
 class OnboardingsManager(ManagerMixin):
@@ -16,6 +14,8 @@ class OnboardingsManager(ManagerMixin):
         "create",
         "submit",
         "upload_document",
+        "append_document",
+        "delete_document",
         "upload_shareholder_document",
         "upload_legal_representative_document",
     ]
@@ -26,9 +26,24 @@ class OnboardingsManager(ManagerMixin):
         return self._create(path_=path, **kwargs)
 
     def _upload_document(self, identifier, slot_key, file, **kwargs):
-        """Upload a document to a slot, identified by :slot_key:."""
+        """Upload a document to a slot, replacing the one already there."""
         path = f"{self._build_path(**kwargs)}/{identifier}/documents/{slot_key}"
         return self._upload(path, {"file": self._build_file_payload(file)})
+
+    def _append_document(self, identifier, slot_key, file, **kwargs):
+        """Add a document to a multi-file slot, keeping the existing ones."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/documents/{slot_key}"
+        return self._upload(
+            path, {"file": self._build_file_payload(file)}, method="post"
+        )
+
+    def _delete_document(self, identifier, slot_key, document_id, **kwargs):
+        """Delete a document from a slot."""
+        path = (
+            f"{self._build_path(**kwargs)}/{identifier}"
+            f"/documents/{slot_key}/{document_id}"
+        )
+        return self._request_resource("delete", path, **kwargs)
 
     def _upload_shareholder_document(self, identifier, shareholder_id, file, **kwargs):
         """Upload a document for a shareholder of an onboarding."""
@@ -55,11 +70,4 @@ class OnboardingsManager(ManagerMixin):
         from either a path (``str`` / ``os.PathLike``) or a binary file-like
         object.
         """
-        if isinstance(file, (str, os.PathLike)):
-            filename = os.path.basename(os.fspath(file))
-            content_type = mimetypes.guess_type(filename)[0]
-            return (filename, open(file, "rb"), content_type)  # noqa: SIM115
-
-        filename = os.path.basename(getattr(file, "name", "") or "") or None
-        content_type = mimetypes.guess_type(filename)[0] if filename else None
-        return (filename, file, content_type)
+        return build_file_payload(file)

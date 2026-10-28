@@ -7,14 +7,21 @@ from fintoc.client import Client
 from fintoc.core import Fintoc
 from fintoc.resources import (
     Charge,
+    Event,
     Institution,
     Invoice,
     Link,
     LinkIntent,
+    Onboarding,
+    PaymentEligibility,
     PaymentIntent,
     Payout,
+    Product,
     Refund,
+    SettlementAccount,
+    SetupIntent,
     TaxStatement,
+    TransferReceipt,
     VoucherUrl,
 )
 
@@ -1773,6 +1780,178 @@ class TestFintocIntegration:
             self.fintoc.tax_statements.get(tax_statement_id, link_token=link_token)
         )
 
+    def test_v2_entity_settlement_account(self):
+        """Test getting the settlement account of an entity using v2 API."""
+        entity_id = "ent_12345"
+
+        account = self.fintoc.v2.entities.settlement_account(entity_id)
+
+        assert isinstance(account, SettlementAccount)
+        assert account.method == "get"
+        assert account.url == f"v2/entities/{entity_id}/settlement_account"
+
+    def test_v2_entity_onboarding_append_document(self, tmp_path):
+        """Test adding a document to a multi-file onboarding slot using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        slot_key = "incorporation_amendments"
+        file_path = tmp_path / "amendment.pdf"
+        file_path.write_bytes(b"%PDF-1.4 test file")
+
+        result = self.fintoc.v2.entities.onboardings.append_document(
+            onboarding_id, slot_key, str(file_path), entity_id=entity_id
+        )
+
+        assert isinstance(result, Onboarding)
+        assert result.method == "post"
+        assert result.url == (
+            f"v2/entities/{entity_id}/onboardings/{onboarding_id}"
+            f"/documents/{slot_key}"
+        )
+        assert getattr(result.headers, "content-type").startswith("multipart/form-data")
+        assert result.json.multipart is True
+
+    def test_v2_events_list(self):
+        """Test listing events using v2 API."""
+        events = list(self.fintoc.v2.events.list(type="payment_intent.succeeded"))
+
+        assert len(events) > 0
+        for event in events:
+            assert isinstance(event, Event)
+            assert event.method == "get"
+            assert event.url == "v2/events"
+            assert event.params.type == "payment_intent.succeeded"
+
+    def test_v2_event_get(self):
+        """Test getting a specific event using v2 API."""
+        event_id = "evt_12345"
+
+        event = self.fintoc.v2.events.get(event_id)
+
+        assert isinstance(event, Event)
+        assert event.method == "get"
+        assert event.url == f"v2/events/{event_id}"
+
+    def test_v2_invoice_create(self):
+        """Test creating an invoice using v2 API."""
+        data = {
+            "customer": "cus_12345",
+            "collection_method": "send_invoice",
+            "lines": [
+                {"amount": 60000, "currency": "CLP", "name": "Design", "quantity": 1}
+            ],
+        }
+
+        invoice = self.fintoc.v2.invoices.create(**data)
+
+        assert invoice.method == "post"
+        assert invoice.url == "v2/invoices"
+        assert invoice.json.customer == data["customer"]
+        assert invoice.json.collection_method == data["collection_method"]
+        assert invoice.json.lines[0].name == "Design"
+
+    def test_v2_invoice_update(self):
+        """Test updating an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+
+        invoice = self.fintoc.v2.invoices.update(invoice_id, metadata={"key": "value"})
+
+        assert invoice.method == "patch"
+        assert invoice.url == f"v2/invoices/{invoice_id}"
+        assert invoice.json.metadata.key == "value"
+
+    @pytest.mark.parametrize("action", ["finalize", "mark_uncollectible", "void"])
+    def test_v2_invoice_actions(self, action):
+        """Test invoice actions, and updating the resulting invoice."""
+        invoice_id = "test_invoice_id"
+
+        invoice = getattr(self.fintoc.v2.invoices, action)(invoice_id)
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/{action}"
+
+        # The resulting invoice keeps the invoices collection path
+        invoice.update(metadata={"key": "value"})
+        assert invoice.method == "patch"
+        assert invoice.url == f"v2/invoices/{invoice.id}"
+
+    def test_v2_invoice_pay(self):
+        """Test paying an invoice using v2 API."""
+        invoice_id = "test_invoice_id"
+
+        invoice = self.fintoc.v2.invoices.pay(invoice_id, payment_method="pm_12345")
+
+        assert invoice.method == "post"
+        assert invoice.url == f"v2/invoices/{invoice_id}/pay"
+        assert invoice.json.payment_method == "pm_12345"
+
+    def test_v2_payment_intent_check_eligibility(self):
+        """Test checking payment eligibility using v2 API."""
+        data = {
+            "amount": 100000,
+            "currency": "CLP",
+            "sender_account": {"institution_id": "cl_banco_de_chile"},
+        }
+
+        result = self.fintoc.v2.payment_intents.check_eligibility(**data)
+
+        assert isinstance(result, PaymentEligibility)
+        assert result.method == "post"
+        assert result.url == "v2/payment_intents/check_eligibility"
+        assert result.json.amount == data["amount"]
+        assert result.json.sender_account.institution_id == "cl_banco_de_chile"
+        assert getattr(result.headers, "idempotency-key")
+
+    def test_v2_payment_intent_cancel(self):
+        """Test canceling a payment intent using v2 API."""
+        payment_intent_id = "pi_12345"
+
+        payment_intent = self.fintoc.v2.payment_intents.cancel(payment_intent_id)
+
+        assert payment_intent.method == "post"
+        assert payment_intent.url == f"v2/payment_intents/{payment_intent_id}/cancel"
+
+    def test_v2_payment_intent_voucher_url(self):
+        """Test getting the voucher URL of a payment intent using v2 API."""
+        payment_intent_id = "pi_12345"
+
+        voucher_url = self.fintoc.v2.payment_intents.voucher_url(payment_intent_id)
+
+        assert isinstance(voucher_url, VoucherUrl)
+        assert voucher_url.method == "get"
+        assert voucher_url.url == f"v2/payment_intents/{payment_intent_id}/voucher_url"
+
+    def test_v2_product_update(self):
+        """Test updating a product using v2 API."""
+        product_id = "prod_12345"
+
+        product = self.fintoc.v2.products.update(product_id, name="New name")
+
+        assert isinstance(product, Product)
+        assert product.method == "patch"
+        assert product.url == f"v2/products/{product_id}"
+        assert product.json.name == "New name"
+
+    def test_v2_setup_intent_get(self):
+        """Test getting a setup intent using v2 API."""
+        setup_intent_id = "seti_12345"
+
+        setup_intent = self.fintoc.v2.setup_intents.get(setup_intent_id)
+
+        assert isinstance(setup_intent, SetupIntent)
+        assert setup_intent.method == "get"
+        assert setup_intent.url == f"v2/setup_intents/{setup_intent_id}"
+
+    def test_v2_transfer_receipt(self):
+        """Test getting the receipt of a transfer using v2 API."""
+        transfer_id = "tr_12345"
+
+        receipt = self.fintoc.v2.transfers.receipt(transfer_id)
+
+        assert isinstance(receipt, TransferReceipt)
+        assert receipt.method == "get"
+        assert receipt.url == f"v2/transfers/{transfer_id}/receipt"
+
 
 class TestFintocCustomResponses:
     """Tests for operations whose responses the shared HTTP mock can't represent."""
@@ -1820,6 +1999,46 @@ class TestFintocCustomResponses:
         request = self.requests[-1]
         assert request.method == "PATCH"
         assert request.url.path == "/v1/links/link_12345_token_abc"
+
+    def test_v2_entity_onboarding_delete_document(self):
+        """Test deleting a document from an onboarding slot using v2 API."""
+        entity_id = "ent_12345"
+        onboarding_id = "onbprc_12345"
+        slot_key = "incorporation_amendments"
+        document_id = "onbdoc_12345"
+        self.response = {"id": onboarding_id, "object": "onboarding", "documents": []}
+
+        onboarding = self.fintoc.v2.entities.onboardings.delete_document(
+            onboarding_id, slot_key, document_id, entity_id=entity_id
+        )
+
+        request = self.requests[-1]
+        assert request.method == "DELETE"
+        assert request.url.path == (
+            f"/v2/entities/{entity_id}/onboardings/{onboarding_id}"
+            f"/documents/{slot_key}/{document_id}"
+        )
+        assert isinstance(onboarding, Onboarding)
+        assert onboarding.id == onboarding_id
+
+    def test_v2_subscription_detach_payment_method(self):
+        """Test detaching the payment method of a subscription, and updating it."""
+        subscription_id = "sub_12345"
+        self.response = {"id": subscription_id, "object": "subscription"}
+
+        subscription = self.fintoc.v2.subscriptions.detach_payment_method(
+            subscription_id
+        )
+
+        request = self.requests[-1]
+        assert request.method == "DELETE"
+        assert request.url.path == f"/v2/subscriptions/{subscription_id}/payment_method"
+        assert subscription.id == subscription_id
+
+        subscription.update(metadata={"key": "value"})
+        request = self.requests[-1]
+        assert request.method == "PATCH"
+        assert request.url.path == f"/v2/subscriptions/{subscription_id}"
 
 
 if __name__ == "__main__":

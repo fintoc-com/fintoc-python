@@ -8,7 +8,18 @@ class InvoicesManager(ManagerMixin):
     """Represents an invoices manager."""
 
     resource = "invoice"
-    methods = ["list", "get", "add_lines", "remove_lines"]
+    methods = [
+        "list",
+        "get",
+        "create",
+        "update",
+        "add_lines",
+        "remove_lines",
+        "finalize",
+        "mark_uncollectible",
+        "pay",
+        "void",
+    ]
 
     def __init__(self, path, client):
         super().__init__(path, client)
@@ -37,3 +48,26 @@ class InvoicesManager(ManagerMixin):
         """Remove line items from an invoice."""
         path = f"{self._build_path(**kwargs)}/{identifier}/remove_lines"
         return self._create(path_=path, **kwargs)
+
+    def _finalize(self, identifier, **kwargs):
+        """Finalize a draft invoice."""
+        return self._invoice_action(identifier, "finalize", **kwargs)
+
+    def _mark_uncollectible(self, identifier, **kwargs):
+        """Mark an open invoice as uncollectible."""
+        return self._invoice_action(identifier, "mark_uncollectible", **kwargs)
+
+    def _pay(self, identifier, **kwargs):
+        """Pay an open invoice."""
+        return self._invoice_action(identifier, "pay", **kwargs)
+
+    def _void(self, identifier, **kwargs):
+        """Void an invoice."""
+        return self._invoice_action(identifier, "void", **kwargs)
+
+    def _invoice_action(self, identifier, action, **kwargs):
+        path = f"{self._build_path(**kwargs)}/{identifier}/{action}"
+        invoice = self._create(path_=path, **kwargs)
+        # pylint: disable=protected-access
+        invoice._path = self._build_path(**kwargs)
+        return invoice

@@ -34,17 +34,23 @@ from .v2.account_number import AccountNumber
 from .v2.account_verification import AccountVerification
 from .v2.customer import Customer
 from .v2.entity import Entity
+from .v2.event import Event
 from .v2.invoice import Invoice as InvoiceV2
 from .v2.line import Line
 from .v2.onboarding import Onboarding
 from .v2.onboarding_document import OnboardingDocument
 from .v2.onboarding_legal_representative import OnboardingLegalRepresentative
 from .v2.onboarding_shareholder import OnboardingShareholder
+from .v2.payment_eligibility import PaymentEligibility
 from .v2.payment_method import PaymentMethod
+from .v2.product import Product
 from .v2.recipient import Recipient
+from .v2.settlement_account import SettlementAccount
+from .v2.setup_intent import SetupIntent
 from .v2.subscription import Subscription as SubscriptionV2
 from .v2.subscription_item import SubscriptionItem
 from .v2.transfer import Transfer
 from .v2.transfer_batch import TransferBatch
+from .v2.transfer_receipt import TransferReceipt
 from .voucher_url import VoucherUrl
 from .webhook_endpoint import WebhookEndpoint

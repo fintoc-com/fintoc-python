@@ -2,6 +2,8 @@
 
 import datetime
 import functools
+import mimetypes
+import os
 import warnings
 from importlib import import_module
 
@@ -134,3 +136,19 @@ def deprecate(message=None):
         return wrapper
 
     return decorator
+
+
+def build_file_payload(file):
+    """
+    Build the ``(filename, fileobj, content_type)`` tuple expected by httpx
+    from either a path (``str`` / ``os.PathLike``) or a binary file-like
+    object.
+    """
+    if isinstance(file, (str, os.PathLike)):
+        filename = os.path.basename(os.fspath(file))
+        content_type = mimetypes.guess_type(filename)[0]
+        return (filename, open(file, "rb"), content_type)  # noqa: SIM115
+
+    filename = os.path.basename(getattr(file, "name", "") or "") or None
+    content_type = mimetypes.guess_type(filename)[0] if filename else None
+    return (filename, file, content_type)
