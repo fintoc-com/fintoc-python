@@ -7,4 +7,4 @@ class ProductsManager(ManagerMixin):
     """Represents a products manager."""
 
     resource = "product"
-    methods = ["create", "get", "list"]
+    methods = ["create", "get", "list", "update"]

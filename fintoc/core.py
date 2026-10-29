@@ -9,28 +9,33 @@ from fintoc.managers import (
     ChargesManager,
     CheckoutSessionsManager,
     DisputesManager,
+    InstitutionsManager,
     InvoicesManager,
+    LinkIntentsManager,
     LinksManager,
     PaymentIntentsManager,
     PaymentLinksManager,
+    PayoutsManager,
     RefreshIntentsManager,
     RefundsManager,
     SubscriptionIntentsManager,
     SubscriptionsManager,
     TaxReturnsManager,
+    TaxStatementsManager,
     WebhookEndpointsManager,
 )
 from fintoc.managers.v2 import AccountNumbersManager
 from fintoc.managers.v2 import AccountsManager as AccountsManagerV2
 from fintoc.managers.v2 import AccountVerificationsManager
 from fintoc.managers.v2 import CheckoutSessionsManager as CheckoutSessionsManagerV2
-from fintoc.managers.v2 import CustomersManager, EntitiesManager
+from fintoc.managers.v2 import CustomersManager, EntitiesManager, EventsManager
 from fintoc.managers.v2 import InvoicesManager as InvoicesManagerV2
 from fintoc.managers.v2 import PaymentIntentsManager as PaymentIntentsManagerV2
 from fintoc.managers.v2 import (
     PaymentMethodsManager,
     ProductsManager,
     RecipientsManager,
+    SetupIntentsManager,
     SimulateManager,
 )
 from fintoc.managers.v2 import SubscriptionsManager as SubscriptionsManagerV2
@@ -75,6 +80,10 @@ class Fintoc:
         self.tax_returns = TaxReturnsManager("/v1/tax_returns", self._client)
         self.invoices = InvoicesManager("/v1/invoices", self._client)
         self.disputes = DisputesManager("/v1/disputes", self._client)
+        self.institutions = InstitutionsManager("/v1/institutions", self._client)
+        self.link_intents = LinkIntentsManager("/v1/link_intents", self._client)
+        self.payouts = PayoutsManager("/v1/payouts", self._client)
+        self.tax_statements = TaxStatementsManager("/v1/tax_statements", self._client)
 
         self.v2 = _FintocV2(self._client)
 
@@ -90,6 +99,7 @@ class _FintocV2:
         )
         self.customers = CustomersManager("/v2/customers", client)
         self.entities = EntitiesManager("/v2/entities", client)
+        self.events = EventsManager("/v2/events", client)
         self.recipients = RecipientsManager("/v2/recipients", client)
         self.simulate = SimulateManager("/v2/simulate", client)
         self.checkout_sessions = CheckoutSessionsManagerV2(
@@ -99,4 +109,5 @@ class _FintocV2:
         self.payment_intents = PaymentIntentsManagerV2("/v2/payment_intents", client)
         self.payment_methods = PaymentMethodsManager("/v2/payment_methods", client)
         self.products = ProductsManager("/v2/products", client)
+        self.setup_intents = SetupIntentsManager("/v2/setup_intents", client)
         self.subscriptions = SubscriptionsManagerV2("/v2/subscriptions", client)

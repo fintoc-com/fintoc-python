@@ -7,6 +7,7 @@ from .accounts_manager import AccountsManager
 from .checkout_sessions_manager import CheckoutSessionsManager
 from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
+from .events_manager import EventsManager
 from .invoices_manager import InvoicesManager
 from .lines_manager import LinesManager
 from .movements_manager import MovementsManager
@@ -15,6 +16,7 @@ from .payment_intents_manager import PaymentIntentsManager
 from .payment_methods_manager import PaymentMethodsManager
 from .products_manager import ProductsManager
 from .recipients_manager import RecipientsManager
+from .setup_intents_manager import SetupIntentsManager
 from .simulate_manager import SimulateManager
 from .subscription_items_manager import SubscriptionItemsManager
 from .subscriptions_manager import SubscriptionsManager

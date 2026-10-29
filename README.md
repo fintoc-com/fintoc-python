@@ -37,6 +37,9 @@
     - [V2 Endpoints](#v2-endpoints)
     - [Nested actions or resources](#nested-actions-or-resources)
     - [Entity onboardings](#entity-onboardings)
+    - [Links](#links)
+    - [Payouts](#payouts)
+    - [Payment methods](#payment-methods)
     - [Transfer batches](#transfer-batches)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
@@ -256,11 +259,76 @@ client.v2.entities.onboardings.upload_legal_representative_document(
 )
 ```
 
+Slots that accept more than one file, such as `incorporation_amendments`, take additional
+files with `append_document`. Each file is listed in the onboarding's `documents`, and its
+`id` lets you delete it:
+
+```python
+onboarding = client.v2.entities.onboardings.append_document(
+    onboarding_id, "incorporation_amendments", "amendment.pdf", entity_id=entity_id
+)
+onboarding = client.v2.entities.onboardings.delete_document(
+    onboarding_id,
+    "incorporation_amendments",
+    onboarding.documents[0].id,
+    entity_id=entity_id,
+)
+```
+
 Once every required field and document is complete, `submittable` turns `True` and the
 onboarding can be sent for review:
 
 ```python
 onboarding = client.v2.entities.onboardings.submit(onboarding_id, entity_id=entity_id)
+```
+
+#### Links
+
+After the account holder connects their account through the widget, exchange the
+`exchange_token` for the link. The resulting link includes its `link_token`, used to fetch
+the link's resources:
+
+```python
+link = client.links.exchange("exchange_token_123")
+accounts = link.accounts.list()
+tax_statements = link.tax_statements.list()
+```
+
+#### Payouts
+
+The resources a payout disburses or discounts are nested under the payout. Use
+`resource_type` (`payment_intent`, `charge`, `refund` or `refund_adjustment`) to choose
+which ones to list:
+
+```python
+payouts = client.payouts.list(status="succeeded")
+charges = client.payouts.resources.list(
+    payout_id="po_0ujsswThIGTUYm2K8FjOOfXtY1K", resource_type="charge"
+)
+```
+
+#### Payment methods
+
+Mexican direct debit mandates are created with a `multipart/form-data` request, so the
+consent documents can be paths or binary file-like objects:
+
+```python
+payment_method = client.v2.payment_methods.create(
+    type="mx_direct_debit",
+    customer="cus_0ujsswThIGTUYm2K8FjOOfXtY1K",
+    mx_direct_debit={
+        "account_number": "000000000000000000",
+        "account_type": "clabe",
+        "interval": "month",
+        "max_amount": 100000,
+        "consent_documents": {
+            "contract": "contract.pdf",
+            "selfie": "selfie.jpg",
+            "id_front": "id_front.jpg",
+            "id_back": "id_back.jpg",
+        },
+    },
+)
 ```
 
 #### Transfer batches

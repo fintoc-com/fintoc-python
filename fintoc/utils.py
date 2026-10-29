@@ -2,6 +2,8 @@
 
 import datetime
 import functools
+import mimetypes
+import os
 import warnings
 from importlib import import_module
 
@@ -74,11 +76,16 @@ def can_raise_fintoc_error(function):
         try:
             return function(*args, **kwargs)
         except httpx.HTTPStatusError as exc:
-            error_data = exc.response.json()
-            error = get_error_class(error_data["error"]["type"])
-            raise error(error_data["error"]) from None
+            raise fintoc_error_from(exc) from None
 
     return wrapper
+
+
+def fintoc_error_from(http_error):
+    """Build the Fintoc error that corresponds to an HTTPStatusError."""
+    error_data = http_error.response.json()
+    error = get_error_class(error_data["error"]["type"])
+    return error(error_data["error"])
 
 
 def serialize(object_):
@@ -110,10 +117,14 @@ def objetize(klass, client, data, handlers={}, methods=[], path=None):
 def objetize_generator(generator, klass, client, handlers={}, methods=[], path=None):
     """
     Transform a generator of dictionaries into a generator of
-    objects with class :klass:.
+    objects with class :klass:. Pages are fetched while iterating, outside
+    the scope of :can_raise_fintoc_error:, so HTTP errors are converted here.
     """
-    for element in generator:
-        yield objetize(klass, client, element, handlers, methods, path)
+    try:
+        for element in generator:
+            yield objetize(klass, client, element, handlers, methods, path)
+    except httpx.HTTPStatusError as exc:
+        raise fintoc_error_from(exc) from None
 
 
 def deprecate(message=None):
@@ -134,3 +145,21 @@ def deprecate(message=None):
         return wrapper
 
     return decorator
+
+
+def build_file_payload(file, default_filename="file"):
+    """
+    Build the httpx file tuple from a path or a binary file-like object.
+    Nameless file-like objects use :default_filename:, because servers only
+    treat multipart parts with a filename as uploaded files.
+    """
+    if isinstance(file, (str, os.PathLike)):
+        filename = os.path.basename(os.fspath(file))
+        content_type = mimetypes.guess_type(filename)[0]
+        return (filename, open(file, "rb"), content_type)  # noqa: SIM115
+
+    name = getattr(file, "name", None)
+    filename = os.path.basename(name) if isinstance(name, str) else ""
+    filename = filename or default_filename
+    content_type = mimetypes.guess_type(filename)[0]
+    return (filename, file, content_type)

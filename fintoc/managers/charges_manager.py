@@ -8,4 +8,9 @@ class ChargesManager(ManagerMixin):
     """Represents a charges manager."""
 
     resource = "charge"
-    methods = ["list", "get", "create"]
+    methods = ["list", "get", "create", "update", "cancel"]
+
+    def _cancel(self, identifier, **kwargs):
+        """Cancel a charge."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/cancel"
+        return self._create(path_=path, **kwargs)

@@ -43,7 +43,14 @@ def resource_get(client, path, id_, klass, handlers, methods, params):
 
 
 def resource_create(
-    client, path, klass, handlers, methods, params, idempotency_key=None
+    client,
+    path,
+    klass,
+    handlers,
+    methods,
+    params,
+    idempotency_key=None,
+    resource_path=None,
 ):
     """Create a new instance of a resource."""
     data = client.request(
@@ -55,13 +62,29 @@ def resource_create(
         data,
         handlers=handlers,
         methods=methods,
-        path=path,
+        path=resource_path or path,
     )
 
 
-def resource_upload(client, path, klass, handlers, methods, files):
-    """Upload files to a resource endpoint through a multipart PUT request."""
-    data = client.request(path, method="put", files=files)
+def resource_upload(
+    client,
+    path,
+    klass,
+    handlers,
+    methods,
+    files,
+    method="put",
+    data=None,
+    idempotency_key=None,
+):
+    """Upload files to a resource endpoint through a multipart request."""
+    data = client.request(
+        path,
+        method=method,
+        files=files,
+        data=data,
+        idempotency_key=idempotency_key,
+    )
     return objetize(
         klass,
         client,
@@ -69,6 +92,34 @@ def resource_upload(client, path, klass, handlers, methods, files):
         handlers=handlers,
         methods=methods,
         path=path,
+    )
+
+
+def resource_request(
+    client,
+    path,
+    klass,
+    handlers,
+    methods,
+    method,
+    params,
+    resource_path=None,
+    idempotency_key=None,
+):
+    """Make a request with an arbitrary :method: and objetize the response."""
+    if method.lower() in ["get", "delete"]:
+        data = client.request(path, method=method, params=params)
+    else:
+        data = client.request(
+            path, method=method, json=params, idempotency_key=idempotency_key
+        )
+    return objetize(
+        klass,
+        client,
+        data,
+        handlers=handlers,
+        methods=methods,
+        path=resource_path or path,
     )
 
 

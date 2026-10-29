@@ -8,7 +8,7 @@ class SubscriptionsManager(ManagerMixin):
     """Represents a subscriptions manager."""
 
     resource = "subscription"
-    methods = ["list", "get", "create", "update", "cancel"]
+    methods = ["list", "get", "create", "update", "cancel", "detach_payment_method"]
 
     def __init__(self, path, client):
         super().__init__(path, client)
@@ -32,3 +32,8 @@ class SubscriptionsManager(ManagerMixin):
         """Cancel a subscription."""
         path = f"{self._build_path(**kwargs)}/{identifier}/cancel"
         return self._create(path_=path, **kwargs)
+
+    def _detach_payment_method(self, identifier, **kwargs):
+        """Detach the payment method from a subscription."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/payment_method"
+        return self._request_resource("delete", path, **kwargs)

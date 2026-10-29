@@ -8,7 +8,15 @@ class LinksManager(ManagerMixin):
     """Represents a links manager."""
 
     resource = "link"
-    methods = ["list", "get", "update", "delete"]
+    methods = ["list", "get", "update", "delete", "exchange"]
+
+    def _exchange(self, exchange_token, **kwargs):
+        """Exchange the widget's :exchange_token: for its link."""
+        path = f"{self._build_path(**kwargs)}/exchange"
+        link = self._request_resource(
+            "get", path, exchange_token=exchange_token, **kwargs
+        )
+        return self.post_get_handler(link, link.link_token)
 
     def post_get_handler(self, object_, identifier, **kwargs):
         # pylint: disable=protected-access
