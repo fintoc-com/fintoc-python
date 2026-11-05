@@ -16,6 +16,7 @@ from fintoc.resources import (
     LinkIntent,
     MandateDocument,
     Onboarding,
+    Organization,
     PaymentEligibility,
     PaymentIntent,
     PaymentMethod,
@@ -1719,6 +1720,43 @@ class TestFintocIntegration:
         assert isinstance(payout, Payout)
         assert payout.method == "get"
         assert payout.url == f"v1/payouts/{payout_id}"
+
+    def test_organization_create(self):
+        """Test creating a referred organization."""
+        organization_data = {
+            "name": "Empresa SpA",
+            "tax_id": "111111111",
+            "founder_email": "founder@example.com",
+            "products": {
+                "business_accounts": {
+                    "company_basics": {"incorporation_type": "one_day_company"},
+                    "shareholders": [
+                        {"type": "natural_person", "name": "Test", "percentage": 60}
+                    ],
+                }
+            },
+            "external_reference": "SOL-123",
+            "metadata": {"request_id": "abc"},
+        }
+
+        organization = self.fintoc.organizations.create(**organization_data)
+
+        assert isinstance(organization, Organization)
+        assert organization.method == "post"
+        assert organization.url == "v1/organizations"
+        assert organization.json.name == organization_data["name"]
+        assert organization.json.tax_id == organization_data["tax_id"]
+        assert organization.json.founder_email == organization_data["founder_email"]
+        business_accounts = organization.json.products.business_accounts
+        assert business_accounts.company_basics.incorporation_type == (
+            "one_day_company"
+        )
+        assert business_accounts.shareholders[0].percentage == 60
+
+    def test_organizations_only_support_create(self):
+        """Test that organizations only expose the create operation."""
+        with pytest.raises(AttributeError):
+            self.fintoc.organizations.list()
 
     @pytest.mark.parametrize(
         "resource_type,klass",

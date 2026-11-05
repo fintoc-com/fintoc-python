@@ -10,6 +10,7 @@ from .invoices_manager import InvoicesManager
 from .link_intents_manager import LinkIntentsManager
 from .links_manager import LinksManager
 from .movements_manager import MovementsManager
+from .organizations_manager import OrganizationsManager
 from .payment_intents_manager import PaymentIntentsManager
 from .payment_links_manager import PaymentLinksManager
 from .payout_resources_manager import PayoutResourcesManager
