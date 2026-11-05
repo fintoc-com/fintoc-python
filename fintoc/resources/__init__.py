@@ -15,6 +15,7 @@ from .invoice import Invoice
 from .link import Link
 from .link_intent import LinkIntent
 from .movement import Movement
+from .organization import Organization
 from .other_taxes import OtherTaxes
 from .payment_intent import PaymentIntent
 from .payment_link import PaymentLink

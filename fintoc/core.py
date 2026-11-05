@@ -13,6 +13,7 @@ from fintoc.managers import (
     InvoicesManager,
     LinkIntentsManager,
     LinksManager,
+    OrganizationsManager,
     PaymentIntentsManager,
     PaymentLinksManager,
     PayoutsManager,
@@ -84,6 +85,7 @@ class Fintoc:
         self.link_intents = LinkIntentsManager("/v1/link_intents", self._client)
         self.payouts = PayoutsManager("/v1/payouts", self._client)
         self.tax_statements = TaxStatementsManager("/v1/tax_statements", self._client)
+        self.organizations = OrganizationsManager("/v1/organizations", self._client)
 
         self.v2 = _FintocV2(self._client)
 

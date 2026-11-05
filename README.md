@@ -39,6 +39,7 @@
     - [Entity onboardings](#entity-onboardings)
     - [Links](#links)
     - [Payouts](#payouts)
+    - [Organizations](#organizations)
     - [Payment methods](#payment-methods)
     - [Transfer batches](#transfer-batches)
   - [Webhook Signature Validation](#webhook-signature-validation)
@@ -304,6 +305,25 @@ which ones to list:
 payouts = client.payouts.list(status="succeeded")
 charges = client.payouts.resources.list(
     payout_id="po_0ujsswThIGTUYm2K8FjOOfXtY1K", resource_type="charge"
+)
+```
+
+#### Organizations
+
+Partnerships can create an organization for a company they refer. This endpoint only
+supports `live` mode and requires the [JWS Signature](#generate-the-jws-signature):
+
+```python
+organization = client.organizations.create(
+    name="Empresa SpA",
+    tax_id="111111111",
+    founder_email="founder@example.com",
+    products={
+        "business_accounts": {
+            "company_basics": {"incorporation_type": "one_day_company"},
+        },
+    },
+    external_reference="SOL-123",
 )
 ```
 
