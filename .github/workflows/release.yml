@@ -13,16 +13,75 @@ on:
         description: 'Release notes (markdown, opcional)'
         type: string
         required: false
+  push:
+    branches: [master]
+
+permissions: {}
 
 jobs:
+  resolve:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      bump: ${{ steps.resolve.outputs.bump }}
+      notes: ${{ steps.resolve.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Find merged PR
+        id: pulls
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in 1 2 3; do
+            pulls=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq 'tojson')
+            if [ "$pulls" != "[]" ] || [ "$attempt" -eq 3 ]; then break; fi
+            sleep 10
+          done
+          echo "json=$pulls" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve bump and release notes
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SHA: ${{ github.sha }}
+          INPUT_BUMP: ${{ inputs.bump }}
+          INPUT_NOTES: ${{ inputs.release-notes }}
+          PULLS_JSON: ${{ steps.pulls.outputs.json }}
+        run: .github/scripts/resolve-release.sh
+
   release:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    needs: resolve
+    if: github.ref == 'refs/heads/master' && needs.resolve.outputs.bump != ''
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    concurrency:
+      group: release
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
       - name: Checkout to commit code
         uses: actions/checkout@v3
+        with:
+          ref: master
+
+      - name: Check master has no other changes after the merged PR
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          head=$(git rev-parse HEAD)
+          later=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_SHA...$head" \
+            --jq '[.commits[] | select(.commit.message | startswith("release: ") | not) | .sha[0:7]] | join(" ")')
+          if [ -n "$later" ]; then
+            echo "::error::master has commits merged after $GITHUB_SHA ($later). Aborting so they are not published with this PR's bump and notes. The next release will include this PR; use workflow_dispatch if it needs a bigger bump."
+            exit 1
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -48,11 +107,29 @@ jobs:
       - uses: fintoc-com/release-action/prepare@main
         id: prep
         with:
-          bump: ${{ inputs.bump }}
+          bump: ${{ needs.resolve.outputs.bump }}
           version-format: py
           tag-prefix: v
           app-id: ${{ vars.FIN_RELEASES_APP_ID }}
           app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
+
+      - name: Fall back to auto-generated release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.prep.outputs.tag }}
+          NOTES: ${{ needs.resolve.outputs.notes }}
+        run: |
+          if [ -z "${NOTES//[[:space:]]/}" ]; then
+            NOTES=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+              -f tag_name="$TAG" -f target_commitish="$GITHUB_SHA" --jq '.body')
+          fi
+          delimiter="RELEASE_NOTES_$(openssl rand -hex 16)"
+          {
+            echo "body<<$delimiter"
+            printf '%s\n' "$NOTES"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build the package
         run: poetry build
@@ -66,6 +143,6 @@ jobs:
       - uses: fintoc-com/release-action/finalize@main
         with:
           tag: ${{ steps.prep.outputs.tag }}
-          release-notes: ${{ inputs.release-notes }}
+          release-notes: ${{ steps.notes.outputs.body }}
           app-id: ${{ vars.FIN_RELEASES_APP_ID }}
           app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
