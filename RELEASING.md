@@ -1,12 +1,18 @@
 # Releasing
 
-Manual desde Actions. Toma ~2–3 min.
+Automático al mergear a `master`. Toma ~2–3 min.
 
 ## Cómo
 
-1. https://github.com/fintoc-com/fintoc-python/actions → **release** → **Run workflow**.
-2. `bump`: `patch` / `minor` / `major`. `release-notes`: markdown opcional.
-3. **Run workflow**. Solo corre desde `master`.
+1. Agrega al PR un label `release:patch`, `release:minor` o `release:major`.
+2. Escribe en la sección `## Release notes` de la descripción del PR lo que verán los usuarios del SDK, en inglés. Si queda vacía, se usan las notas autogeneradas de GitHub.
+3. Mergea. Los PRs sin label `release:*` no publican; un PR con más de uno hace fallar el workflow.
+
+El release parte de `master` actualizado (incluye el commit de versión de un release anterior en cola). Si después del PR se mergeó algo más que un commit `release: ...`, aborta antes de publicar para no sacar esos cambios con el bump y las notas de este PR. El siguiente release los incluye; usa el manual si hace falta un bump mayor.
+
+### Manual
+
+https://github.com/fintoc-com/fintoc-python/actions → **release** → **Run workflow**, con `bump` (`patch` / `minor` / `major`) y `release-notes` opcionales. Solo corre desde `master`.
 
 ## Qué hace
 
@@ -22,5 +28,6 @@ Todo autoreado por `fin-releases[bot]`.
 
 | Falla en | Estado | Recovery |
 |---|---|---|
+| `master` tiene commits posteriores al PR | Nada publicado | Esperar el siguiente release, o correr el manual |
 | Antes o durante `pypi-publish` | Nada en el remote | Re-run |
 | `release/finalize` (post-publish) | Paquete en PyPI, sin tag/release | PR con el commit del bump + `gh release create vX.Y.Z` |

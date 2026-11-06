@@ -8,11 +8,21 @@ on:
   pull_request:
     paths:
       - ".github/workflows/tests.yml"
+      - ".github/scripts/**"
       - "Makefile"
       - "fintoc/**/*.py"
       - "tests/**/*.py"
 
 jobs:
+  release-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to commit code
+        uses: actions/checkout@v4
+
+      - name: Test resolve-release
+        run: .github/scripts/resolve-release.test.sh
+
   pytest:
     runs-on: ubuntu-latest
     steps:
