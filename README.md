@@ -310,8 +310,8 @@ charges = client.payouts.resources.list(
 
 #### Organizations
 
-Partnerships can create an organization for a company they refer. This endpoint only
-supports `live` mode and requires the [JWS Signature](#generate-the-jws-signature):
+Partnerships can create an organization for a company they refer. In `test` mode, the
+API returns a mock organization:
 
 ```python
 organization = client.organizations.create(
@@ -324,6 +324,16 @@ organization = client.organizations.create(
         },
     },
     external_reference="SOL-123",
+)
+```
+
+They can also correct the founder email of an organization they referred:
+
+```python
+organization = client.organizations.update(
+    "org_0ujsswThIGTUYm2K8FjOOfXtY1K",
+    previous_founder_email="founder@exmaple.com",
+    founder_email="founder@example.com",
 )
 ```
 
