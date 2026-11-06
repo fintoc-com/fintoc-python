@@ -1753,10 +1753,50 @@ class TestFintocIntegration:
         )
         assert business_accounts.shareholders[0].percentage == 60
 
-    def test_organizations_only_support_create(self):
-        """Test that organizations only expose the create operation."""
+    def test_organization_update(self):
+        """Test correcting the founder email of a referred organization."""
+        organization_id = "org_test_organization_id"
+        update_data = {
+            "previous_founder_email": "founder@exmaple.com",
+            "founder_email": "founder@example.com",
+        }
+
+        organization = self.fintoc.organizations.update(organization_id, **update_data)
+
+        assert isinstance(organization, Organization)
+        assert organization.method == "patch"
+        assert organization.url == f"v1/organizations/{organization_id}"
+        assert organization.json.previous_founder_email == (
+            update_data["previous_founder_email"]
+        )
+        assert organization.json.founder_email == update_data["founder_email"]
+
+    def test_organization_instance_update(self):
+        """Test updating an organization returned by create."""
+        organization = self.fintoc.organizations.create(
+            name="Empresa SpA",
+            tax_id="111111111",
+            founder_email="founder@exmaple.com",
+            products={"business_accounts": {}},
+        )
+        organization.id = "org_test_organization_id"
+
+        organization.update(
+            previous_founder_email="founder@exmaple.com",
+            founder_email="founder@example.com",
+        )
+
+        assert isinstance(organization, Organization)
+        assert organization.method == "patch"
+        assert organization.url == "v1/organizations/org_test_organization_id"
+        assert organization.json.founder_email == "founder@example.com"
+
+    def test_organizations_only_support_create_and_update(self):
+        """Test that organizations only expose the create and update operations."""
         with pytest.raises(AttributeError):
             self.fintoc.organizations.list()
+        with pytest.raises(AttributeError):
+            self.fintoc.organizations.get("org_test_organization_id")
 
     @pytest.mark.parametrize(
         "resource_type,klass",

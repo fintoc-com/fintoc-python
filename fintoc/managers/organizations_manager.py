@@ -8,4 +8,4 @@ class OrganizationsManager(ManagerMixin):
     """Represents an organizations manager."""
 
     resource = "organization"
-    methods = ["create"]
+    methods = ["create", "update"]
