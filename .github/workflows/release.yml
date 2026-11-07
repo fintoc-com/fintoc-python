@@ -110,6 +110,7 @@ jobs:
           bump: ${{ needs.resolve.outputs.bump }}
           version-format: py
           tag-prefix: v
+          push: 'true'
           app-id: ${{ vars.FIN_RELEASES_APP_ID }}
           app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
 
