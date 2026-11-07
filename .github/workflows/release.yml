@@ -77,7 +77,7 @@ jobs:
         run: |
           head=$(git rev-parse HEAD)
           later=$(gh api "repos/$GITHUB_REPOSITORY/compare/$GITHUB_SHA...$head" \
-            --jq '[.commits[] | select(.commit.message | startswith("release: ") | not) | .sha[0:7]] | join(" ")')
+            --jq '[.commits[] | select(.author.login != "fin-releases[bot]" or (.commit.message | startswith("release: ") | not)) | .sha[0:7]] | join(" ")')
           if [ -n "$later" ]; then
             echo "::error::master has commits merged after $GITHUB_SHA ($later). Aborting so they are not published with this PR's bump and notes. The next release will include this PR; use workflow_dispatch if it needs a bigger bump."
             exit 1
@@ -110,6 +110,7 @@ jobs:
           bump: ${{ needs.resolve.outputs.bump }}
           version-format: py
           tag-prefix: v
+          push: 'true'
           app-id: ${{ vars.FIN_RELEASES_APP_ID }}
           app-private-key: ${{ secrets.FIN_RELEASES_PRIVATE_KEY }}
 
