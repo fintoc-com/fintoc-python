@@ -46,4 +46,4 @@ make black flake8 isort pylint
 
 Update the relevant README examples in English when public usage changes. Use `list`, not the deprecated `all`.
 
-Follow the repository's PR template and record actual requirements or additional changes; use `None.` where there are none. Keep version bumps and releases separate from resource changes.
+Follow the repository's PR template and record actual requirements or additional changes; use `None.` where there are none. Do not bump the version; add the release label and `## Release notes` described in `AGENTS.md`.
