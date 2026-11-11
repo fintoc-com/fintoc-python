@@ -1118,6 +1118,15 @@ class TestFintocIntegration:
         assert result.method == "post"
         assert result.url == f"v2/checkout_sessions/{checkout_session_id}/expire"
 
+    def test_v2_checkout_session_confirm(self):
+        """Test confirming a checkout session using v2 API."""
+        checkout_session_id = "test_checkout_session_id"
+
+        result = self.fintoc.v2.checkout_sessions.confirm(checkout_session_id)
+
+        assert result.method == "post"
+        assert result.url == f"v2/checkout_sessions/{checkout_session_id}/confirm"
+
     def test_v2_payment_intent_list(self):
         """Test getting all payment intents using v2 API."""
         payment_intents = list(self.fintoc.v2.payment_intents.list())

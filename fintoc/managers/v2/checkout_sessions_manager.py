@@ -7,9 +7,14 @@ class CheckoutSessionsManager(ManagerMixin):
     """Represents a checkout sessions manager."""
 
     resource = "checkout_session"
-    methods = ["list", "get", "create", "expire"]
+    methods = ["list", "get", "create", "expire", "confirm"]
 
     def _expire(self, identifier, **kwargs):
         """Expire a checkout session."""
         path = f"{self._build_path(**kwargs)}/{identifier}/expire"
+        return self._create(path_=path, **kwargs)
+
+    def _confirm(self, identifier, **kwargs):
+        """Confirm a checkout session."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/confirm"
         return self._create(path_=path, **kwargs)
