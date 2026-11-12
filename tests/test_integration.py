@@ -8,7 +8,11 @@ import pytest
 from fintoc.client import Client
 from fintoc.core import Fintoc
 from fintoc.resources import (
+    AccountCertificate,
     Charge,
+    CrossborderBeneficiary,
+    CrossborderQuote,
+    CrossborderTransfer,
     Event,
     Institution,
     Invoice,
@@ -2099,6 +2103,128 @@ class TestFintocIntegration:
         assert receipt.method == "get"
         assert receipt.url == f"v2/transfers/{transfer_id}/receipt"
 
+    def test_v2_account_certificate(self):
+        """Test getting the certificate of an account using v2 API."""
+        account_id = "acc_12345"
+
+        certificate = self.fintoc.v2.accounts.certificate(account_id)
+
+        assert isinstance(certificate, AccountCertificate)
+        assert certificate.method == "get"
+        assert certificate.url == f"v2/accounts/{account_id}/certificate"
+
+    def test_v2_account_number_certificate(self):
+        """Test getting the certificate of an account number using v2 API."""
+        account_number_id = "acno_12345"
+
+        certificate = self.fintoc.v2.account_numbers.certificate(account_number_id)
+
+        assert isinstance(certificate, AccountCertificate)
+        assert certificate.method == "get"
+        assert certificate.url == f"v2/account_numbers/{account_number_id}/certificate"
+
+    def test_v2_crossborder_quote_create(self):
+        """Test creating a crossborder quote using v2 API."""
+        quote = self.fintoc.v2.crossborder.quotes.create(
+            direction="mx_to_usd", source_amount=200001
+        )
+
+        assert isinstance(quote, CrossborderQuote)
+        assert quote.method == "post"
+        assert quote.url == "v2/crossborder/quotes"
+        assert quote.json.direction == "mx_to_usd"
+        assert quote.json.source_amount == 200001
+
+    def test_v2_crossborder_quote_get(self):
+        """Test getting a crossborder quote using v2 API."""
+        quote_id = "xbq_12345"
+
+        quote = self.fintoc.v2.crossborder.quotes.get(quote_id)
+
+        assert isinstance(quote, CrossborderQuote)
+        assert quote.method == "get"
+        assert quote.url == f"v2/crossborder/quotes/{quote_id}"
+
+    def test_v2_crossborder_beneficiaries_list(self):
+        """Test listing crossborder beneficiaries using v2 API."""
+        beneficiaries = list(self.fintoc.v2.crossborder.beneficiaries.list())
+
+        assert len(beneficiaries) > 0
+        for beneficiary in beneficiaries:
+            assert isinstance(beneficiary, CrossborderBeneficiary)
+            assert beneficiary.method == "get"
+            assert beneficiary.url == "v2/crossborder/beneficiaries"
+
+    def test_v2_crossborder_beneficiary_get(self):
+        """Test getting a crossborder beneficiary using v2 API."""
+        beneficiary_id = "xbb_12345"
+
+        beneficiary = self.fintoc.v2.crossborder.beneficiaries.get(beneficiary_id)
+
+        assert isinstance(beneficiary, CrossborderBeneficiary)
+        assert beneficiary.method == "get"
+        assert beneficiary.url == f"v2/crossborder/beneficiaries/{beneficiary_id}"
+
+    def test_v2_crossborder_beneficiary_create(self):
+        """Test creating a crossborder beneficiary using v2 API."""
+        beneficiary = self.fintoc.v2.crossborder.beneficiaries.create(
+            holder_type="business",
+            business_name="Acme LLC",
+            account_identifier="123456789",
+            routing_number="021000021",
+            bank_name="JPMorgan Chase Bank, N.A.",
+            address={"street_line1": "100 Main St", "country": "US"},
+        )
+
+        assert isinstance(beneficiary, CrossborderBeneficiary)
+        assert beneficiary.method == "post"
+        assert beneficiary.url == "v2/crossborder/beneficiaries"
+        assert beneficiary.json.holder_type == "business"
+        assert beneficiary.json.address.country == "US"
+
+    def test_v2_crossborder_beneficiary_delete(self):
+        """Test archiving a crossborder beneficiary using v2 API."""
+        beneficiary_id = "xbb_12345"
+
+        result = self.fintoc.v2.crossborder.beneficiaries.delete(beneficiary_id)
+
+        assert result == beneficiary_id
+
+    def test_v2_crossborder_transfers_list(self):
+        """Test listing crossborder transfers using v2 API."""
+        transfers = list(
+            self.fintoc.v2.crossborder.transfers.list(direction="mx_to_usd")
+        )
+
+        assert len(transfers) > 0
+        for transfer in transfers:
+            assert isinstance(transfer, CrossborderTransfer)
+            assert transfer.method == "get"
+            assert transfer.url == "v2/crossborder/transfers"
+            assert transfer.params.direction == "mx_to_usd"
+
+    def test_v2_crossborder_transfer_get(self):
+        """Test getting a crossborder transfer using v2 API."""
+        transfer_id = "xbt_12345"
+
+        transfer = self.fintoc.v2.crossborder.transfers.get(transfer_id)
+
+        assert isinstance(transfer, CrossborderTransfer)
+        assert transfer.method == "get"
+        assert transfer.url == f"v2/crossborder/transfers/{transfer_id}"
+
+    def test_v2_crossborder_transfer_create(self):
+        """Test creating a crossborder transfer using v2 API."""
+        transfer = self.fintoc.v2.crossborder.transfers.create(
+            quote_id="xbq_12345", beneficiary_id="xbb_12345", reference="Factura 123"
+        )
+
+        assert isinstance(transfer, CrossborderTransfer)
+        assert transfer.method == "post"
+        assert transfer.url == "v2/crossborder/transfers"
+        assert transfer.json.quote_id == "xbq_12345"
+        assert transfer.json.beneficiary_id == "xbb_12345"
+
 
 class TestFintocCustomResponses:
     """Tests for operations whose responses the shared HTTP mock can't represent."""
@@ -2257,6 +2383,49 @@ class TestFintocCustomResponses:
         request = self.requests[-1]
         assert request.method == "PATCH"
         assert request.url.path == f"/v2/subscriptions/{subscription_id}"
+
+    def test_v2_crossborder_transfer_get_beneficiary(self):
+        """Test that a crossborder transfer objetizes its beneficiary."""
+        transfer_id = "xbt_12345"
+        self.response = {
+            "id": transfer_id,
+            "object": "crossborder_transfer",
+            "fees": [{"name": "fixed_fee", "amount": 27069, "currency": "MXN"}],
+            "beneficiary": {
+                "id": "xbb_12345",
+                "object": "crossborder_beneficiary",
+                "address": {"country": "US"},
+            },
+        }
+
+        transfer = self.fintoc.v2.crossborder.transfers.get(transfer_id)
+
+        request = self.requests[-1]
+        assert request.method == "GET"
+        assert request.url.path == f"/v2/crossborder/transfers/{transfer_id}"
+        assert isinstance(transfer, CrossborderTransfer)
+        assert isinstance(transfer.beneficiary, CrossborderBeneficiary)
+        assert transfer.beneficiary.address.country == "US"
+        assert transfer.fees[0].amount == 27069
+
+    def test_v2_account_certificate_fields(self):
+        """Test that an account certificate exposes its download URL."""
+        account_id = "acc_12345"
+        self.response = {
+            "object": "account_certificate",
+            "account_id": account_id,
+            "account_number_id": "acno_12345",
+            "download_url": "https://storage.example.com/certificate.pdf",
+            "expires_at": "2026-11-09T18:05:00Z",
+        }
+
+        certificate = self.fintoc.v2.accounts.certificate(account_id)
+
+        request = self.requests[-1]
+        assert request.method == "GET"
+        assert request.url.path == f"/v2/accounts/{account_id}/certificate"
+        assert isinstance(certificate, AccountCertificate)
+        assert certificate.download_url == "https://storage.example.com/certificate.pdf"
 
 
 if __name__ == "__main__":

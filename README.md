@@ -41,6 +41,8 @@
     - [Payouts](#payouts)
     - [Organizations](#organizations)
     - [Payment methods](#payment-methods)
+    - [Account certificates](#account-certificates)
+    - [Crossborder](#crossborder)
     - [Transfer batches](#transfer-batches)
   - [Webhook Signature Validation](#webhook-signature-validation)
   - [Idempotency Keys](#idempotency-keys)
@@ -359,6 +361,44 @@ payment_method = client.v2.payment_methods.create(
         },
     },
 )
+```
+
+#### Account certificates
+
+Mexican accounts and account numbers have a certificate (constancia de cuenta) with a
+temporary `download_url` for its PDF:
+
+```python
+certificate = client.v2.accounts.certificate("acc_31yYL7h9LVPg121AgFtCyJPDsgM")
+certificate = client.v2.account_numbers.certificate("acno_31yYL5uOb39vzvRIszPhoXYMjt4")
+print(certificate.download_url, certificate.expires_at)
+```
+
+#### Crossborder
+
+Crossborder quotes, beneficiaries and transfers are under the `v2.crossborder` namespace.
+Create a quote to lock the exchange rate, and accept it with a transfer to a beneficiary:
+
+```python
+beneficiary = client.v2.crossborder.beneficiaries.create(
+    holder_type="business",
+    business_name="Acme LLC",
+    account_identifier="123456789",
+    routing_number="021000021",
+    bank_name="JPMorgan Chase Bank, N.A.",
+    address={
+        "street_line1": "100 Main St",
+        "city": "New York",
+        "state": "NY",
+        "postal_code": "10001",
+        "country": "US",
+    },
+)
+quote = client.v2.crossborder.quotes.create(direction="mx_to_usd", source_amount=200001)
+transfer = client.v2.crossborder.transfers.create(
+    quote_id=quote.id, beneficiary_id=beneficiary.id, reference="Factura 123"
+)
+print(transfer.funding_instructions.clabe)
 ```
 
 #### Transfer batches

@@ -1,9 +1,13 @@
 """Init file for the v2 resources module of the SDK."""
 
 from .account import Account
+from .account_certificate import AccountCertificate
 from .account_number import AccountNumber
 from .account_statement import AccountStatement
 from .account_verification import AccountVerification
+from .crossborder_beneficiary import CrossborderBeneficiary
+from .crossborder_quote import CrossborderQuote
+from .crossborder_transfer import CrossborderTransfer
 from .entity import Entity
 from .event import Event
 from .invoice import Invoice

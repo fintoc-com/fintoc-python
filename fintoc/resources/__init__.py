@@ -31,8 +31,12 @@ from .taxpayer import Taxpayer
 from .tobacco_taxes import TobaccoTaxes
 from .transfer_account import TransferAccount
 from .v2.account import Account as AccountV2
+from .v2.account_certificate import AccountCertificate
 from .v2.account_number import AccountNumber
 from .v2.account_verification import AccountVerification
+from .v2.crossborder_beneficiary import CrossborderBeneficiary
+from .v2.crossborder_quote import CrossborderQuote
+from .v2.crossborder_transfer import CrossborderTransfer
 from .v2.customer import Customer
 from .v2.entity import Entity
 from .v2.event import Event

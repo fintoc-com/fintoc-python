@@ -29,7 +29,14 @@ from fintoc.managers.v2 import AccountNumbersManager
 from fintoc.managers.v2 import AccountsManager as AccountsManagerV2
 from fintoc.managers.v2 import AccountVerificationsManager
 from fintoc.managers.v2 import CheckoutSessionsManager as CheckoutSessionsManagerV2
-from fintoc.managers.v2 import CustomersManager, EntitiesManager, EventsManager
+from fintoc.managers.v2 import (
+    CrossborderBeneficiariesManager,
+    CrossborderQuotesManager,
+    CrossborderTransfersManager,
+    CustomersManager,
+    EntitiesManager,
+    EventsManager,
+)
 from fintoc.managers.v2 import InvoicesManager as InvoicesManagerV2
 from fintoc.managers.v2 import PaymentIntentsManager as PaymentIntentsManagerV2
 from fintoc.managers.v2 import (
@@ -99,6 +106,7 @@ class _FintocV2:
         self.account_verifications = AccountVerificationsManager(
             "/v2/account_verifications", client
         )
+        self.crossborder = _FintocV2Crossborder(client)
         self.customers = CustomersManager("/v2/customers", client)
         self.entities = EntitiesManager("/v2/entities", client)
         self.events = EventsManager("/v2/events", client)
@@ -113,3 +121,14 @@ class _FintocV2:
         self.products = ProductsManager("/v2/products", client)
         self.setup_intents = SetupIntentsManager("/v2/setup_intents", client)
         self.subscriptions = SubscriptionsManagerV2("/v2/subscriptions", client)
+
+
+class _FintocV2Crossborder:
+    def __init__(self, client):
+        self.quotes = CrossborderQuotesManager("/v2/crossborder/quotes", client)
+        self.beneficiaries = CrossborderBeneficiariesManager(
+            "/v2/crossborder/beneficiaries", client
+        )
+        self.transfers = CrossborderTransfersManager(
+            "/v2/crossborder/transfers", client
+        )
