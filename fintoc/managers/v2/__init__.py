@@ -5,6 +5,9 @@ from .account_statements_manager import AccountStatementsManager
 from .account_verifications_manager import AccountVerificationsManager
 from .accounts_manager import AccountsManager
 from .checkout_sessions_manager import CheckoutSessionsManager
+from .crossborder_beneficiaries_manager import CrossborderBeneficiariesManager
+from .crossborder_quotes_manager import CrossborderQuotesManager
+from .crossborder_transfers_manager import CrossborderTransfersManager
 from .customers_manager import CustomersManager
 from .entities_manager import EntitiesManager
 from .events_manager import EventsManager

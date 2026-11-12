@@ -10,12 +10,19 @@ class AccountsManager(ManagerMixin):
     """Represents an accounts manager."""
 
     resource = "account"
-    methods = ["list", "get", "create", "update"]
+    methods = ["list", "get", "create", "update", "certificate"]
 
     def __init__(self, path, client):
         super().__init__(path, client)
         self.__account_statements_manager = None
         self.__movements_manager = None
+
+    def _certificate(self, identifier, **kwargs):
+        """Get a signed link to download the PDF certificate of an account."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/certificate"
+        return self._request_resource(
+            "get", path, resource="account_certificate", **kwargs
+        )
 
     @property
     def account_statements(self):
