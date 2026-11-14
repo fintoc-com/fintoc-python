@@ -82,6 +82,13 @@ class TestRequest:
         assert "next" in data
         assert "link_token=sample_link_token" in data["next"]
 
+    def test_request_preserves_query_params_in_url(self):
+        client = httpx.Client(base_url="https://test.com")
+        data = request(client, "/movements?custom_param=value&page=2")
+        assert "next" in data
+        assert "custom_param=value" in data["next"]
+        assert "page=3" in data["next"]
+
 
 class TestPaginate:
     @pytest.fixture(autouse=True)
@@ -98,3 +105,14 @@ class TestPaginate:
 
         for element in elements:
             assert isinstance(element, dict)
+
+    def test_pagination_with_initial_query_params(self):
+        client = httpx.Client(base_url="https://test.com")
+        data = paginate(
+            client,
+            "/movements",
+            params={"filter": "recent"},
+        )
+        assert isinstance(data, GeneratorType)
+        elements = list(data)
+        assert len(elements) == 100
