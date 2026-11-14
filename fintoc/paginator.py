@@ -11,8 +11,8 @@ from fintoc.constants import LINK_HEADER_PATTERN
 def paginate(
     client: httpx.Client,
     url: str,
-    params: dict[str, str] = {},
-    headers: dict[str, str] = {},
+    params: dict[str, str] = None,
+    headers: dict[str, str] = None,
 ):
     """
     Fetch a paginated resource and return a generator with all of
@@ -32,18 +32,23 @@ def paginate(
 def request(
     client: httpx.Client,
     url: str,
-    params: dict[str, str] = {},
-    headers: dict[str, str] = {},
+    params: dict[str, str] = None,
+    headers: dict[str, str] = None,
 ):
     """
     Fetch a page of a resource and return its elements and the next
     page of the resource.
     """
-    _request = httpx.Request("get", url, params=params, headers=headers)
+    _request = httpx.Request(
+        "get",
+        url,
+        params=params or None,
+        headers=headers,
+    )
     response = client.send(_request)
     response.raise_for_status()
-    headers = parse_link_headers(response.headers.get("link"))
-    next_ = headers and headers.get("next")
+    link_headers = parse_link_headers(response.headers.get("link"))
+    next_ = link_headers and link_headers.get("next")
     elements = response.json()
     return {
         "next": next_,
