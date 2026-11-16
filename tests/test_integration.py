@@ -2234,6 +2234,28 @@ class TestFintocIntegration:
         assert transfer.json.quote_id == "xbq_12345"
         assert transfer.json.beneficiary_id == "xbb_12345"
 
+    def test_v2_crossborder_transfer_cancel(self):
+        """Test canceling a crossborder transfer using v2 API."""
+        transfer_id = "xbt_12345"
+
+        transfer = self.fintoc.v2.crossborder.transfers.cancel(transfer_id)
+
+        assert isinstance(transfer, CrossborderTransfer)
+        assert transfer.method == "post"
+        assert transfer.url == f"v2/crossborder/transfers/{transfer_id}/cancel"
+
+    def test_v2_crossborder_transfer_simulate_credit(self):
+        """Test simulating the credit of a crossborder transfer using v2 API."""
+        transfer_id = "xbt_12345"
+
+        transfer = self.fintoc.v2.crossborder.transfers.simulate_credit(transfer_id)
+
+        assert isinstance(transfer, CrossborderTransfer)
+        assert transfer.method == "post"
+        assert transfer.url == (
+            f"v2/crossborder/transfers/{transfer_id}/simulate_credit"
+        )
+
 
 class TestFintocCustomResponses:
     """Tests for operations whose responses the shared HTTP mock can't represent."""
