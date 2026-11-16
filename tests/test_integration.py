@@ -24,6 +24,7 @@ from fintoc.resources import (
     PaymentEligibility,
     PaymentIntent,
     PaymentMethod,
+    PaymentMethodInstallments,
     Payout,
     Product,
     Refund,
@@ -2354,6 +2355,22 @@ class TestFintocCustomResponses:
             assert f"\r\n\r\n{name}\r\n" in body
         assert isinstance(payment_method, PaymentMethod)
         assert payment_method.id == "pm_12345"
+
+    def test_v2_payment_method_installments(self):
+        """Test getting the installments of a payment method using v2 API."""
+        self.response = {"available_installments": [3, 6, 12]}
+
+        installments = self.fintoc.v2.payment_methods.installments(
+            "pm_12345", amount=100000, currency="CLP"
+        )
+
+        request = self.requests[-1]
+        assert request.method == "GET"
+        assert request.url.path == "/v2/payment_methods/pm_12345/installments"
+        assert request.url.params["amount"] == "100000"
+        assert request.url.params["currency"] == "CLP"
+        assert isinstance(installments, PaymentMethodInstallments)
+        assert installments.available_installments == [3, 6, 12]
 
     @pytest.mark.parametrize(
         "method,args",

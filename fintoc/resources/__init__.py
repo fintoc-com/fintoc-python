@@ -49,6 +49,7 @@ from .v2.onboarding_legal_representative import OnboardingLegalRepresentative
 from .v2.onboarding_shareholder import OnboardingShareholder
 from .v2.payment_eligibility import PaymentEligibility
 from .v2.payment_method import PaymentMethod
+from .v2.payment_method_installments import PaymentMethodInstallments
 from .v2.product import Product
 from .v2.recipient import Recipient
 from .v2.settlement_account import SettlementAccount

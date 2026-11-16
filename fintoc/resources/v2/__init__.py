@@ -20,6 +20,7 @@ from .onboarding_legal_representative import OnboardingLegalRepresentative
 from .onboarding_shareholder import OnboardingShareholder
 from .payment_eligibility import PaymentEligibility
 from .payment_method import PaymentMethod
+from .payment_method_installments import PaymentMethodInstallments
 from .product import Product
 from .recipient import Recipient
 from .settlement_account import SettlementAccount
