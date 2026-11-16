@@ -363,6 +363,16 @@ payment_method = client.v2.payment_methods.create(
 )
 ```
 
+The installments available to pay an amount with a saved card are returned as a list of
+numbers of installments, empty when the card doesn't take installments:
+
+```python
+installments = client.v2.payment_methods.installments(
+    "pm_31yYL7h9LVPg121AgFtCyJPDsgM", amount=100000, currency="CLP"
+)
+print(installments.available_installments)  # [3, 6, 12]
+```
+
 #### Account certificates
 
 Mexican accounts and account numbers have a certificate (constancia de cuenta) with a

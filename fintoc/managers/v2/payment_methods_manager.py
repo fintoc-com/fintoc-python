@@ -8,7 +8,7 @@ class PaymentMethodsManager(ManagerMixin):
     """Represents a payment methods manager."""
 
     resource = "payment_method"
-    methods = ["list", "get", "create", "cancel", "mandate_document"]
+    methods = ["list", "get", "create", "cancel", "mandate_document", "installments"]
 
     file_parameters = ("consent_documents",)
 
@@ -40,6 +40,13 @@ class PaymentMethodsManager(ManagerMixin):
         path = f"{self._build_path(**kwargs)}/{identifier}/mandate_document"
         return self._request_resource(
             "get", path, resource="mandate_document", **kwargs
+        )
+
+    def _installments(self, identifier, **kwargs):
+        """Get the installments available to pay an amount with a card."""
+        path = f"{self._build_path(**kwargs)}/{identifier}/installments"
+        return self._request_resource(
+            "get", path, resource="payment_method_installments", **kwargs
         )
 
     def _flatten(self, key, value, data, files, is_file=False):
