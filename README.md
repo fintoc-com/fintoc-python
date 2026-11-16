@@ -399,6 +399,12 @@ transfer = client.v2.crossborder.transfers.create(
     quote_id=quote.id, beneficiary_id=beneficiary.id, reference="Factura 123"
 )
 print(transfer.funding_instructions.clabe)
+
+# Cancel a transfer that is still waiting for its funds
+transfer = client.v2.crossborder.transfers.cancel(transfer.id)
+
+# In test mode, simulate the credit of a transfer
+transfer = client.v2.crossborder.transfers.simulate_credit(transfer.id)
 ```
 
 #### Transfer batches
