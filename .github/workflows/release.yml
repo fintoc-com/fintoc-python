@@ -101,7 +101,7 @@ jobs:
           path: .venv
 
       - name: Install dependencies
-        if: steps.poetry-cache.outputs.cache-hit != 'true'
+        if: steps.environment-cache.outputs.cache-hit != 'true'
         run: poetry install
 
       - uses: fintoc-com/release-action/prepare@main
