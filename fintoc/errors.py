@@ -11,10 +11,10 @@ class FintocError(Exception):
         error_message = error_data.get("message")
         error_param = error_data.get("param")
         error_doc_url = error_data.get("doc_url")
-        message = error_type
+        message = error_type or "error"
         message += f": {error_code}" if error_code is not None else ""
         message += f" ({error_param})" if error_param is not None else ""
-        message += f"\n{error_message}"
+        message += f"\n{error_message}" if error_message is not None else ""
         message += (
             f"\nCheck the docs for more info: {error_doc_url}"
             if error_doc_url is not None
