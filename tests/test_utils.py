@@ -11,6 +11,7 @@ from fintoc.resources import GenericFintocResource, Link
 from fintoc.utils import (
     build_file_payload,
     can_raise_fintoc_error,
+    fintoc_error_from,
     get_error_class,
     get_resource_class,
     is_iso_datetime,
@@ -343,3 +344,73 @@ class TestBuildFilePayload:
         file_obj.name = 3
 
         assert build_file_payload(file_obj)[0] == "file"
+
+
+class TestFintocErrorFrom:
+    def test_standard_fintoc_error(self):
+        req = httpx.Request("GET", "https://api.fintoc.com/v1/links")
+        resp = httpx.Response(
+            status_code=400,
+            json={
+                "error": {
+                    "type": "invalid_request_error",
+                    "code": "missing_param",
+                    "message": "param missing",
+                }
+            },
+            request=req,
+        )
+        http_error = httpx.HTTPStatusError("Bad Request", request=req, response=resp)
+        err = fintoc_error_from(http_error)
+        assert isinstance(err, InvalidRequestError)
+        assert "invalid_request_error: missing_param" in str(err)
+
+    def test_html_response_502_bad_gateway(self):
+        req = httpx.Request("GET", "https://api.fintoc.com/v1/links")
+        resp = httpx.Response(
+            status_code=502,
+            text="<html>502 Bad Gateway</html>",
+            request=req,
+        )
+        http_error = httpx.HTTPStatusError("Bad Gateway", request=req, response=resp)
+        err = fintoc_error_from(http_error)
+        assert isinstance(err, ApiError)
+        assert isinstance(err, FintocError)
+        assert "http_502" in str(err)
+        assert "502 Bad Gateway" in str(err)
+
+    def test_empty_response_500_server_error(self):
+        req = httpx.Request("POST", "https://api.fintoc.com/v1/payments")
+        resp = httpx.Response(
+            status_code=500,
+            content=b"",
+            request=req,
+        )
+        http_error = httpx.HTTPStatusError("Server Error", request=req, response=resp)
+        err = fintoc_error_from(http_error)
+        assert isinstance(err, ApiError)
+        assert "http_500" in str(err)
+
+    def test_flat_json_error_response(self):
+        req = httpx.Request("GET", "https://api.fintoc.com/v1/links/123")
+        resp = httpx.Response(
+            status_code=404,
+            json={"detail": "Link not found"},
+            request=req,
+        )
+        http_error = httpx.HTTPStatusError("Not Found", request=req, response=resp)
+        err = fintoc_error_from(http_error)
+        assert isinstance(err, ApiError)
+        assert "Link not found" in str(err)
+
+    def test_error_dict_without_type(self):
+        req = httpx.Request("GET", "https://api.fintoc.com/v1/links")
+        resp = httpx.Response(
+            status_code=400,
+            json={"error": {"message": "Invalid parameters supplied"}},
+            request=req,
+        )
+        http_error = httpx.HTTPStatusError("Bad Request", request=req, response=resp)
+        err = fintoc_error_from(http_error)
+        assert isinstance(err, ApiError)
+        assert "Invalid parameters supplied" in str(err)

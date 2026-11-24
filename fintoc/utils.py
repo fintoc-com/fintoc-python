@@ -6,11 +6,12 @@ import mimetypes
 import os
 import warnings
 from importlib import import_module
+from json.decoder import JSONDecodeError
 
 import httpx
 
 from fintoc.constants import DATE_TIME_PATTERN
-from fintoc.errors import FintocError
+from fintoc.errors import ApiError, FintocError
 
 
 def snake_to_pascal(snake_string):
@@ -83,9 +84,45 @@ def can_raise_fintoc_error(function):
 
 def fintoc_error_from(http_error):
     """Build the Fintoc error that corresponds to an HTTPStatusError."""
-    error_data = http_error.response.json()
-    error = get_error_class(error_data["error"]["type"])
-    return error(error_data["error"])
+    try:
+        error_data = http_error.response.json()
+        if isinstance(error_data, dict):
+            error_info = error_data.get("error")
+            if isinstance(error_info, dict) and error_info.get("type"):
+                error_class = get_error_class(error_info["type"])
+                return error_class(error_info)
+            if isinstance(error_info, dict) and error_info.get("message"):
+                return ApiError(
+                    {
+                        "type": "api_error",
+                        "code": f"http_{http_error.response.status_code}",
+                        "message": error_info["message"],
+                    }
+                )
+            flat_message = error_data.get("message") or error_data.get("detail")
+            if flat_message:
+                return ApiError(
+                    {
+                        "type": "api_error",
+                        "code": f"http_{http_error.response.status_code}",
+                        "message": str(flat_message),
+                    }
+                )
+    except (JSONDecodeError, AttributeError):
+        pass
+
+    fallback_message = (
+        http_error.response.text.strip()
+        if hasattr(http_error.response, "text") and http_error.response.text
+        else f"HTTP {http_error.response.status_code} error"
+    )
+    return ApiError(
+        {
+            "type": "api_error",
+            "code": f"http_{http_error.response.status_code}",
+            "message": fallback_message,
+        }
+    )
 
 
 def serialize(object_):
