@@ -13,6 +13,7 @@ from fintoc.resources import (
     CrossborderBeneficiary,
     CrossborderQuote,
     CrossborderTransfer,
+    Customer,
     Event,
     Institution,
     Invoice,
@@ -799,6 +800,29 @@ class TestFintocIntegration:
         assert customer.url == "v2/customers"
         assert customer.json.name == customer_data["name"]
         assert customer.json.email == customer_data["email"]
+
+    def test_v2_customer_update(self):
+        """Test replacing the metadata of a customer using v2 API."""
+        customer_id = "cus_test_id"
+        metadata = {"channel": "digital"}
+
+        customer = self.fintoc.v2.customers.update(customer_id, metadata=metadata)
+
+        assert isinstance(customer, Customer)
+        assert customer.method == "patch"
+        assert customer.url == f"v2/customers/{customer_id}"
+        assert customer.json.metadata.channel == metadata["channel"]
+
+    def test_v2_customer_instance_update(self):
+        """Test updating a customer returned by get."""
+        customer = self.fintoc.v2.customers.get("cus_test_id")
+        customer.id = "cus_test_id"
+
+        customer.update(metadata={"channel": "digital"})
+
+        assert isinstance(customer, Customer)
+        assert customer.method == "patch"
+        assert customer.url == "v2/customers/cus_test_id"
 
     def test_v2_entities_list(self):
         """Test getting all entities using v2 API."""
